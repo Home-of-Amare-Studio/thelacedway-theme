@@ -383,3 +383,14 @@ button {
   outline: 2px solid var(--tlw-accent);
   outline-offset: 3px;
 }
+body::before {
+  content: "TLW CSS IS LOADED";
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  background: #D97A56;
+  color: #fff;
+  padding: 10px 20px;
+  font: 14px sans-serif;
+}
