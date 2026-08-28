@@ -42,7 +42,10 @@
     {%- render 'scripts' -%}
     {%- render 'theme-styles-variables' -%}
     {%- render 'color-palette' -%}
-
+    {% comment %} THELACEDWÁY {% endcomment %}
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Work+Sans:wght@300..600&display=swap" rel="stylesheet">
+    {{ 'tlw-theme.css' | asset_url | stylesheet_tag }}
     {% if request.design_mode %}
       {%- render 'theme-editor' -%}
     {% endif %}
