@@ -1,0 +1,309 @@
+{% comment %}
+  THELACEDWÁY collection section
+  Home of Amare Studio
+
+  One file serves every collection. Shopify already knows which collection the
+  visitor is on, so there is no need for a separate file per collection the way
+  the React app had separate route files.
+
+  Add-on products are tagged 'addon' in Shopify. They are published so they can
+  be added to the cart, but customers should never browse them, so they are
+  skipped here.
+{% endcomment %}
+
+<section
+  class="tlw-collection tlw-container"
+  id="tlw-collection-{{ section.id }}"
+>
+
+  {%- if section.settings.show_header -%}
+    <header class="tlw-collection__header">
+      <h1 class="tlw-display-lg">{{ collection.title }}</h1>
+
+      {%- if section.settings.show_description and collection.description != blank -%}
+        <div class="tlw-collection__intro tlw-body-lg">
+          {{ collection.description }}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.show_count -%}
+        <p class="tlw-label-caps tlw-collection__count">
+          {%- assign visible = 0 -%}
+          {%- for product in collection.products -%}
+            {%- unless product.tags contains 'addon' -%}
+              {%- assign visible = visible | plus: 1 -%}
+            {%- endunless -%}
+          {%- endfor -%}
+          {{ visible }} {% if visible == 1 %}piece{% else %}pieces{% endif %}
+        </p>
+      {%- endif -%}
+    </header>
+  {%- endif -%}
+
+  {%- paginate collection.products by section.settings.per_page -%}
+
+    {%- if collection.products.size == 0 -%}
+      <p class="tlw-body-lg tlw-collection__empty">
+        {{ section.settings.empty_text }}
+      </p>
+    {%- else -%}
+
+      <div class="tlw-collection__grid">
+        {%- for product in collection.products -%}
+          {%- if product.tags contains 'addon' -%}
+            {%- continue -%}
+          {%- endif -%}
+
+          <a class="tlw-card" href="{{ product.url }}">
+            <div class="tlw-card__media">
+              {%- if product.featured_media -%}
+                {{ product.featured_media
+                  | image_url: width: 900
+                  | image_tag:
+                    loading: 'lazy',
+                    sizes: '(min-width: 900px) 30vw, 45vw',
+                    widths: '300, 450, 600, 900',
+                    alt: product.title,
+                    class: 'tlw-card__img'
+                }}
+
+                {%- if product.media[1] and section.settings.hover_second_image -%}
+                  {{ product.media[1]
+                    | image_url: width: 900
+                    | image_tag:
+                      loading: 'lazy',
+                      alt: '',
+                      class: 'tlw-card__img tlw-card__img--hover'
+                  }}
+                {%- endif -%}
+              {%- else -%}
+                <div class="tlw-card__placeholder">
+                  <span class="tlw-label-caps">{{ product.title }}</span>
+                </div>
+              {%- endif -%}
+
+              {%- unless product.available -%}
+                <span class="tlw-card__badge tlw-label-caps">Sold out</span>
+              {%- endunless -%}
+            </div>
+
+            <div class="tlw-card__body">
+              <h2 class="tlw-card__title tlw-headline-sm">{{ product.title }}</h2>
+
+              <p class="tlw-card__price tlw-body-md">
+                {%- if product.price_varies -%}
+                  From {{ product.price_min | money }}
+                {%- else -%}
+                  {{ product.price | money }}
+                {%- endif -%}
+              </p>
+            </div>
+          </a>
+        {%- endfor -%}
+      </div>
+
+      {%- if paginate.pages > 1 -%}
+        <nav class="tlw-pagination" aria-label="Pagination">
+          {%- if paginate.previous -%}
+            <a class="tlw-label-caps" href="{{ paginate.previous.url }}">Previous</a>
+          {%- endif -%}
+
+          <span class="tlw-label-caps tlw-pagination__count">
+            Page {{ paginate.current_page }} of {{ paginate.pages }}
+          </span>
+
+          {%- if paginate.next -%}
+            <a class="tlw-label-caps" href="{{ paginate.next.url }}">Next</a>
+          {%- endif -%}
+        </nav>
+      {%- endif -%}
+
+    {%- endif -%}
+  {%- endpaginate -%}
+</section>
+
+<style>
+  #tlw-collection-{{ section.id }} {
+    padding-block: 48px 80px;
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__header {
+    max-width: 640px;
+    margin-bottom: 48px;
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__intro {
+    margin-top: 16px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__count {
+    margin-top: 20px;
+    color: var(--tlw-outline);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 12px;
+  }
+
+  @media (min-width: 700px) {
+    #tlw-collection-{{ section.id }} .tlw-collection__grid {
+      grid-template-columns: repeat({{ section.settings.columns }}, 1fr);
+      gap: 40px 24px;
+    }
+  }
+
+  @media (min-width: 900px) {
+    #tlw-collection-{{ section.id }} {
+      padding-block: 72px 120px;
+    }
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-card {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-card__media {
+    position: relative;
+    overflow: hidden;
+    background: var(--tlw-surface-container);
+    aspect-ratio: 4 / 5;
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 600ms ease, transform 1100ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-card__img--hover {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+
+  @media (hover: hover) {
+    #tlw-collection-{{ section.id }} .tlw-card:hover .tlw-card__img--hover {
+      opacity: 1;
+    }
+    #tlw-collection-{{ section.id }} .tlw-card:hover .tlw-card__img {
+      transform: scale(1.03);
+    }
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-card__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 16px;
+    color: var(--tlw-outline);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-card__badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--tlw-primary);
+    color: var(--tlw-on-primary);
+    padding: 6px 10px;
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-card__body {
+    padding-top: 14px;
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-card__title {
+    margin: 0 0 4px;
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-card__price {
+    margin: 0;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__empty {
+    padding-block: 64px;
+    color: var(--tlw-outline);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--tlw-outline-variant);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-pagination__count {
+    color: var(--tlw-outline);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "TLW Collection",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_header",
+      "label": "Show collection name",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show collection description",
+      "info": "The description written on the collection in Shopify admin",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_count",
+      "label": "Show how many pieces are in the collection",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns on desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "per_page",
+      "label": "Pieces per page",
+      "min": 8,
+      "max": 24,
+      "step": 4,
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "hover_second_image",
+      "label": "Show the second photo on hover",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "Text when a collection is empty",
+      "default": "New pieces are on their way. Check back soon."
+    }
+  ],
+  "presets": [{ "name": "TLW Collection" }]
+}
+{% endschema %}
