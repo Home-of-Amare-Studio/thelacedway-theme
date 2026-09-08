@@ -190,6 +190,22 @@
     #tlw-header-{{ section.id }}.tlw-header--overlay .tlw-header__logo--light { display: block; }
   {% endif %}
 
+  {% if section.settings.hide_until_scroll %}
+  /* Hidden entirely at the top of the page, slides in once you scroll. */
+  #tlw-header-{{ section.id }}.tlw-header--overlay {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 400ms ease, opacity 300ms ease, background-color 350ms ease;
+  }
+
+  #tlw-header-{{ section.id }}.tlw-header--overlay.is-solid {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  {% endif %}
+
   /* Scrolled past the hero: solid bar again. */
   #tlw-header-{{ section.id }}.tlw-header--overlay.is-solid {
     background: rgba(255, 255, 255, {{ section.settings.opacity | divided_by: 100.0 }});
@@ -598,6 +614,13 @@
       "id": "overlay_first",
       "label": "Sit over the hero",
       "info": "No bar at the top of the page, white text over the video. Turns into a solid bar once you scroll past.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_until_scroll",
+      "label": "Hide the bar until you scroll",
+      "info": "Nothing at all over the hero. The bar slides in once the hero is behind you.",
       "default": true
     },
     {
