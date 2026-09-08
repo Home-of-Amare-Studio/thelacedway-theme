@@ -127,10 +127,32 @@
         "collection_inverse_logo": false,
         "text_color_transparent_collection": ""
       }
+    },
+    "tlw_header_agmzmR": {
+      "type": "tlw-header",
+      "custom_css": [
+        "@media (min-width: 1100px) {.tlw-header__inner {position: relative; } .tlw-header__logo {position: absolute; left: 50%; transform: translateX(-50%); margin-inline: 0; }}"
+      ],
+      "name": "TLW Header",
+      "settings": {
+        "menu_left": "main-menu",
+        "menu_right": "main-menu-2",
+        "logo": "shopify://shop_images/logo-gold-v3.webp",
+        "logo_light": "shopify://shop_images/logo-white-v3.webp",
+        "logo_width": 140,
+        "overlay_first": true,
+        "height": 68,
+        "opacity": 90,
+        "blur": true,
+        "show_border": true,
+        "link_size": 13,
+        "link_gap": 24
+      }
     }
   },
   "order": [
     "header_announcements_9jGBFp",
-    "header_section"
+    "header_section",
+    "tlw_header_agmzmR"
   ]
 }
