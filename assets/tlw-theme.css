@@ -14,9 +14,34 @@
    applied by adding a class to a section wrapper, exactly as in the React app.
    -------------------------------------------------------------------------- */
 
+/* DEFAULT: white background, black and gold. Matches the live site. */
 :root {
   --tlw-nav-h: 96px;
 
+  --tlw-background: #ffffff;
+  --tlw-foreground: #0a0a0a;
+  --tlw-primary: #0a0a0a;
+  --tlw-primary-light: #ffffff;
+  --tlw-primary-container: #0d0d0d;
+  --tlw-secondary-light: #f6f4f0;
+  --tlw-accent: #a68b3f;
+  --tlw-outline: #6f6a62;
+  --tlw-outline-variant: #e3ded5;
+  --tlw-surface-lowest: #ffffff;
+  --tlw-surface: #ffffff;
+  --tlw-surface-container: #f2efea;
+  --tlw-surface-container-low: #f6f4f0;
+  --tlw-surface-variant: #ebe7e0;
+  --tlw-on-surface-variant: #3a3733;
+  --tlw-on-primary: #ffffff;
+  --tlw-sand: #e6d6a8;
+  --tlw-tertiary: #0a0a0a;
+  --tlw-scrim: #0a0a0a;
+  --tlw-logo-swap: 1;
+}
+
+/* Cream background, warm charcoal and soft gold. The original Quiet Craft palette. */
+.tlw-theme-cream {
   --tlw-background: #fef9f2;
   --tlw-foreground: #241b15;
   --tlw-primary: #241b15;
@@ -36,30 +61,6 @@
   --tlw-sand: #ebdbb1;
   --tlw-tertiary: #221c11;
   --tlw-scrim: #241b15;
-  --tlw-logo-swap: 1;
-}
-
-/* White background, black and gold */
-.tlw-theme-white {
-  --tlw-background: #ffffff;
-  --tlw-foreground: #0a0a0a;
-  --tlw-primary: #0a0a0a;
-  --tlw-primary-light: #ffffff;
-  --tlw-primary-container: #0d0d0d;
-  --tlw-secondary-light: #f6f4f0;
-  --tlw-accent: #b58f2d;
-  --tlw-outline: #6f6a62;
-  --tlw-outline-variant: #e3ded5;
-  --tlw-surface-lowest: #ffffff;
-  --tlw-surface: #ffffff;
-  --tlw-surface-container: #f2efea;
-  --tlw-surface-container-low: #faf8f4;
-  --tlw-surface-variant: #ebe7e0;
-  --tlw-on-surface-variant: #3a3733;
-  --tlw-on-primary: #ffffff;
-  --tlw-sand: #e6d6a8;
-  --tlw-tertiary: #0a0a0a;
-  --tlw-scrim: #0a0a0a;
   --tlw-logo-swap: 1;
 }
 
@@ -123,7 +124,7 @@
 
 body {
   margin: 0;
-  background-color: var(--tlw-primary-light);
+  background-color: var(--tlw-background);
   color: var(--tlw-primary);
   font-family: var(--tlw-font-body);
   font-size: 16px;
@@ -382,4 +383,15 @@ button {
 :focus-visible {
   outline: 2px solid var(--tlw-accent);
   outline-offset: 3px;
+}
+
+
+/* --------------------------------------------------------------------------
+   9. ACCENT WORD
+   The gold italic word inside a heading, e.g. "Find your perfect look."
+   -------------------------------------------------------------------------- */
+
+.tlw-accent-word {
+  color: var(--tlw-accent);
+  font-style: italic;
 }
