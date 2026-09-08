@@ -262,7 +262,7 @@
     font-size: {{ section.settings.link_size }}px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    font-weight: 500;
+    font-weight: {{ section.settings.link_weight }};
     color: var(--tlw-primary);
     white-space: nowrap;
     transition: color 250ms ease;
@@ -375,7 +375,7 @@
       order: 0;
       position: absolute;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(calc(-50% + {{ section.settings.logo_nudge }}px));
       margin-inline: 0;
     }
     #tlw-header-{{ section.id }} .tlw-header__cart { order: 0; }
@@ -642,6 +642,28 @@
       "step": 1,
       "unit": "px",
       "default": 13
+    },
+    {
+      "type": "select",
+      "id": "link_weight",
+      "label": "Menu text weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "logo_nudge",
+      "label": "Nudge the logo sideways",
+      "info": "For when the logo image has uneven space around it",
+      "min": -40,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 0
     },
     {
       "type": "range",
