@@ -480,20 +480,46 @@
       });
     });
 
-    /* Overlay mode: swap to a solid bar once the hero is behind us */
+    /* Overlay mode: swap to a solid bar once the hero is behind us.
+
+       A 1px marker is dropped just below the fold and watched. When it leaves
+       the top of the screen the bar goes solid. This works no matter which
+       element is doing the scrolling, which a plain scroll listener does not. */
     if (header.hasAttribute('data-overlay')) {
-      var trigger = function () {
-        var first = header.parentElement.nextElementSibling;
-        return first ? Math.max(first.offsetHeight - header.offsetHeight, 60) : 60;
-      };
+      var marker = document.createElement('div');
+      marker.setAttribute('aria-hidden', 'true');
+      marker.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:1px;pointer-events:none;';
 
-      var onScroll = function () {
-        header.classList.toggle('is-solid', window.scrollY > trigger());
-      };
+      var host = document.querySelector('#MainContent') || document.body;
+      if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+      host.appendChild(marker);
 
-      onScroll();
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', onScroll);
+      function placeMarker() {
+        var firstSection = host.firstElementChild;
+        var h = firstSection ? firstSection.offsetHeight : window.innerHeight;
+        marker.style.top = Math.max(h - header.offsetHeight, 60) + 'px';
+      }
+      placeMarker();
+      window.addEventListener('resize', placeMarker);
+
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          header.classList.toggle('is-solid', !entries[0].isIntersecting);
+        }, { rootMargin: '0px 0px -100% 0px' }).observe(marker);
+      }
+
+      /* Belt and braces: catch scroll on the window and on any wrapper. */
+      function fallback() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        if (y === 0) {
+          var wrap = document.querySelector('.page-wrapper');
+          if (wrap) y = wrap.scrollTop || 0;
+        }
+        header.classList.toggle('is-solid', y > parseInt(marker.style.top, 10));
+      }
+      fallback();
+      window.addEventListener('scroll', fallback, { passive: true });
+      document.addEventListener('scroll', fallback, { passive: true, capture: true });
     }
 
     /* Tell the rest of the theme how tall the bar is, and whether it
