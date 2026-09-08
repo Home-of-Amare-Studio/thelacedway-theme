@@ -6,8 +6,44 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
+    "tlw_main_product_fAykxh": {
+      "type": "tlw-main-product",
+      "blocks": {
+        "service_option_rVeVxG": {
+          "type": "service_option",
+          "settings": {
+            "label": "Customisation",
+            "values": "No, Yes",
+            "trigger_value": "Yes",
+            "addon_product": "customisation",
+            "help_text": ""
+          }
+        },
+        "service_option_VPQUyc": {
+          "type": "service_option",
+          "settings": {
+            "label": "Jet Black",
+            "values": "No, Yes",
+            "trigger_value": "Yes",
+            "addon_product": "jet-black",
+            "help_text": ""
+          }
+        }
+      },
+      "block_order": [
+        "service_option_rVeVxG",
+        "service_option_VPQUyc"
+      ],
+      "name": "TLW Product",
+      "settings": {
+        "detail_line": "HD lace / Machine made unit",
+        "button_label": "Add to bag",
+        "show_collection_label": true
+      }
+    },
     "main": {
       "type": "product-information",
       "blocks": {
@@ -38,6 +74,7 @@
             "media_columns": "two",
             "image_gap": 4,
             "large_first_image": false,
+            "icons_style": "arrow",
             "slideshow_controls_style": "counter",
             "slideshow_mobile_controls_style": "dots",
             "thumbnail_position": "right",
@@ -116,6 +153,7 @@
                 "border_opacity": 100,
                 "border_color": "",
                 "border_radius": 0,
+                "link": "",
                 "open_in_new_tab": false,
                 "placeholder": "",
                 "padding-block-start": 0,
@@ -468,6 +506,7 @@
     }
   },
   "order": [
+    "tlw_main_product_fAykxh",
     "main",
     "product_recommendations_qggXJq"
   ]
