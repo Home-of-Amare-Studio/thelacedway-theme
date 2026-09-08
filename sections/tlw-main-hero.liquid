@@ -2,51 +2,79 @@
   THELACEDWÁY hero
   Home of Amare Studio
 
-  Three media panels side by side on desktop, one on mobile. Each panel takes
-  either a video or an image. Video wins if both are set.
+  One full-bleed video. The three-panel look is in the footage itself, not the
+  layout, so there is nothing to compose here.
 
-  Videos need uploading to Shopify first: Content > Files, then pick them here.
-  Anything still in .mov needs converting to mp4, since Chrome and Firefox
-  will not play QuickTime.
+  Separate desktop and mobile videos are supported because the crops differ.
+  Only the one in view downloads, so a phone never pulls the wide file.
+
+  Videos go in Content > Files first, then get picked here. mp4 only, since
+  Chrome and Firefox will not play .mov.
 {% endcomment %}
 
-<section
-  class="tlw-hero"
-  id="tlw-hero-{{ section.id }}"
->
-  <div class="tlw-hero__panels">
-    {%- for block in section.blocks -%}
-      {%- if block.type == 'panel' -%}
-        <div
-          class="tlw-hero__panel"
-          {% if forloop.index > 1 %}data-desktop-only{% endif %}
-          {{ block.shopify_attributes }}
-        >
-          {%- if block.settings.video != blank -%}
-            {{ block.settings.video
-              | video_tag:
-                autoplay: true,
-                loop: true,
-                muted: true,
-                controls: false,
-                playsinline: true,
-                image_size: '1200x',
-                class: 'tlw-hero__media'
-            }}
-          {%- elsif block.settings.image != blank -%}
-            {{ block.settings.image
-              | image_url: width: 1200
-              | image_tag:
-                loading: 'eager',
-                alt: '',
-                class: 'tlw-hero__media'
-            }}
-          {%- else -%}
-            <div class="tlw-hero__media tlw-hero__media--empty"></div>
+{%- liquid
+  assign desktop = section.settings.video_desktop
+  assign mobile = section.settings.video_mobile
+  if mobile == blank
+    assign mobile = desktop
+  endif
+-%}
+
+<section class="tlw-hero" id="tlw-hero-{{ section.id }}">
+
+  <div class="tlw-hero__media">
+
+    {%- if desktop != blank -%}
+      <video
+        class="tlw-hero__video tlw-hero__video--desktop"
+        data-hero-video
+        muted
+        loop
+        playsinline
+        preload="none"
+        {% if section.settings.poster != blank %}
+          poster="{{ section.settings.poster | image_url: width: 1600 }}"
+        {% elsif desktop.preview_image %}
+          poster="{{ desktop.preview_image | image_url: width: 1600 }}"
+        {% endif %}
+      >
+        {%- for source in desktop.sources -%}
+          {%- if source.format == 'mp4' -%}
+            <source src="{{ source.url }}" type="{{ source.mime_type }}">
           {%- endif -%}
-        </div>
-      {%- endif -%}
-    {%- endfor -%}
+        {%- endfor -%}
+      </video>
+
+      <video
+        class="tlw-hero__video tlw-hero__video--mobile"
+        data-hero-video
+        muted
+        loop
+        playsinline
+        preload="none"
+        {% if section.settings.poster_mobile != blank %}
+          poster="{{ section.settings.poster_mobile | image_url: width: 900 }}"
+        {% elsif mobile.preview_image %}
+          poster="{{ mobile.preview_image | image_url: width: 900 }}"
+        {% endif %}
+      >
+        {%- for source in mobile.sources -%}
+          {%- if source.format == 'mp4' -%}
+            <source src="{{ source.url }}" type="{{ source.mime_type }}">
+          {%- endif -%}
+        {%- endfor -%}
+      </video>
+
+    {%- elsif section.settings.poster != blank -%}
+      {{ section.settings.poster
+        | image_url: width: 1800
+        | image_tag: loading: 'eager', alt: '', class: 'tlw-hero__video'
+      }}
+
+    {%- else -%}
+      <div class="tlw-hero__video tlw-hero__video--empty"></div>
+    {%- endif -%}
+
   </div>
 
   {%- if section.settings.overlay > 0 -%}
@@ -95,41 +123,30 @@
     background: var(--tlw-primary);
   }
 
-  #tlw-hero-{{ section.id }} .tlw-hero__panels {
-    display: grid;
-    grid-template-columns: 1fr;
-    height: 100%;
-    gap: {{ section.settings.gap }}px;
-  }
-
-  #tlw-hero-{{ section.id }} .tlw-hero__panel {
-    position: relative;
-    overflow: hidden;
-  }
-
-  #tlw-hero-{{ section.id }} .tlw-hero__panel[data-desktop-only] {
-    display: none;
-  }
-
-  @media (min-width: 900px) {
-    #tlw-hero-{{ section.id }} .tlw-hero__panels {
-      grid-template-columns: repeat({{ section.blocks.size | at_least: 1 }}, 1fr);
-    }
-    #tlw-hero-{{ section.id }} .tlw-hero__panel[data-desktop-only] {
-      display: block;
-    }
-  }
-
   #tlw-hero-{{ section.id }} .tlw-hero__media,
-  #tlw-hero-{{ section.id }} .tlw-hero__media video {
+  #tlw-hero-{{ section.id }} .tlw-hero__video {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
+  }
+
+  #tlw-hero-{{ section.id }} .tlw-hero__video {
     object-fit: cover;
+    object-position: {{ section.settings.focal }};
     display: block;
   }
 
-  #tlw-hero-{{ section.id }} .tlw-hero__media--empty {
+  #tlw-hero-{{ section.id }} .tlw-hero__video--empty {
     background: var(--tlw-surface-variant);
+  }
+
+  #tlw-hero-{{ section.id }} .tlw-hero__video--desktop { display: none; }
+  #tlw-hero-{{ section.id }} .tlw-hero__video--mobile  { display: block; }
+
+  @media (min-width: 750px) {
+    #tlw-hero-{{ section.id }} .tlw-hero__video--desktop { display: block; }
+    #tlw-hero-{{ section.id }} .tlw-hero__video--mobile  { display: none; }
   }
 
   #tlw-hero-{{ section.id }} .tlw-hero__scrim {
@@ -152,7 +169,7 @@
   }
 
   #tlw-hero-{{ section.id }} .tlw-hero__logo {
-    width: min(46vw, 320px);
+    width: min(52vw, 340px);
     margin-top: 4vh;
   }
 
@@ -186,13 +203,10 @@
 
   @media (min-width: 900px) {
     #tlw-hero-{{ section.id }} .tlw-hero__content {
-      align-items: flex-start;
+      align-items: {{ section.settings.cta_align }};
     }
     #tlw-hero-{{ section.id }} .tlw-hero__logo {
       align-self: center;
-    }
-    #tlw-hero-{{ section.id }} .tlw-hero__cta {
-      margin-left: 4vw;
     }
   }
 
@@ -228,6 +242,25 @@
     var root = document.getElementById('tlw-hero-{{ section.id }}');
     if (!root) return;
 
+    /* Only play the video that is actually on screen, so a phone never
+       downloads the wide desktop file. */
+    function playVisible() {
+      root.querySelectorAll('[data-hero-video]').forEach(function (v) {
+        var shown = v.offsetParent !== null;
+        if (shown) {
+          v.preload = 'auto';
+          v.muted = true;
+          var go = v.play();
+          if (go && go.catch) go.catch(function () {});
+        } else {
+          v.pause();
+        }
+      });
+    }
+
+    playVisible();
+    window.addEventListener('resize', playVisible);
+
     var cue = root.querySelector('[data-hero-scroll]');
     if (cue) {
       cue.addEventListener('click', function () {
@@ -239,14 +272,6 @@
         }
       });
     }
-
-    /* Some browsers block autoplay until the video is in view. Nudge them. */
-    root.querySelectorAll('video').forEach(function (v) {
-      v.muted = true;
-      v.setAttribute('playsinline', '');
-      var attempt = v.play();
-      if (attempt && attempt.catch) attempt.catch(function () {});
-    });
   })();
 </script>
 
@@ -256,10 +281,49 @@
   "tag": "section",
   "settings": [
     {
+      "type": "video",
+      "id": "video_desktop",
+      "label": "Video",
+      "info": "Upload to Content > Files first. Must be mp4, not .mov."
+    },
+    {
+      "type": "video",
+      "id": "video_mobile",
+      "label": "Mobile video",
+      "info": "Optional. The taller crop for phones. Falls back to the main video."
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "Still image",
+      "info": "Shows while the video loads, and instead of it if no video is set"
+    },
+    {
+      "type": "image_picker",
+      "id": "poster_mobile",
+      "label": "Mobile still image"
+    },
+    {
+      "type": "select",
+      "id": "focal",
+      "label": "What to keep in frame",
+      "info": "Which part of the footage stays visible when it gets cropped",
+      "options": [
+        { "value": "center top", "label": "Top" },
+        { "value": "center center", "label": "Middle" },
+        { "value": "center bottom", "label": "Bottom" }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
       "type": "image_picker",
       "id": "logo",
       "label": "Logo",
-      "info": "Use the white version. Sits over the middle panel."
+      "info": "Use the white version"
     },
     {
       "type": "text",
@@ -273,64 +337,35 @@
       "label": "Button goes to"
     },
     {
+      "type": "select",
+      "id": "cta_align",
+      "label": "Button position on desktop",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Centre" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "flex-start"
+    },
+    {
       "type": "text",
       "id": "scroll_label",
       "label": "Scroll cue text",
-      "info": "The word above the arrow at the bottom. Leave empty to hide it.",
+      "info": "The word above the arrow. Leave empty to hide it.",
       "default": "Welcome"
     },
     {
       "type": "range",
       "id": "overlay",
-      "label": "Darken the panels",
-      "info": "Helps the logo and button stay readable over busy footage",
+      "label": "Darken the video",
+      "info": "Helps the logo and button stay readable",
       "min": 0,
       "max": 60,
       "step": 5,
       "unit": "%",
       "default": 25
-    },
-    {
-      "type": "range",
-      "id": "gap",
-      "label": "Gap between panels",
-      "min": 0,
-      "max": 12,
-      "step": 2,
-      "unit": "px",
-      "default": 4
     }
   ],
-  "blocks": [
-    {
-      "type": "panel",
-      "name": "Panel",
-      "limit": 4,
-      "settings": [
-        {
-          "type": "video",
-          "id": "video",
-          "label": "Video",
-          "info": "Upload to Content > Files first. Must be mp4, not .mov."
-        },
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Image instead",
-          "info": "Used only if no video is set"
-        }
-      ]
-    }
-  ],
-  "presets": [
-    {
-      "name": "TLW Hero",
-      "blocks": [
-        { "type": "panel" },
-        { "type": "panel" },
-        { "type": "panel" }
-      ]
-    }
-  ]
+  "presets": [{ "name": "TLW Hero" }]
 }
 {% endschema %}
