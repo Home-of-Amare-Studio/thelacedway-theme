@@ -84,7 +84,7 @@
   <div class="tlw-hero__content">
 
     {%- if section.settings.logo != blank -%}
-      <div class="tlw-hero__logo">
+      <div class="tlw-hero__logo"{% unless section.settings.logo_on_mobile %} data-desktop-logo{% endunless %}>
         {{ section.settings.logo
           | image_url: width: 700
           | image_tag: loading: 'eager', alt: shop.name
@@ -169,8 +169,18 @@
   }
 
   #tlw-hero-{{ section.id }} .tlw-hero__logo {
-    width: min(52vw, 340px);
-    margin-top: 4vh;
+    width: min(60vw, {{ section.settings.logo_width }}px);
+    margin-top: {{ section.settings.logo_top }}vh;
+  }
+
+  #tlw-hero-{{ section.id }} .tlw-hero__logo[data-desktop-logo] {
+    display: none;
+  }
+
+  @media (min-width: 750px) {
+    #tlw-hero-{{ section.id }} .tlw-hero__logo[data-desktop-logo] {
+      display: block;
+    }
   }
 
   #tlw-hero-{{ section.id }} .tlw-hero__logo img {
@@ -180,8 +190,9 @@
 
   #tlw-hero-{{ section.id }} .tlw-hero__cta {
     pointer-events: auto;
-    margin-top: auto;
-    margin-bottom: auto;
+    position: absolute;
+    top: {{ section.settings.cta_top }}%;
+    transform: translateY(-50%);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -201,12 +212,20 @@
     color: var(--tlw-primary);
   }
 
+  #tlw-hero-{{ section.id }} .tlw-hero__scroll {
+    margin-top: auto;
+  }
+
   @media (min-width: 900px) {
     #tlw-hero-{{ section.id }} .tlw-hero__content {
       align-items: {{ section.settings.cta_align }};
     }
     #tlw-hero-{{ section.id }} .tlw-hero__logo {
       align-self: center;
+    }
+    #tlw-hero-{{ section.id }} .tlw-hero__cta {
+      {% if section.settings.cta_align == 'flex-start' %}left: var(--tlw-margin);{% endif %}
+      {% if section.settings.cta_align == 'flex-end' %}right: var(--tlw-margin);{% endif %}
     }
   }
 
@@ -326,6 +345,33 @@
       "info": "Use the white version"
     },
     {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo width",
+      "min": 120,
+      "max": 420,
+      "step": 10,
+      "unit": "px",
+      "default": 260
+    },
+    {
+      "type": "range",
+      "id": "logo_top",
+      "label": "How far down the logo sits",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "%",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "logo_on_mobile",
+      "label": "Show the logo on mobile too",
+      "info": "Off by default, since the header already shows it on small screens",
+      "default": false
+    },
+    {
       "type": "text",
       "id": "button_label",
       "label": "Button text",
@@ -335,6 +381,16 @@
       "type": "url",
       "id": "button_link",
       "label": "Button goes to"
+    },
+    {
+      "type": "range",
+      "id": "cta_top",
+      "label": "How far down the button sits",
+      "min": 20,
+      "max": 85,
+      "step": 1,
+      "unit": "%",
+      "default": 55
     },
     {
       "type": "select",
