@@ -1,1 +1,582 @@
+{% comment %}
+  THELACEDWÁY main product section
+  Home of Amare Studio
 
+  Handles two kinds of purchase:
+  1. Real Shopify variants (Lace Size, Length, Lace type) which carry the price.
+  2. Service options, which are either free line item properties, or paid
+     add-ons that get added to the cart as their own separate line.
+
+  Paid add-ons MUST be separate cart lines. Line item properties are display
+  only and carry no price.
+{% endcomment %}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+-%}
+
+<section
+  class="tlw-product tlw-container"
+  id="tlw-product-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="tlw-product__grid">
+
+    {% comment %} ---------- GALLERY ---------- {% endcomment %}
+    <div class="tlw-product__media">
+      {%- if product.media.size > 0 -%}
+        <div class="tlw-product__main-image" data-main-image>
+          {{ product.featured_media
+            | image_url: width: 1400
+            | image_tag:
+              loading: 'eager',
+              sizes: '(min-width: 900px) 50vw, 100vw',
+              widths: '400, 600, 900, 1200, 1400',
+              alt: product.title
+          }}
+        </div>
+
+        {%- if product.media.size > 1 -%}
+          <div class="tlw-product__thumbs">
+            {%- for media in product.media -%}
+              <button
+                type="button"
+                class="tlw-product__thumb{% if forloop.first %} is-active{% endif %}"
+                data-thumb
+                data-full="{{ media | image_url: width: 1400 }}"
+                aria-label="View image {{ forloop.index }}"
+              >
+                {{ media | image_url: width: 200 | image_tag: loading: 'lazy', alt: '' }}
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      {%- else -%}
+        <div class="tlw-product__placeholder">
+          <span class="tlw-label-caps">Image coming soon</span>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {% comment %} ---------- DETAILS ---------- {% endcomment %}
+    <div class="tlw-product__info">
+
+      {%- if section.settings.show_collection_label and product.collections.size > 0 -%}
+        <p class="tlw-label-caps tlw-product__eyebrow">
+          {{ product.collections.first.title }}
+        </p>
+      {%- endif -%}
+
+      <h1 class="tlw-display-lg tlw-product__title">{{ product.title }}</h1>
+
+      {%- if section.settings.detail_line != blank -%}
+        <p class="tlw-body-md tlw-product__detail">{{ section.settings.detail_line }}</p>
+      {%- endif -%}
+
+      <p class="tlw-headline-sm tlw-product__price" data-price>
+        {{ current_variant.price | money }}
+      </p>
+
+      <form
+        method="post"
+        action="{{ routes.cart_add_url }}"
+        id="tlw-form-{{ section.id }}"
+        data-product-form
+        data-product-title="{{ product.title | escape }}"
+      >
+
+        {% comment %} ---------- REAL VARIANTS ---------- {% endcomment %}
+        {%- unless product.has_only_default_variant -%}
+          {%- for option in product.options_with_values -%}
+            <div class="tlw-field">
+              <label
+                class="tlw-label-caps tlw-field__label"
+                for="tlw-opt-{{ section.id }}-{{ forloop.index }}"
+              >
+                {{ option.name }}
+              </label>
+              <select
+                class="tlw-select"
+                id="tlw-opt-{{ section.id }}-{{ forloop.index }}"
+                data-option-index="{{ forloop.index0 }}"
+                data-variant-option
+              >
+                {%- for value in option.values -%}
+                  <option
+                    value="{{ value | escape }}"
+                    {% if option.selected_value == value %}selected{% endif %}
+                  >
+                    {{ value }}
+                  </option>
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- endfor -%}
+        {%- endunless -%}
+
+        {% comment %}
+          ---------- SERVICE OPTIONS ----------
+          Each block is one dropdown. If the chosen value matches the block's
+          trigger value AND the block has an add-on product set, that add-on
+          is added to the cart as its own line at its own price.
+        {% endcomment %}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'service_option' -%}
+            {%- assign values = block.settings.values | split: ',' -%}
+            {%- assign addon = block.settings.addon_product -%}
+
+            <div class="tlw-field" {{ block.shopify_attributes }}>
+              <label
+                class="tlw-label-caps tlw-field__label"
+                for="tlw-svc-{{ block.id }}"
+              >
+                {{ block.settings.label }}
+                {%- if addon != blank and block.settings.trigger_value != blank -%}
+                  <span class="tlw-field__price">
+                    +{{ addon.price | money }} if {{ block.settings.trigger_value | strip }}
+                  </span>
+                {%- endif -%}
+              </label>
+
+              <select
+                class="tlw-select"
+                id="tlw-svc-{{ block.id }}"
+                data-service-option
+                data-property-name="{{ block.settings.label | escape }}"
+                data-trigger-value="{{ block.settings.trigger_value | strip | escape }}"
+                {% if addon != blank %}
+                  data-addon-variant-id="{{ addon.selected_or_first_available_variant.id }}"
+                  data-addon-price="{{ addon.price }}"
+                  data-addon-title="{{ addon.title | escape }}"
+                {% endif %}
+              >
+                {%- for value in values -%}
+                  {%- assign clean = value | strip -%}
+                  <option value="{{ clean | escape }}">{{ clean }}</option>
+                {%- endfor -%}
+              </select>
+
+              {%- if block.settings.help_text != blank -%}
+                <p class="tlw-field__help">{{ block.settings.help_text }}</p>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+
+        {% comment %} ---------- TOTAL ---------- {% endcomment %}
+        <div class="tlw-product__total">
+          <span class="tlw-label-caps">Total</span>
+          <span class="tlw-headline-sm" data-running-total>
+            {{ current_variant.price | money }}
+          </span>
+        </div>
+
+        <input type="hidden" name="id" data-variant-id value="{{ current_variant.id }}">
+
+        <button
+          type="submit"
+          class="tlw-btn tlw-product__submit"
+          data-add-to-cart
+          {% unless current_variant.available %}disabled{% endunless %}
+        >
+          <span data-button-text>
+            {%- if current_variant.available -%}
+              {{ section.settings.button_label | default: 'Add to bag' }}
+            {%- else -%}
+              Sold out
+            {%- endif -%}
+          </span>
+        </button>
+
+        <p class="tlw-product__error" data-cart-error hidden></p>
+      </form>
+
+      {%- if product.description != blank -%}
+        <div class="tlw-product__description tlw-body-md">
+          {{ product.description }}
+        </div>
+      {%- endif -%}
+
+    </div>
+  </div>
+
+  {% comment %}
+    Variant data for the price and availability updates. Written as JSON so the
+    script never has to guess which variant a set of options maps to.
+  {% endcomment %}
+  <script type="application/json" data-variant-json>
+    {{ product.variants | json }}
+  </script>
+</section>
+
+<style>
+  #tlw-product-{{ section.id }} {
+    padding-block: 48px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__grid {
+    display: grid;
+    gap: 40px;
+  }
+
+  @media (min-width: 900px) {
+    #tlw-product-{{ section.id }} {
+      padding-block: 80px;
+    }
+    #tlw-product-{{ section.id }} .tlw-product__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    #tlw-product-{{ section.id }} .tlw-product__info {
+      position: sticky;
+      top: calc(var(--tlw-nav-h) + 24px);
+    }
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__main-image img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__placeholder {
+    aspect-ratio: 4 / 5;
+    background: var(--tlw-surface-container);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tlw-outline);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__thumbs {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    overflow-x: auto;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__thumb {
+    flex: 0 0 72px;
+    padding: 0;
+    border: 1px solid transparent;
+    background: none;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__thumb.is-active {
+    border-color: var(--tlw-primary);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__thumb img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__eyebrow {
+    color: var(--tlw-outline);
+    margin: 0 0 12px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__title {
+    margin-bottom: 8px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__detail {
+    color: var(--tlw-on-surface-variant);
+    margin-bottom: 16px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__price {
+    margin-bottom: 32px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-field {
+    margin-bottom: 20px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-field__label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-field__price {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 12px;
+    color: var(--tlw-outline);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-field__help {
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--tlw-outline);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-select {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--tlw-outline-variant);
+    border-radius: var(--tlw-radius);
+    background: var(--tlw-surface-lowest);
+    color: var(--tlw-primary);
+    font-family: var(--tlw-font-body);
+    font-size: 15px;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23241b15' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 20px 0;
+    margin-top: 12px;
+    border-top: 1px solid var(--tlw-outline-variant);
+    border-bottom: 1px solid var(--tlw-outline-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__submit {
+    width: 100%;
+    margin-top: 24px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__error {
+    margin-top: 12px;
+    color: #a33;
+    font-size: 14px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__description {
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--tlw-outline-variant);
+  }
+</style>
+
+<script>
+  (function () {
+    var root = document.getElementById('tlw-product-{{ section.id }}');
+    if (!root) return;
+
+    var form = root.querySelector('[data-product-form]');
+    var variants = JSON.parse(root.querySelector('[data-variant-json]').textContent);
+    var variantInput = root.querySelector('[data-variant-id]');
+    var priceEl = root.querySelector('[data-price]');
+    var totalEl = root.querySelector('[data-running-total]');
+    var button = root.querySelector('[data-add-to-cart]');
+    var buttonText = root.querySelector('[data-button-text]');
+    var errorEl = root.querySelector('[data-cart-error]');
+    var moneyFormat = {{ shop.money_format | json }};
+
+    function formatMoney(cents) {
+      var amount = (cents / 100).toFixed(2);
+      return moneyFormat.replace(/\{\{\s*amount\s*\}\}/, amount);
+    }
+
+    /* ---- work out which variant the chosen options map to ---- */
+    function currentVariant() {
+      var selects = root.querySelectorAll('[data-variant-option]');
+      if (!selects.length) return variants[0];
+
+      var chosen = [];
+      selects.forEach(function (s) {
+        chosen[parseInt(s.dataset.optionIndex, 10)] = s.value;
+      });
+
+      return variants.find(function (v) {
+        return chosen.every(function (val, i) {
+          return v.options[i] === val;
+        });
+      }) || null;
+    }
+
+    /* ---- add up base variant plus any triggered add-ons ---- */
+    function runningTotal(variant) {
+      var total = variant ? variant.price : 0;
+      root.querySelectorAll('[data-service-option]').forEach(function (s) {
+        var trigger = s.dataset.triggerValue;
+        var price = s.dataset.addonPrice;
+        if (trigger && price && s.value === trigger) {
+          total += parseInt(price, 10);
+        }
+      });
+      return total;
+    }
+
+    function refresh() {
+      var variant = currentVariant();
+
+      if (!variant) {
+        button.disabled = true;
+        buttonText.textContent = 'Unavailable';
+        return;
+      }
+
+      variantInput.value = variant.id;
+      priceEl.textContent = formatMoney(variant.price);
+      totalEl.textContent = formatMoney(runningTotal(variant));
+
+      button.disabled = !variant.available;
+      buttonText.textContent = variant.available
+        ? {{ section.settings.button_label | default: 'Add to bag' | json }}
+        : 'Sold out';
+    }
+
+    root.addEventListener('change', function (e) {
+      if (e.target.matches('[data-variant-option], [data-service-option]')) refresh();
+    });
+
+    /* ---- gallery ---- */
+    var mainImg = root.querySelector('[data-main-image] img');
+    root.querySelectorAll('[data-thumb]').forEach(function (thumb) {
+      thumb.addEventListener('click', function () {
+        if (mainImg) mainImg.src = thumb.dataset.full;
+        root.querySelectorAll('[data-thumb]').forEach(function (t) {
+          t.classList.remove('is-active');
+        });
+        thumb.classList.add('is-active');
+      });
+    });
+
+    /* ---- add to cart ---- */
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      errorEl.hidden = true;
+
+      var variant = currentVariant();
+      if (!variant) return;
+
+      var productTitle = form.dataset.productTitle;
+      var properties = {};
+      var addons = [];
+
+      root.querySelectorAll('[data-service-option]').forEach(function (s) {
+        /* every service choice is recorded on the main line so the order
+           shows exactly what was picked, paid or not */
+        properties[s.dataset.propertyName] = s.value;
+
+        var trigger = s.dataset.triggerValue;
+        var addonId = s.dataset.addonVariantId;
+        if (trigger && addonId && s.value === trigger) {
+          addons.push({
+            id: parseInt(addonId, 10),
+            quantity: 1,
+            properties: { 'Add-on for': productTitle }
+          });
+        }
+      });
+
+      var items = [{ id: variant.id, quantity: 1, properties: properties }].concat(addons);
+
+      buttonText.textContent = 'Adding...';
+      button.disabled = true;
+
+      fetch('{{ routes.cart_add_url }}.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ items: items })
+      })
+        .then(function (res) {
+          if (!res.ok) return res.json().then(function (d) { throw new Error(d.description || 'Could not add to bag'); });
+          return res.json();
+        })
+        .then(function () {
+          /* let Horizon's cart drawer know something changed */
+          document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+          window.location.href = '{{ routes.cart_url }}';
+        })
+        .catch(function (err) {
+          errorEl.textContent = err.message;
+          errorEl.hidden = false;
+        })
+        .finally(function () {
+          button.disabled = false;
+          refresh();
+        });
+    });
+
+    refresh();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "TLW Product",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "detail_line",
+      "label": "Detail line",
+      "info": "Shown under the product name, e.g. HD lace / Machine made unit",
+      "default": "HD lace / Machine made unit"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button text",
+      "default": "Add to bag"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_label",
+      "label": "Show collection name above the title",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "service_option",
+      "name": "Service option",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Option name",
+          "info": "Shown to the customer and recorded on the order, e.g. Customisation"
+        },
+        {
+          "type": "text",
+          "id": "values",
+          "label": "Choices",
+          "info": "Separate with commas. The first one is selected by default.",
+          "default": "No, Yes"
+        },
+        {
+          "type": "text",
+          "id": "trigger_value",
+          "label": "Charge when the customer picks",
+          "info": "Must match one of the choices exactly. Leave empty for a free option."
+        },
+        {
+          "type": "product",
+          "id": "addon_product",
+          "label": "Add-on product to charge for",
+          "info": "The hidden product holding the price. Leave empty for a free option."
+        },
+        {
+          "type": "text",
+          "id": "help_text",
+          "label": "Helper text",
+          "info": "Optional line under the dropdown"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TLW Product",
+      "blocks": [
+        { "type": "service_option" }
+      ]
+    }
+  ]
+}
+{% endschema %}
