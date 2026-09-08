@@ -17,8 +17,12 @@
         "video_mobile": "shopify://files/videos/homepage banner-mobile-v3.mp4",
         "focal": "center center",
         "logo": "shopify://shop_images/logo-white-v3.webp",
+        "logo_width": 150,
+        "logo_top": 0,
+        "logo_on_mobile": true,
         "button_label": "Shop the collections",
         "button_link": "",
+        "cta_top": 50,
         "cta_align": "flex-start",
         "scroll_label": "Welcome",
         "overlay": 25
