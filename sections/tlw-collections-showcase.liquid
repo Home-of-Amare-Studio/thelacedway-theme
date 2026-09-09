@@ -1,0 +1,380 @@
+{% comment %}
+  THELACEDWÁY collections showcase
+  Home of Amare Studio
+
+  The heading is split into three fields so the gold italic word can be styled
+  without anyone having to write HTML. "Find your" + "perfect" + "look."
+
+  Tiles are free-standing blocks rather than tied to Shopify collections, so a
+  tile can point at a page, or say Coming Soon with no link at all.
+{% endcomment %}
+
+<section class="tlw-showcase" id="tlw-showcase-{{ section.id }}">
+  <div class="tlw-container">
+
+    <header class="tlw-showcase__head">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="tlw-label-caps tlw-showcase__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+
+      <h2 class="tlw-display-lg tlw-showcase__title">
+        {{ section.settings.heading_before }}
+        {%- if section.settings.heading_accent != blank -%}
+          <em class="tlw-accent-word">{{ section.settings.heading_accent }}</em>
+        {%- endif -%}
+        {{ section.settings.heading_after }}
+      </h2>
+
+      {%- if section.settings.show_rule -%}
+        <span class="tlw-showcase__rule" aria-hidden="true"></span>
+      {%- endif -%}
+
+      {%- if section.settings.intro != blank -%}
+        <p class="tlw-showcase__intro tlw-body-lg">{{ section.settings.intro }}</p>
+      {%- endif -%}
+    </header>
+
+    <div class="tlw-showcase__grid">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'tile' -%}
+          <article class="tlw-tile" {{ block.shopify_attributes }}>
+
+            <div class="tlw-tile__media">
+              {%- if block.settings.image != blank -%}
+                {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}">{%- endif -%}
+                  {{ block.settings.image
+                    | image_url: width: 1000
+                    | image_tag:
+                      loading: 'lazy',
+                      sizes: '(min-width: 900px) 32vw, 92vw',
+                      widths: '400, 600, 800, 1000',
+                      alt: block.settings.title,
+                      class: 'tlw-tile__img'
+                  }}
+                {%- if block.settings.link != blank -%}</a>{%- endif -%}
+              {%- else -%}
+                <div class="tlw-tile__placeholder">
+                  <span class="tlw-label-caps">{{ block.settings.title }}</span>
+                </div>
+              {%- endif -%}
+            </div>
+
+            <div class="tlw-tile__body">
+              <h3 class="tlw-headline-md tlw-tile__title">{{ block.settings.title }}</h3>
+
+              {%- if block.settings.hook != blank -%}
+                <p class="tlw-tile__hook tlw-body-lg">{{ block.settings.hook }}</p>
+              {%- endif -%}
+
+              {%- if block.settings.body != blank -%}
+                <p class="tlw-tile__text tlw-body-md">{{ block.settings.body }}</p>
+              {%- endif -%}
+
+              {%- if block.settings.link != blank and block.settings.button_label != blank -%}
+                <a class="tlw-btn tlw-btn--ghost tlw-tile__cta" href="{{ block.settings.link }}">
+                  {{ block.settings.button_label }}
+                </a>
+              {%- elsif block.settings.status_label != blank -%}
+                <p class="tlw-label-caps tlw-tile__status">{{ block.settings.status_label }}</p>
+              {%- endif -%}
+            </div>
+
+          </article>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.show_divider -%}
+      <hr class="tlw-showcase__divider">
+    {%- endif -%}
+
+  </div>
+</section>
+
+<style>
+  #tlw-showcase-{{ section.id }} {
+    padding-block: 72px;
+    background: var(--tlw-background);
+    color: var(--tlw-foreground);
+  }
+
+  @media (min-width: 900px) {
+    #tlw-showcase-{{ section.id }} {
+      padding-block: 120px;
+    }
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-showcase__head {
+    max-width: 760px;
+    margin: 0 auto 56px;
+    text-align: center;
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-showcase__eyebrow {
+    color: var(--tlw-on-surface-variant);
+    margin: 0 0 22px;
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-showcase__title em {
+    font-style: italic;
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-showcase__rule {
+    display: block;
+    width: 120px;
+    height: 1px;
+    margin: 28px auto;
+    background: var(--tlw-accent);
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-showcase__intro {
+    color: var(--tlw-on-surface-variant);
+    margin: 0;
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-showcase__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  @media (min-width: 900px) {
+    #tlw-showcase-{{ section.id }} .tlw-showcase__grid {
+      grid-template-columns: repeat({{ section.settings.columns }}, 1fr);
+      gap: {{ section.settings.gap }}px;
+    }
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-tile__media {
+    position: relative;
+    overflow: hidden;
+    background: var(--tlw-surface-container);
+    aspect-ratio: {{ section.settings.ratio }};
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-tile__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: {{ section.settings.focal }};
+    transition: transform 1100ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @media (hover: hover) {
+    #tlw-showcase-{{ section.id }} .tlw-tile:hover .tlw-tile__img {
+      transform: scale(1.04);
+    }
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-tile__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tlw-outline);
+    text-align: center;
+    padding: 20px;
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-tile__body {
+    padding-top: 26px;
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-tile__title {
+    margin: 0 0 12px;
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-tile__hook {
+    margin: 0 0 14px;
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-tile__text {
+    margin: 0 0 24px;
+    color: var(--tlw-on-surface-variant);
+    max-width: 42ch;
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-tile__cta {
+    border-color: var(--tlw-accent);
+    color: var(--tlw-primary);
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-tile__cta:hover {
+    background: var(--tlw-accent);
+    color: #fff;
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-showcase__divider {
+    border: 0;
+    border-top: 1px solid var(--tlw-outline-variant);
+    margin: 72px 0 0;
+  }
+
+  @media (min-width: 900px) {
+    #tlw-showcase-{{ section.id }} .tlw-showcase__divider {
+      margin-top: 110px;
+    }
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-tile__status {
+    color: var(--tlw-accent);
+    margin: 0;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "TLW Collections",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Small label above the heading",
+      "default": "The collections"
+    },
+    {
+      "type": "text",
+      "id": "heading_before",
+      "label": "Heading, first part",
+      "default": "Find your"
+    },
+    {
+      "type": "text",
+      "id": "heading_accent",
+      "label": "Heading, gold italic word",
+      "default": "perfect"
+    },
+    {
+      "type": "text",
+      "id": "heading_after",
+      "label": "Heading, last part",
+      "default": "look."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rule",
+      "label": "Gold line under the heading",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Supporting paragraph",
+      "default": "The right hair doesn't change you, it enhances you. Explore our collections and find the look that feels like you."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Tiles across on desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Space between tiles",
+      "min": 8,
+      "max": 64,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "Image shape",
+      "options": [
+        { "value": "3 / 4", "label": "Portrait" },
+        { "value": "4 / 5", "label": "Tall portrait" },
+        { "value": "2 / 3", "label": "Taller still" },
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 3", "label": "Landscape" }
+      ],
+      "default": "4 / 5"
+    },
+    {
+      "type": "select",
+      "id": "focal",
+      "label": "What to keep in frame",
+      "info": "Which part of the photo stays visible when it gets cropped",
+      "options": [
+        { "value": "center top", "label": "Top" },
+        { "value": "center center", "label": "Middle" },
+        { "value": "center bottom", "label": "Bottom" }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_divider",
+      "label": "Line under the tiles",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Tile",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "The Essentials"
+        },
+        {
+          "type": "text",
+          "id": "hook",
+          "label": "One line hook",
+          "default": "Every wardrobe starts with a staple."
+        },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Description"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Links to"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button text",
+          "default": "Shop now"
+        },
+        {
+          "type": "text",
+          "id": "status_label",
+          "label": "Text instead of a button",
+          "info": "Used when there is no link, e.g. Coming soon"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TLW Collections",
+      "blocks": [
+        { "type": "tile" },
+        { "type": "tile" },
+        { "type": "tile" }
+      ]
+    }
+  ]
+}
+{% endschema %}
