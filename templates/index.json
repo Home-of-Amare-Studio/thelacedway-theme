@@ -234,8 +234,15 @@
         "empty_text": "New pieces are on their way. Check back soon.",
         "show_badge": true,
         "badge_text": "Ready to ship",
+        "caption": "Ready to Ship",
+        "soldout_text": "Sold out",
+        "soon_text": "Coming soon",
+        "cta_view": "View",
+        "cta_enquire": "Enquire",
+        "show_arrows": false,
         "per_view": 4,
         "gap": 24,
+        "peek": 90,
         "ratio": "3 / 4"
       }
     },
@@ -438,6 +445,73 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "tlw_reviews_aC8Mj7": {
+      "type": "tlw-reviews",
+      "blocks": {
+        "review_xNPYXy": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "title": "",
+            "quote": "",
+            "name": "",
+            "meta": "",
+            "verified": true
+          }
+        },
+        "review_gkGzGV": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "title": "",
+            "quote": "",
+            "name": "",
+            "meta": "",
+            "verified": true
+          }
+        },
+        "review_afUcH9": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "title": "",
+            "quote": "",
+            "name": "",
+            "meta": "",
+            "verified": true
+          }
+        },
+        "review_7THDBU": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "title": "",
+            "quote": "",
+            "name": "",
+            "meta": "",
+            "verified": true
+          }
+        }
+      },
+      "block_order": [
+        "review_xNPYXy",
+        "review_gkGzGV",
+        "review_afUcH9",
+        "review_7THDBU"
+      ],
+      "name": "TLW Reviews",
+      "settings": {
+        "eyebrow": "Client reviews",
+        "heading": "Worn, loved, reviewed",
+        "show_summary": true,
+        "average": 50,
+        "average_word": "average",
+        "count": "41",
+        "count_word": "reviews",
+        "speed": 28,
+        "verified_text": "Verified buyer"
+      }
     }
   },
   "order": [
@@ -446,6 +520,7 @@
     "tlw_collections_showcase_rCTPQj",
     "tlw_process_kXWKc3",
     "tlw_ready_to_ship_dmXxXg",
-    "product_list_fa6P9H"
+    "product_list_fa6P9H",
+    "tlw_reviews_aC8Mj7"
   ]
 }

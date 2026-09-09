@@ -12,9 +12,31 @@
 {% endcomment %}
 
 {%- liquid
-  assign avg = section.settings.average
-  assign whole = avg | divided_by: 10
-  assign rem = avg | modulo: 10
+  comment
+    Judge.me writes the store totals into shop metafields, so the real numbers
+    come straight from there. The settings below are only a fallback for when
+    those metafields are empty, which happens before Judge.me has synced.
+  endcomment
+
+  assign jm_rating = shop.metafields.judgeme.all_reviews_rating
+  assign jm_count = shop.metafields.judgeme.all_reviews_count
+
+  if section.settings.use_judgeme and jm_rating != blank
+    assign avg_display = jm_rating | round: 1
+    assign avg_tenths = jm_rating | times: 10 | round
+  else
+    assign avg_display = section.settings.average | divided_by: 10.0
+    assign avg_tenths = section.settings.average
+  endif
+
+  if section.settings.use_judgeme and jm_count != blank
+    assign count_display = jm_count
+  else
+    assign count_display = section.settings.count
+  endif
+
+  assign whole = avg_tenths | divided_by: 10
+  assign rem = avg_tenths | modulo: 10
 -%}
 
 <section class="tlw-reviews" id="tlw-reviews-{{ section.id }}">
@@ -30,7 +52,7 @@
 
     {%- if section.settings.show_summary -%}
       <div class="tlw-reviews__summary">
-        <span class="tlw-stars" aria-label="{{ avg | divided_by: 10.0 }} out of 5">
+        <span class="tlw-stars" aria-label="{{ avg_display }} out of 5">
           {%- assign half_index = whole | plus: 1 -%}
           {%- for i in (1..5) -%}
             {%- assign filled = false -%}
@@ -46,9 +68,9 @@
         </span>
 
         <span class="tlw-reviews__stat">
-          {{ avg | divided_by: 10.0 }} {{ section.settings.average_word }}
-          {%- if section.settings.count != blank -%}
-            <span class="tlw-reviews__dot">·</span>{{ section.settings.count }} {{ section.settings.count_word }}
+          {{ avg_display }} {{ section.settings.average_word }}
+          {%- if count_display != blank -%}
+            <span class="tlw-reviews__dot">·</span>{{ count_display }} {{ section.settings.count_word }}
           {%- endif -%}
         </span>
       </div>
@@ -382,9 +404,16 @@
       "default": true
     },
     {
+      "type": "checkbox",
+      "id": "use_judgeme",
+      "label": "Use the real Judge.me figures",
+      "info": "Reads the live average and count from Judge.me. Falls back to the numbers below if Judge.me has not synced yet.",
+      "default": true
+    },
+    {
       "type": "range",
       "id": "average",
-      "label": "Average rating",
+      "label": "Average rating, fallback only",
       "info": "In tenths, so 50 means 5.0 and 48 means 4.8. Check the real figure in Judge.me.",
       "min": 10,
       "max": 50,
@@ -400,8 +429,8 @@
     {
       "type": "text",
       "id": "count",
-      "label": "How many reviews",
-      "info": "Check the real figure in Judge.me and update it now and then. Leave empty to hide it.",
+      "label": "How many reviews, fallback only",
+      "info": "Only used if the Judge.me figures are not available. Leave empty to hide it.",
       "default": "41"
     },
     {
