@@ -2,245 +2,448 @@
   THELACEDWÁY our process
   Home of Amare Studio
 
-  Image on one side, text on the other, with three icon features underneath.
+  This is a pinned scroll sequence, not a normal two column band. The wrapper is
+  taller than the screen and the panel inside sticks to the top, so the page
+  appears to hold still while the content reveals.
 
-  The icons are drawn inline as SVG rather than uploaded, so they inherit the
-  gold from the theme and stay sharp at any size. Each feature block picks one
-  from a list. If you ever want an icon that is not in the list, tell me and I
-  will add it rather than you fighting with an image upload.
+  What happens as you scroll through it:
+    0 to 28%   the heading types itself out, with a blinking caret
+    28%        the paragraph, rule and three markers fade in
+    0 to 100%  the text drifts up slightly and the progress line fills
+    past 90%   the keep scrolling cue fades away
+
+  The photo is full bleed behind everything and fades out towards the text with
+  a soft gradient mask, so there is no hard edge between image and page.
 {% endcomment %}
 
-<section class="tlw-process" id="tlw-process-{{ section.id }}">
-  <div class="tlw-process__grid">
+{%- liquid
+  assign l1 = section.settings.line_one
+  assign l2a = section.settings.line_two
+  assign l2b = section.settings.line_two_accent
+-%}
 
-    <div class="tlw-process__media">
+<div
+  class="tlw-process"
+  id="tlw-process-{{ section.id }}"
+  data-process
+  style="--tlw-process-height: {{ section.settings.scroll_length }}vh;"
+>
+  <div class="tlw-process__panel">
+
+    <div class="tlw-process__bg">
       {%- if section.settings.image != blank -%}
         {{ section.settings.image
-          | image_url: width: 1400
+          | image_url: width: 2000
           | image_tag:
             loading: 'lazy',
-            sizes: '(min-width: 900px) 50vw, 100vw',
-            widths: '600, 900, 1200, 1400',
+            sizes: '100vw',
+            widths: '800, 1200, 1600, 2000',
             alt: '',
             class: 'tlw-process__img'
         }}
       {%- else -%}
-        <div class="tlw-process__placeholder"></div>
+        <div class="tlw-process__img tlw-process__img--empty"></div>
       {%- endif -%}
+
+      {% comment %} On phones the photo sits behind the text, so it needs a veil {% endcomment %}
+      <div class="tlw-process__veil"></div>
     </div>
 
-    <div class="tlw-process__body">
-      <div class="tlw-process__inner">
+    <div class="tlw-process__content">
+      <div class="tlw-process__col" data-process-shift>
 
         {%- if section.settings.eyebrow != blank -%}
           <p class="tlw-label-caps tlw-process__eyebrow">{{ section.settings.eyebrow }}</p>
         {%- endif -%}
 
-        <h2 class="tlw-display-lg tlw-process__title">
-          {{ section.settings.heading_before }}
-          {%- if section.settings.heading_accent != blank -%}
-            <em class="tlw-accent-word">{{ section.settings.heading_accent }}</em>
-          {%- endif -%}
-          {{ section.settings.heading_after }}
+        <h2 class="tlw-process__title">
+          <span class="tlw-process__line" data-type-line-1></span>
+          <span class="tlw-process__line">
+            <span data-type-line-2a></span><em class="tlw-accent-word" data-type-line-2b></em><span class="tlw-process__caret" data-caret></span>
+          </span>
         </h2>
 
-        {%- if section.settings.body != blank -%}
-          <p class="tlw-process__text tlw-body-lg">{{ section.settings.body }}</p>
-        {%- endif -%}
+        <div class="tlw-process__reveal" data-process-reveal>
+          {%- if section.settings.body != blank -%}
+            <p class="tlw-process__text tlw-body-lg">{{ section.settings.body }}</p>
+          {%- endif -%}
 
-        {%- if section.blocks.size > 0 -%}
-          <div class="tlw-process__features">
-            {%- for block in section.blocks -%}
-              {%- if block.type == 'feature' -%}
-                <div class="tlw-feature" {{ block.shopify_attributes }}>
-                  <span class="tlw-feature__icon" aria-hidden="true">
-                    {%- case block.settings.icon -%}
-                      {%- when 'scissors' -%}
-                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                          <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
-                          <line x1="20" y1="4" x2="8.12" y2="15.88"/>
-                          <line x1="14.47" y1="14.48" x2="20" y2="20"/>
-                          <line x1="8.12" y1="8.12" x2="12" y2="12"/>
-                        </svg>
-                      {%- when 'ruler' -%}
-                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M2 15.5 15.5 2 22 8.5 8.5 22z"/>
-                          <path d="M6.5 11 9 13.5M9.5 8 12 10.5M12.5 5 15 7.5"/>
-                        </svg>
-                      {%- when 'hand' -%}
-                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M18 11V6a1.5 1.5 0 0 0-3 0M15 10.5V4a1.5 1.5 0 0 0-3 0v6.5"/>
-                          <path d="M12 10.5V5.5a1.5 1.5 0 0 0-3 0V13"/>
-                          <path d="M9 13v-2a1.5 1.5 0 0 0-3 0v5a7 7 0 0 0 7 7h1a6 6 0 0 0 6-6v-4"/>
-                        </svg>
-                      {%- when 'needle' -%}
-                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M20 3 6.5 16.5"/>
-                          <path d="M6.5 16.5 4 21l4.5-2.5"/>
-                          <circle cx="19" cy="4" r="1.6"/>
-                        </svg>
-                      {%- when 'sparkle' -%}
-                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M12 3 13.8 9.2 20 11l-6.2 1.8L12 19l-1.8-6.2L4 11l6.2-1.8z"/>
-                        </svg>
-                      {%- when 'heart' -%}
-                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M20.8 6.6a5 5 0 0 0-7.1 0L12 8.3l-1.7-1.7a5 5 0 1 0-7.1 7.1L12 22l8.8-8.3a5 5 0 0 0 0-7.1z"/>
-                        </svg>
-                    {%- endcase -%}
-                  </span>
+          {%- if section.blocks.size > 0 -%}
+            <div class="tlw-process__rule" aria-hidden="true"></div>
 
-                  <p class="tlw-label-caps tlw-feature__label">{{ block.settings.label }}</p>
-                </div>
-              {%- endif -%}
-            {%- endfor -%}
-          </div>
-        {%- endif -%}
-
-        {%- if section.settings.scroll_label != blank -%}
-          <div class="tlw-process__cue">
-            <span class="tlw-process__cue-line" aria-hidden="true"></span>
-            <span class="tlw-label-caps">{{ section.settings.scroll_label }}</span>
-          </div>
-        {%- endif -%}
+            <ul class="tlw-process__markers">
+              {%- for block in section.blocks -%}
+                {%- if block.type == 'feature' -%}
+                  <li class="tlw-marker" {{ block.shopify_attributes }}>
+                    <span class="tlw-marker__icon" aria-hidden="true">
+                      {%- case block.settings.icon -%}
+                        {%- when 'scissors' -%}
+                          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+                            <line x1="20" y1="4" x2="8.12" y2="15.88"/>
+                            <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+                            <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+                          </svg>
+                        {%- when 'ruler' -%}
+                          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 15.5 15.5 2 22 8.5 8.5 22z"/>
+                            <path d="M6.5 11 9 13.5M9.5 8 12 10.5M12.5 5 15 7.5"/>
+                          </svg>
+                        {%- when 'hand' -%}
+                          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 11V6a1.5 1.5 0 0 0-3 0"/>
+                            <path d="M15 10.5V4a1.5 1.5 0 0 0-3 0v6.5"/>
+                            <path d="M12 10.5V5.5a1.5 1.5 0 0 0-3 0V13"/>
+                            <path d="M9 13v-2a1.5 1.5 0 0 0-3 0v5a7 7 0 0 0 7 7h1a6 6 0 0 0 6-6v-4"/>
+                          </svg>
+                        {%- when 'needle' -%}
+                          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 3 6.5 16.5"/><path d="M6.5 16.5 4 21l4.5-2.5"/>
+                            <circle cx="19" cy="4" r="1.6"/>
+                          </svg>
+                        {%- when 'sparkle' -%}
+                          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 3 13.8 9.2 20 11l-6.2 1.8L12 19l-1.8-6.2L4 11l6.2-1.8z"/>
+                          </svg>
+                        {%- when 'heart' -%}
+                          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.8 6.6a5 5 0 0 0-7.1 0L12 8.3l-1.7-1.7a5 5 0 1 0-7.1 7.1L12 22l8.8-8.3a5 5 0 0 0 0-7.1z"/>
+                          </svg>
+                      {%- endcase -%}
+                    </span>
+                    <span class="tlw-marker__label">{{ block.settings.label }}</span>
+                  </li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
 
       </div>
     </div>
 
+    {%- if section.settings.scroll_label != blank -%}
+      <div class="tlw-process__cue" data-process-cue>
+        <div class="tlw-process__track">
+          <div class="tlw-process__fill" data-process-fill></div>
+        </div>
+        <span class="tlw-process__cue-label">{{ section.settings.scroll_label }}</span>
+      </div>
+    {%- endif -%}
+
   </div>
-</section>
+</div>
 
 <style>
   #tlw-process-{{ section.id }} {
-    background: var(--tlw-background);
-    color: var(--tlw-foreground);
-  }
-
-  #tlw-process-{{ section.id }} .tlw-process__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 900px) {
-    #tlw-process-{{ section.id }} .tlw-process__grid {
-      grid-template-columns: {{ section.settings.split }};
-      align-items: stretch;
-      min-height: 78vh;
-    }
-
-    {% if section.settings.image_side == 'right' %}
-      #tlw-process-{{ section.id }} .tlw-process__media { order: 2; }
-      #tlw-process-{{ section.id }} .tlw-process__body  { order: 1; }
-    {% endif %}
-  }
-
-  #tlw-process-{{ section.id }} .tlw-process__media {
     position: relative;
-    overflow: hidden;
-    background: var(--tlw-surface-container);
-    aspect-ratio: 4 / 5;
+    width: 100%;
+    height: var(--tlw-process-height);
   }
 
-  @media (min-width: 900px) {
-    #tlw-process-{{ section.id }} .tlw-process__media {
-      aspect-ratio: auto;
+  #tlw-process-{{ section.id }} .tlw-process__panel {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    height: 100svh;
+    overflow: hidden;
+    background: var(--tlw-surface-lowest);
+    color: var(--tlw-primary);
+  }
+
+  #tlw-process-{{ section.id }} .tlw-process__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  @media (min-width: 1024px) {
+    #tlw-process-{{ section.id }} .tlw-process__bg {
+      right: {{ section.settings.image_width }}%;
     }
   }
 
-  #tlw-process-{{ section.id }} .tlw-process__img,
-  #tlw-process-{{ section.id }} .tlw-process__placeholder {
+  #tlw-process-{{ section.id }} .tlw-process__img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: {{ section.settings.focal }};
+    object-position: 50% {{ section.settings.focal }}%;
     display: block;
   }
 
-  #tlw-process-{{ section.id }} .tlw-process__body {
-    display: flex;
-    align-items: center;
-    padding: 56px var(--tlw-margin);
+  #tlw-process-{{ section.id }} .tlw-process__img--empty {
+    background: var(--tlw-surface-container);
   }
 
-  @media (min-width: 900px) {
-    #tlw-process-{{ section.id }} .tlw-process__body {
-      padding: 80px clamp(40px, 5vw, 96px);
+  /* The soft fade towards the text. No hard edge where the photo stops. */
+  @media (min-width: 1024px) {
+    #tlw-process-{{ section.id }} .tlw-process__img {
+      -webkit-mask-image: linear-gradient(
+        to right,
+        black 0%, black 46%,
+        rgba(0,0,0,0.92) 62%,
+        rgba(0,0,0,0.55) 80%,
+        rgba(0,0,0,0.18) 92%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(
+        to right,
+        black 0%, black 46%,
+        rgba(0,0,0,0.92) 62%,
+        rgba(0,0,0,0.55) 80%,
+        rgba(0,0,0,0.18) 92%,
+        transparent 100%
+      );
     }
   }
 
-  #tlw-process-{{ section.id }} .tlw-process__inner {
+  #tlw-process-{{ section.id }} .tlw-process__veil {
+    position: absolute;
+    inset: 0;
+    background: var(--tlw-surface-lowest);
+    opacity: 0.85;
+  }
+
+  @media (min-width: 1024px) {
+    #tlw-process-{{ section.id }} .tlw-process__veil { display: none; }
+  }
+
+  #tlw-process-{{ section.id }} .tlw-process__content {
+    position: relative;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 1fr;
     width: 100%;
-    max-width: 620px;
+    padding-inline: var(--tlw-margin);
+  }
+
+  @media (min-width: 1024px) {
+    #tlw-process-{{ section.id }} .tlw-process__content {
+      grid-template-columns: 1fr 1fr;
+    }
+    #tlw-process-{{ section.id }} .tlw-process__col {
+      grid-column-start: 2;
+      padding-left: 48px;
+    }
+  }
+
+  #tlw-process-{{ section.id }} .tlw-process__col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 18px;
+  }
+
+  @media (min-width: 768px) {
+    #tlw-process-{{ section.id }} .tlw-process__col { gap: 32px; }
   }
 
   #tlw-process-{{ section.id }} .tlw-process__eyebrow {
     color: var(--tlw-accent);
-    margin: 0 0 22px;
+    margin: 0;
   }
 
   #tlw-process-{{ section.id }} .tlw-process__title {
-    margin-bottom: 28px;
+    font-family: var(--tlw-font-display);
+    font-weight: 300;
+    font-size: clamp(1.5rem, 4.6vw, 3.5rem);
+    line-height: 1.2;
+    min-height: 2.6em;
+    margin: 0;
+    white-space: nowrap;
   }
+
+  #tlw-process-{{ section.id }} .tlw-process__line { display: block; }
+
+  #tlw-process-{{ section.id }} .tlw-process__caret {
+    display: inline-block;
+    width: 0.06em;
+    height: 0.9em;
+    margin-left: 4px;
+    vertical-align: -0.1em;
+    background: var(--tlw-accent);
+    animation: tlw-caret 1s steps(2, start) infinite;
+  }
+
+  @keyframes tlw-caret { 50% { opacity: 0; } }
+
+  #tlw-process-{{ section.id }} .tlw-process__caret[hidden] { display: none; }
+
+  #tlw-process-{{ section.id }} .tlw-process__reveal {
+    max-width: 28rem;
+    opacity: 0;
+    transition: opacity 700ms ease;
+  }
+
+  #tlw-process-{{ section.id }} .tlw-process__reveal.is-in { opacity: 1; }
 
   #tlw-process-{{ section.id }} .tlw-process__text {
     color: var(--tlw-on-surface-variant);
-    margin: 0 0 44px;
-    max-width: 46ch;
+    margin: 0 0 40px;
   }
 
-  #tlw-process-{{ section.id }} .tlw-process__features {
-    display: grid;
-    grid-template-columns: repeat({{ section.blocks.size | at_least: 1 }}, 1fr);
-    border-top: 1px solid var(--tlw-outline-variant);
-    padding-top: 36px;
+  #tlw-process-{{ section.id }} .tlw-process__rule {
+    height: 1px;
+    width: 100%;
+    background: var(--tlw-accent);
+    opacity: 0.4;
   }
 
-  #tlw-process-{{ section.id }} .tlw-feature {
-    text-align: center;
-    padding-inline: 12px;
+  #tlw-process-{{ section.id }} .tlw-process__markers {
+    list-style: none;
+    margin: 40px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
 
-  #tlw-process-{{ section.id }} .tlw-feature + .tlw-feature {
-    border-left: 1px solid var(--tlw-outline-variant);
+  @media (min-width: 1024px) {
+    #tlw-process-{{ section.id }} .tlw-process__markers {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 0;
+      margin-top: 56px;
+    }
   }
 
-  #tlw-process-{{ section.id }} .tlw-feature__icon {
+  #tlw-process-{{ section.id }} .tlw-marker {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+  }
+
+  @media (min-width: 1024px) {
+    #tlw-process-{{ section.id }} .tlw-marker {
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+      padding-inline: 12px;
+    }
+    #tlw-process-{{ section.id }} .tlw-marker + .tlw-marker {
+      border-left: 1px solid var(--tlw-accent);
+    }
+  }
+
+  #tlw-process-{{ section.id }} .tlw-marker__icon {
     display: inline-flex;
+    flex: 0 0 auto;
     color: var(--tlw-accent);
-    margin-bottom: 16px;
   }
 
-  #tlw-process-{{ section.id }} .tlw-feature__label {
-    margin: 0;
-    line-height: 1.5;
+  #tlw-process-{{ section.id }} .tlw-marker__label {
+    font-family: var(--tlw-font-body);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
   }
 
   #tlw-process-{{ section.id }} .tlw-process__cue {
+    position: absolute;
+    bottom: 32px;
+    right: 0;
+    z-index: 30;
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 18px;
-    margin-top: 52px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    pointer-events: none;
+    transition: opacity 500ms ease;
+  }
+
+  #tlw-process-{{ section.id }} .tlw-process__track {
+    width: 224px;
+    height: 1px;
+    overflow: hidden;
+    background: var(--tlw-outline-variant);
+  }
+
+  @media (min-width: 768px) {
+    #tlw-process-{{ section.id }} .tlw-process__track { width: 288px; }
+  }
+
+  #tlw-process-{{ section.id }} .tlw-process__fill {
+    height: 100%;
+    width: 0%;
+    background: var(--tlw-accent);
+    transition: width 150ms linear;
+  }
+
+  #tlw-process-{{ section.id }} .tlw-process__cue-label {
+    padding-inline: var(--tlw-margin);
+    font-family: var(--tlw-font-body);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
     color: var(--tlw-outline);
   }
-
-  #tlw-process-{{ section.id }} .tlw-process__cue-line {
-    flex: 0 0 90px;
-    height: 1px;
-    background: var(--tlw-accent);
-    animation: tlw-cue-slide 2.6s ease-in-out infinite;
-    transform-origin: left center;
-  }
-
-  @keyframes tlw-cue-slide {
-    0%, 100% { transform: scaleX(0.5); opacity: 0.5; }
-    50%      { transform: scaleX(1);   opacity: 1; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    #tlw-process-{{ section.id }} .tlw-process__cue-line { animation: none; }
-  }
 </style>
+
+<script>
+  (function () {
+    var root = document.getElementById('tlw-process-{{ section.id }}');
+    if (!root) return;
+
+    var L1  = {{ l1 | json }};
+    var L2A = {{ l2a | json }};
+    var L2B = {{ l2b | json }};
+    var TOTAL = L1.length + L2A.length + L2B.length;
+    var TYPE_END = {{ section.settings.type_end | divided_by: 100.0 }};
+
+    var el1   = root.querySelector('[data-type-line-1]');
+    var el2a  = root.querySelector('[data-type-line-2a]');
+    var el2b  = root.querySelector('[data-type-line-2b]');
+    var caret = root.querySelector('[data-caret]');
+    var shift = root.querySelector('[data-process-shift]');
+    var reveal = root.querySelector('[data-process-reveal]');
+    var cue   = root.querySelector('[data-process-cue]');
+    var fill  = root.querySelector('[data-process-fill]');
+
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var raf = 0;
+
+    function paint() {
+      raf = 0;
+
+      var rect = root.getBoundingClientRect();
+      var span = rect.height - window.innerHeight;
+      var p = span > 0 ? Math.min(1, Math.max(0, -rect.top / span)) : 0;
+
+      /* typing */
+      var typed = reduced ? TOTAL : Math.round(Math.min(1, p / TYPE_END) * TOTAL);
+      var done = typed >= TOTAL;
+
+      el1.textContent  = L1.slice(0, typed);
+      el2a.textContent = L2A.slice(0, Math.max(0, typed - L1.length));
+      el2b.textContent = L2B.slice(0, Math.max(0, typed - L1.length - L2A.length));
+
+      if (caret) caret.hidden = done;
+      reveal.classList.toggle('is-in', done);
+
+      /* drift */
+      if (shift && !reduced) shift.style.transform = 'translateY(' + (-20 * p) + 'px)';
+
+      /* progress line and cue */
+      if (fill) fill.style.width = Math.round(p * 100) + '%';
+      if (cue) cue.style.opacity = p > 0.9 ? 0 : 1;
+    }
+
+    function onScroll() {
+      if (!raf) raf = window.requestAnimationFrame(paint);
+    }
+
+    paint();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    document.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    window.addEventListener('resize', onScroll);
+  })();
+</script>
 
 {% schema %}
 {
@@ -249,39 +452,29 @@
     {
       "type": "image_picker",
       "id": "image",
-      "label": "Image"
+      "label": "Background photo"
     },
     {
-      "type": "select",
-      "id": "image_side",
-      "label": "Image on the",
-      "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "right", "label": "Right" }
-      ],
-      "default": "left"
+      "type": "range",
+      "id": "image_width",
+      "label": "How far the photo stops from the right",
+      "info": "Higher leaves more clear space for the text on desktop",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "%",
+      "default": 42
     },
     {
-      "type": "select",
-      "id": "split",
-      "label": "Split",
-      "options": [
-        { "value": "1fr 1fr", "label": "Half and half" },
-        { "value": "1.2fr 1fr", "label": "Wider image" },
-        { "value": "1fr 1.2fr", "label": "Wider text" }
-      ],
-      "default": "1fr 1fr"
-    },
-    {
-      "type": "select",
+      "type": "range",
       "id": "focal",
-      "label": "What to keep in frame",
-      "options": [
-        { "value": "center top", "label": "Top" },
-        { "value": "center center", "label": "Middle" },
-        { "value": "center bottom", "label": "Bottom" }
-      ],
-      "default": "center center"
+      "label": "Vertical crop",
+      "info": "0 keeps the top of the photo, 100 keeps the bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 0
     },
     {
       "type": "header",
@@ -295,20 +488,22 @@
     },
     {
       "type": "text",
-      "id": "heading_before",
-      "label": "Heading, first part",
-      "default": "Made with intention. Finished with"
+      "id": "line_one",
+      "label": "Heading, first line",
+      "default": "Made with intention."
     },
     {
       "type": "text",
-      "id": "heading_accent",
-      "label": "Heading, gold italic word",
+      "id": "line_two",
+      "label": "Heading, second line",
+      "info": "Leave a space at the end before the gold word",
+      "default": "Finished with "
+    },
+    {
+      "type": "text",
+      "id": "line_two_accent",
+      "label": "Heading, gold italic ending",
       "default": "precision."
-    },
-    {
-      "type": "text",
-      "id": "heading_after",
-      "label": "Heading, last part"
     },
     {
       "type": "textarea",
@@ -320,14 +515,39 @@
       "type": "text",
       "id": "scroll_label",
       "label": "Scroll cue text",
-      "info": "Bottom right. Leave empty to hide it.",
       "default": "Keep scrolling"
+    },
+    {
+      "type": "header",
+      "content": "Motion"
+    },
+    {
+      "type": "range",
+      "id": "scroll_length",
+      "label": "How long the section holds",
+      "info": "How much scrolling happens while the panel stays pinned. 100 means no hold at all.",
+      "min": 100,
+      "max": 250,
+      "step": 10,
+      "unit": "%",
+      "default": 140
+    },
+    {
+      "type": "range",
+      "id": "type_end",
+      "label": "Typing finishes at",
+      "info": "How far through the hold the heading finishes typing",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "%",
+      "default": 28
     }
   ],
   "blocks": [
     {
       "type": "feature",
-      "name": "Feature",
+      "name": "Marker",
       "limit": 4,
       "settings": [
         {
@@ -348,7 +568,6 @@
           "type": "text",
           "id": "label",
           "label": "Label",
-          "info": "Short. Two words works best.",
           "default": "Expertly constructed"
         }
       ]
@@ -358,9 +577,9 @@
     {
       "name": "TLW Process",
       "blocks": [
-        { "type": "feature" },
-        { "type": "feature" },
-        { "type": "feature" }
+        { "type": "feature", "settings": { "icon": "scissors", "label": "Expertly constructed" } },
+        { "type": "feature", "settings": { "icon": "ruler", "label": "Precisely customised" } },
+        { "type": "feature", "settings": { "icon": "hand", "label": "Finished by hand" } }
       ]
     }
   ]
