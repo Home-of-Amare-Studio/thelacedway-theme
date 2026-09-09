@@ -64,24 +64,40 @@
                 {%- endif -%}
 
                 {%- if section.settings.show_badge and section.settings.badge_text != blank -%}
-                  <span class="tlw-rts__badge tlw-label-caps">{{ section.settings.badge_text }}</span>
+                  <span class="tlw-rts__badge">{{ section.settings.badge_text }}</span>
                 {%- endif -%}
-
-                {%- unless product.available -%}
-                  <span class="tlw-rts__soldout tlw-label-caps">Sold out</span>
-                {%- endunless -%}
               </div>
 
-              <div class="tlw-rts__body">
+              <div class="tlw-rts__row-title">
                 <h3 class="tlw-rts__name">{{ product.title }}</h3>
-                <p class="tlw-rts__price">
-                  {%- if product.price_varies -%}
+                <span class="tlw-rts__price">
+                  {%- if product.available == false -%}
+                    {{ section.settings.soldout_text }}
+                  {%- elsif product.price == 0 -%}
+                    {{ section.settings.soon_text }}
+                  {%- elsif product.price_varies -%}
                     From {{ product.price_min | money }}
                   {%- else -%}
                     {{ product.price | money }}
                   {%- endif -%}
-                </p>
+
+                  {%- if product.available and product.compare_at_price > product.price -%}
+                    <span class="tlw-rts__was">{{ product.compare_at_price | money }}</span>
+                  {%- endif -%}
+                </span>
               </div>
+
+              {%- if section.settings.caption != blank -%}
+                <p class="tlw-rts__caption">{{ section.settings.caption }}</p>
+              {%- endif -%}
+
+              <span class="tlw-rts__cta">
+                {%- if product.available -%}
+                  {{ section.settings.cta_view }}
+                {%- else -%}
+                  {{ section.settings.cta_enquire }}
+                {%- endif -%}
+              </span>
             </a>
           {%- endfor -%}
 
@@ -200,6 +216,8 @@
   }
 
   #tlw-rts-{{ section.id }} .tlw-rts__card {
+    display: flex;
+    flex-direction: column;
     flex: 0 0 72vw;
     scroll-snap-align: center;
     color: inherit;
@@ -233,11 +251,12 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 1100ms cubic-bezier(0.4, 0, 0.2, 1);
+    object-position: 50% 18%;
+    transition: transform 1000ms ease-in-out;
   }
 
   @media (hover: hover) {
-    #tlw-rts-{{ section.id }} .tlw-rts__card:hover .tlw-rts__img { transform: scale(1.04); }
+    #tlw-rts-{{ section.id }} .tlw-rts__card:hover .tlw-rts__img { transform: scale(1.05); }
   }
 
   #tlw-rts-{{ section.id }} .tlw-rts__placeholder {
@@ -253,37 +272,94 @@
 
   #tlw-rts-{{ section.id }} .tlw-rts__badge {
     position: absolute;
-    top: 14px;
-    left: 14px;
-    padding: 7px 12px;
+    top: 12px;
+    left: 12px;
+    padding: 4px 10px;
     background: var(--tlw-accent);
     color: #fff;
-    font-size: 11px;
+    font-family: var(--tlw-font-body);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
   }
 
-  #tlw-rts-{{ section.id }} .tlw-rts__soldout {
-    position: absolute;
-    bottom: 14px;
-    left: 14px;
-    padding: 7px 12px;
-    background: var(--tlw-primary);
-    color: var(--tlw-on-primary);
-    font-size: 11px;
+  #tlw-rts-{{ section.id }} .tlw-rts__row-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    padding-top: 32px;
   }
-
-  #tlw-rts-{{ section.id }} .tlw-rts__body { padding-top: 16px; }
 
   #tlw-rts-{{ section.id }} .tlw-rts__name {
     font-family: var(--tlw-font-display);
     font-weight: 400;
-    font-size: 20px;
-    margin: 0 0 4px;
+    font-size: 22px;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    #tlw-rts-{{ section.id }} .tlw-rts__name { font-size: 24px; }
   }
 
   #tlw-rts-{{ section.id }} .tlw-rts__price {
-    margin: 0;
-    font-size: 15px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    white-space: nowrap;
+    font-family: var(--tlw-font-body);
+    font-size: 16px;
+    font-weight: 300;
     color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__was {
+    font-size: 13px;
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__caption {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  /* Hidden until hover, then it unfolds. Always visible on touch, where
+     there is no hover to trigger it. */
+  #tlw-rts-{{ section.id }} .tlw-rts__cta {
+    display: inline-block;
+    width: fit-content;
+    margin-top: 12px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--tlw-accent);
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tlw-primary);
+  }
+
+  @media (hover: hover) {
+    #tlw-rts-{{ section.id }} .tlw-rts__cta {
+      max-height: 0;
+      padding-bottom: 0;
+      opacity: 0;
+      overflow: hidden;
+      transform: translateY(-4px);
+      transition: max-height 500ms ease-out, opacity 500ms ease-out,
+                  transform 500ms ease-out, padding-bottom 500ms ease-out;
+    }
+
+    #tlw-rts-{{ section.id }} .tlw-rts__card:hover .tlw-rts__cta {
+      max-height: 2rem;
+      padding-bottom: 4px;
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   #tlw-rts-{{ section.id }} .tlw-rts__meter {
@@ -482,6 +558,38 @@
       "id": "badge_text",
       "label": "Badge text",
       "default": "Ready to ship"
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Line under each name",
+      "default": "Ready to Ship"
+    },
+    {
+      "type": "text",
+      "id": "soldout_text",
+      "label": "Sold out wording",
+      "info": "Replaces the price when a unit has gone",
+      "default": "Sold out"
+    },
+    {
+      "type": "text",
+      "id": "soon_text",
+      "label": "Coming soon wording",
+      "info": "Shown when a product has no price set yet",
+      "default": "Coming soon"
+    },
+    {
+      "type": "text",
+      "id": "cta_view",
+      "label": "Hover text, available",
+      "default": "View"
+    },
+    {
+      "type": "text",
+      "id": "cta_enquire",
+      "label": "Hover text, sold out",
+      "default": "Enquire"
     },
     {
       "type": "range",
