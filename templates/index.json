@@ -420,6 +420,24 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "tlw_ready_to_ship_dmXxXg": {
+      "type": "tlw-ready-to-ship",
+      "name": "TLW Ready to Ship",
+      "settings": {
+        "collection": "ready-to-ship",
+        "limit": 16,
+        "eyebrow": "Ready to ship",
+        "heading": "Your next look, without the wait",
+        "body": "Our ready-to-ship wigs are already made and available, giving you TheLacedWay finish without the usual lead time.",
+        "dispatch": "Dispatched within 1-2 working days",
+        "empty_text": "New pieces are on their way. Check back soon.",
+        "show_badge": true,
+        "badge_text": "Ready to ship",
+        "per_view": 4,
+        "gap": 24,
+        "ratio": "3 / 4"
+      }
     }
   },
   "order": [
@@ -427,6 +445,7 @@
     "hero_jVaWmY",
     "tlw_collections_showcase_rCTPQj",
     "tlw_process_kXWKc3",
-    "product_list_fa6P9H"
+    "product_list_fa6P9H",
+    "tlw_ready_to_ship_dmXxXg"
   ]
 }
