@@ -446,66 +446,10 @@
         "padding-block-end": 48
       }
     },
-    "tlw_reviews_aC8Mj7": {
+    "tlw_reviews_zEbaDi": {
       "type": "tlw-reviews",
       "blocks": {
-        "review_gkGzGV": {
-          "type": "review",
-          "settings": {
-            "rating": 5,
-            "title": "",
-            "quote": "",
-            "name": "",
-            "meta": "",
-            "verified": true
-          }
-        },
-        "review_afUcH9": {
-          "type": "review",
-          "settings": {
-            "rating": 5,
-            "title": "",
-            "quote": "",
-            "name": "",
-            "meta": "",
-            "verified": true
-          }
-        },
-        "review_7THDBU": {
-          "type": "review",
-          "settings": {
-            "rating": 5,
-            "title": "",
-            "quote": "",
-            "name": "",
-            "meta": "",
-            "verified": true
-          }
-        }
-      },
-      "block_order": [
-        "review_gkGzGV",
-        "review_afUcH9",
-        "review_7THDBU"
-      ],
-      "name": "TLW Reviews",
-      "settings": {
-        "eyebrow": "Client reviews",
-        "heading": "Worn, loved, reviewed",
-        "show_summary": true,
-        "use_judgeme": true,
-        "average": 50,
-        "average_word": "average",
-        "count": "41",
-        "count_word": "reviews",
-        "speed": 28,
-        "verified_text": "Verified buyer"
-      }
-    },
-    "178897888099e42a22": {
-      "type": "_blocks",
-      "blocks": {
-        "judge_me_reviews_cards_carousel_BPgdiq": {
+        "judge_me_reviews_cards_carousel_DJpGRR": {
           "type": "shopify://apps/judge-me-reviews/blocks/cards_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
           "settings": {
             "show_sample_reviews": true,
@@ -514,20 +458,20 @@
             "filter_pinned": false,
             "filter_featured": false,
             "filter_custom_tags": "",
-            "star_rating": "4_to_5_star",
+            "star_rating": "5_star",
             "show_review_media": true,
             "display_order": "media_first",
-            "no_image_fallback": "review_text_only",
+            "no_image_fallback": "product_image",
             "max_reviews": 20,
-            "review_length": "medium",
-            "text_size": "medium",
+            "review_length": "large",
+            "text_size": "small",
             "image_ratio": "1",
             "reviews_shown": 4,
             "show_reviewer_name": true,
             "show_product_name": true,
             "hide_arrows_mobile": true,
             "arrows_position": "sides",
-            "max_width": 1100,
+            "max_width": 1400,
             "corner_styling": "soft",
             "header_text_color": "#000000",
             "text_color": "#000000",
@@ -542,35 +486,20 @@
         }
       },
       "block_order": [
-        "judge_me_reviews_cards_carousel_BPgdiq"
+        "judge_me_reviews_cards_carousel_DJpGRR"
       ],
+      "name": "TLW Reviews",
       "settings": {
-        "content_direction": "column",
-        "vertical_on_mobile": true,
-        "horizontal_alignment": "flex-start",
-        "vertical_alignment": "center",
-        "align_baseline": false,
-        "horizontal_alignment_flex_direction_column": "flex-start",
-        "vertical_alignment_flex_direction_column": "center",
-        "gap": 12,
-        "section_width": "page-width",
-        "section_height": "",
-        "section_height_custom": 50,
-        "background_media": "none",
-        "background_color": "",
-        "video_position": "cover",
-        "background_image_position": "cover",
-        "toggle_overlay": false,
-        "overlay_color": "#00000026",
-        "overlay_style": "solid",
-        "gradient_direction": "to top",
-        "border": "none",
-        "border_width": 1,
-        "border_opacity": 100,
-        "border_color": "",
-        "border_radius": 0,
-        "padding-block-start": 0,
-        "padding-block-end": 0
+        "eyebrow": "Client reviews",
+        "heading": "Worn, loved, reviewed",
+        "show_summary": true,
+        "use_judgeme": true,
+        "average": 49,
+        "average_word": "average",
+        "count": "41",
+        "count_word": "reviews",
+        "speed": 28,
+        "verified_text": "Verified buyer"
       }
     }
   },
@@ -581,7 +510,6 @@
     "tlw_process_kXWKc3",
     "tlw_ready_to_ship_dmXxXg",
     "product_list_fa6P9H",
-    "tlw_reviews_aC8Mj7",
-    "178897888099e42a22"
+    "tlw_reviews_zEbaDi"
   ]
 }
