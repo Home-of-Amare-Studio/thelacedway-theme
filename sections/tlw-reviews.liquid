@@ -77,7 +77,12 @@
     {%- endif -%}
   </header>
 
-  {%- if section.blocks.size > 0 -%}
+  {%- assign review_blocks = 0 -%}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'review' -%}{%- assign review_blocks = review_blocks | plus: 1 -%}{%- endif -%}
+  {%- endfor -%}
+
+  {%- if review_blocks > 0 -%}
     <div
       class="tlw-reviews__track"
       data-reviews-track
@@ -141,6 +146,18 @@
       </div>
     </div>
   {%- endif -%}
+
+  {% comment %}
+    App blocks go here, so Judge.me's own carousel can sit inside this section
+    and use the heading above rather than bringing its own.
+  {% endcomment %}
+  {%- for block in section.blocks -%}
+    {%- if block.type == '@app' -%}
+      <div class="tlw-reviews__app" {{ block.shopify_attributes }}>
+        {%- render block -%}
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
 
 </section>
 
@@ -231,6 +248,21 @@
 
   @media (min-width: 768px) {
     #tlw-reviews-{{ section.id }} .tlw-reviews__track { padding-inline: 0; }
+  }
+
+  #tlw-reviews-{{ section.id }} .tlw-reviews__app {
+    padding-inline: var(--tlw-margin);
+  }
+
+  @media (min-width: 768px) {
+    #tlw-reviews-{{ section.id }} .tlw-reviews__app { padding-inline: 0; }
+  }
+
+  /* Judge.me brings its own heading and totals. This section already has
+     both above, so hide theirs to avoid saying it twice. */
+  #tlw-reviews-{{ section.id }} .tlw-reviews__app .jdgm-carousel-title,
+  #tlw-reviews-{{ section.id }} .tlw-reviews__app .jdgm-carousel-number-of-reviews {
+    display: none !important;
   }
 
   #tlw-reviews-{{ section.id }} .tlw-reviews__row {
@@ -461,6 +493,7 @@
     }
   ],
   "blocks": [
+    { "type": "@app" },
     {
       "type": "review",
       "name": "Review",
