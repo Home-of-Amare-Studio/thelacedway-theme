@@ -55,7 +55,8 @@
                       sizes: '(min-width: 1024px) 24vw, 72vw',
                       widths: '300, 450, 600, 900',
                       alt: product.title,
-                      class: 'tlw-rts__img'
+                      class: 'tlw-rts__img',
+                      draggable: 'false'
                   }}
                 {%- else -%}
                   <div class="tlw-rts__placeholder">
@@ -228,6 +229,14 @@
   #tlw-rts-{{ section.id }} .tlw-rts__row {
     display: flex;
     gap: {{ section.settings.gap }}px;
+  }
+
+  /* Without this the browser starts dragging the photo or the link itself,
+     which cancels the drag before it gets going. */
+  #tlw-rts-{{ section.id }} .tlw-rts__scroller img,
+  #tlw-rts-{{ section.id }} .tlw-rts__scroller a {
+    -webkit-user-drag: none;
+    user-select: none;
   }
 
   #tlw-rts-{{ section.id }} .tlw-rts__card {
@@ -521,8 +530,11 @@
     /* Click and drag on a mouse. Touch already works on its own. */
     var dragging = false, startX = 0, startLeft = 0, moved = false;
 
+    scroller.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
     scroller.addEventListener('pointerdown', function (e) {
       if (e.pointerType !== 'mouse') return;
+      e.preventDefault();
       dragging = true;
       moved = false;
       startX = e.clientX;
@@ -670,7 +682,8 @@
       "type": "checkbox",
       "id": "show_arrows",
       "label": "Arrows to scroll back and forward",
-      "default": true
+      "info": "Off by default. Dragging and sideways scrolling work without them.",
+      "default": false
     },
     {
       "type": "range",
