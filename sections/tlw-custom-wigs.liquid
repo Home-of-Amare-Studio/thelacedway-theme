@@ -110,6 +110,42 @@
                           >
                         </div>
 
+                      {%- when 'phone' -%}
+                        {%- assign codes = block.settings.codes | newline_to_br | strip_newlines | split: '<br />' -%}
+                        <div class="tlw-field{% if block.settings.full_width %} is-wide{% endif %}" {{ block.shopify_attributes }}>
+                          <label class="tlw-field__label" for="{{ fid }}">
+                            {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
+                          </label>
+                          <div class="tlw-phone">
+                            <select
+                              class="tlw-input tlw-select tlw-phone__code"
+                              name="contact[{{ fname }} country code]"
+                              data-phone-code
+                              aria-label="Country code"
+                            >
+                              {%- for row in codes -%}
+                                {%- assign bits = row | strip | split: '|' -%}
+                                {%- if bits.size >= 2 -%}
+                                  <option
+                                    value="{{ bits[1] | strip | escape }}"
+                                    data-hint="{{ bits[2] | default: '' | strip | escape }}"
+                                    {% if forloop.first %}selected{% endif %}
+                                  >{{ bits[0] | strip }} {{ bits[1] | strip }}</option>
+                                {%- endif -%}
+                              {%- endfor -%}
+                            </select>
+                            <input
+                              class="tlw-input tlw-phone__number"
+                              id="{{ fid }}"
+                              type="tel"
+                              name="contact[{{ fname }}]"
+                              placeholder="{{ block.settings.placeholder }}"
+                              data-phone-number
+                              {% if block.settings.required %}data-required{% endif %}
+                            >
+                          </div>
+                        </div>
+
                       {%- when 'choice' -%}
                         <div class="tlw-field{% if block.settings.full_width %} is-wide{% endif %}" {{ block.shopify_attributes }}>
                           <label class="tlw-field__label" for="{{ fid }}">
@@ -618,6 +654,23 @@
     background-position: right 16px center;
   }
 
+  #tlw-custom-{{ section.id }} .tlw-phone {
+    display: flex;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-phone__code {
+    width: auto;
+    flex: 0 0 auto;
+    min-width: 108px;
+    padding-right: 38px;
+    border-right: 0;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-phone__number {
+    flex: 1;
+    min-width: 0;
+  }
+
   #tlw-custom-{{ section.id }} .tlw-textarea {
     resize: vertical;
     min-height: 130px;
@@ -753,6 +806,18 @@
           e.preventDefault();
           if (warn) warn.hidden = false;
         }
+      });
+
+      /* Each country carries its own example number, the way the live site does */
+      wizard.querySelectorAll('[data-phone-code]').forEach(function (sel) {
+        var input = sel.parentElement.querySelector('[data-phone-number]');
+        function hint() {
+          var opt = sel.options[sel.selectedIndex];
+          var h = opt && opt.dataset.hint;
+          if (input && h) input.placeholder = h;
+        }
+        sel.addEventListener('change', hint);
+        hint();
       });
 
       wizard.addEventListener('input', function (e) {
@@ -949,6 +1014,54 @@
       ]
     },
     {
+      "type": "phone",
+      "name": "Phone with country code",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Question",
+          "default": "Contact number"
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Grey hint text",
+          "info": "Replaced automatically by the example number for the chosen country",
+          "default": "7123 456789"
+        },
+        {
+          "type": "textarea",
+          "id": "codes",
+          "label": "Countries",
+          "info": "One per line, as flag | code | example number",
+          "default": "\ud83c\uddec\ud83c\udde7 | +44 | 7123 456789\\n\ud83c\uddfa\ud83c\uddf8 | +1 | (201) 555-0123\\n\ud83c\uddf7\ud83c\uddfa | +7 | 912 345 6789\\n\ud83c\uddea\ud83c\uddec | +20 | 100 123 4567\\n\ud83c\uddff\ud83c\udde6 | +27 | 71 123 4567\\n\ud83c\uddec\ud83c\uddf7 | +30 | 691 234 5678\\n\ud83c\uddf3\ud83c\uddf1 | +31 | 6 12345678\\n\ud83c\udde7\ud83c\uddea | +32 | 470 12 34 56\\n\ud83c\uddeb\ud83c\uddf7 | +33 | 6 12 34 56 78\\n\ud83c\uddea\ud83c\uddf8 | +34 | 612 34 56 78\\n\ud83c\uddf5\ud83c\uddf9 | +351 | 912 345 678\\n\ud83c\uddf1\ud83c\uddfa | +352 | 628 123 456\\n\ud83c\uddee\ud83c\uddea | +353 | 85 123 4567\\n\ud83c\uddee\ud83c\uddf8 | +354 | 611 1234\\n\ud83c\uddf2\ud83c\uddf9 | +356 | 9696 1234\\n\ud83c\udde8\ud83c\uddfe | +357 | 96 123456\\n\ud83c\uddeb\ud83c\uddee | +358 | 41 2345678\\n\ud83c\udded\ud83c\uddfa | +36 | 20 123 4567\\n\ud83c\uddee\ud83c\uddf9 | +39 | 312 345 6789\\n\ud83c\uddf7\ud83c\uddf4 | +40 | 712 345 678\\n\ud83c\udde8\ud83c\udded | +41 | 78 123 45 67\\n\ud83c\udde6\ud83c\uddf9 | +43 | 664 123456\\n\ud83c\udde9\ud83c\uddf0 | +45 | 32 12 34 56\\n\ud83c\uddf8\ud83c\uddea | +46 | 70 123 45 67\\n\ud83c\uddf3\ud83c\uddf4 | +47 | 406 12 345\\n\ud83c\uddf5\ud83c\uddf1 | +48 | 512 345 678\\n\ud83c\udde9\ud83c\uddea | +49 | 151 12345678\\n\ud83c\uddf2\ud83c\uddfd | +52 | 222 123 4567\\n\ud83c\udde7\ud83c\uddf7 | +55 | 11 91234 5678\\n\ud83c\uddf2\ud83c\uddfe | +60 | 12 345 6789\\n\ud83c\udde6\ud83c\uddfa | +61 | 412 345 678\\n\ud83c\uddee\ud83c\udde9 | +62 | 812 345 678\\n\ud83c\uddf5\ud83c\udded | +63 | 905 123 4567\\n\ud83c\uddf3\ud83c\uddff | +64 | 21 123 4567\\n\ud83c\uddf8\ud83c\uddec | +65 | 8123 4567\\n\ud83c\uddf9\ud83c\udded | +66 | 81 234 5678\\n\ud83c\uddef\ud83c\uddf5 | +81 | 90 1234 5678\\n\ud83c\uddf0\ud83c\uddf7 | +82 | 10 1234 5678\\n\ud83c\uddfb\ud83c\uddf3 | +84 | 91 234 56 78\\n\ud83c\udde8\ud83c\uddf3 | +86 | 138 1234 5678\\n\ud83c\uddf9\ud83c\uddf7 | +90 | 501 234 56 78\\n\ud83c\uddee\ud83c\uddf3 | +91 | 98765 43210\\n\ud83c\uddf5\ud83c\uddf0 | +92 | 301 2345678\\n\ud83c\uddf2\ud83c\udde6 | +212 | 650 123456\\n\ud83c\uddec\ud83c\uddf2 | +220 | 301 2345\\n\ud83c\uddf8\ud83c\uddf3 | +221 | 70 123 45 67\\n\ud83c\uddec\ud83c\udded | +233 | 24 123 4567\\n\ud83c\uddf3\ud83c\uddec | +234 | 805 123 4567\\n\ud83c\udde8\ud83c\uddf2 | +237 | 6 71 23 45 67\\n\ud83c\uddf7\ud83c\uddfc | +250 | 78 123 4567\\n\ud83c\uddf0\ud83c\uddea | +254 | 712 123456\\n\ud83c\uddf9\ud83c\uddff | +255 | 621 234 567\\n\ud83c\uddfa\ud83c\uddec | +256 | 712 345678\\n\ud83c\uddff\ud83c\uddf2 | +260 | 95 5123456\\n\ud83c\uddff\ud83c\uddfc | +263 | 71 234 5678\\n\ud83c\uddf3\ud83c\udde6 | +264 | 81 123 4567\\n\ud83c\udde7\ud83c\uddfc | +267 | 71 123 456\\n\ud83c\udde7\ud83c\udde9 | +880 | 1812 345678\\n\ud83c\uddf8\ud83c\udde6 | +966 | 51 234 5678\\n\ud83c\udde6\ud83c\uddea | +971 | 50 123 4567\\n\ud83c\uddee\ud83c\uddf1 | +972 | 50 123 4567\\n\ud83c\uddf6\ud83c\udde6 | +974 | 3312 3456\\n\ud83c\udde7\ud83c\uddf8 | +1242 | 359 1234\\n\ud83c\udde7\ud83c\udde7 | +1246 | 250 1234\\n\ud83c\uddef\ud83c\uddf2 | +1876 | 210 1234\\n\ud83c\uddf9\ud83c\uddf9 | +1868 | 291 1234"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Must be answered",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "full_width",
+          "label": "Full width",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "step",
+          "label": "Which step",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 1
+        }
+      ]
+    },
+    {
       "type": "choice",
       "name": "Dropdown",
       "settings": [
@@ -1062,7 +1175,7 @@
       "blocks": [
         { "type": "field",  "settings": { "label": "Full name", "kind": "text",  "required": true, "step": 1, "placeholder": "Your full name" } },
         { "type": "field",  "settings": { "label": "Email address", "kind": "email", "required": true, "step": 1, "placeholder": "you@email.com" } },
-        { "type": "field",  "settings": { "label": "Contact number", "kind": "tel", "step": 1, "placeholder": "7123 456789" } },
+        { "type": "phone",  "settings": { "label": "Contact number", "step": 1 } },
 
         { "type": "choice", "settings": { "label": "Hair type", "options": "Virgin, Raw, Not sure", "step": 2, "required": true } },
         { "type": "choice", "settings": { "label": "Length", "options": "16, 18, 20, 22, 24, 26", "step": 2, "required": true } },

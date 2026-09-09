@@ -502,10 +502,10 @@
         "verified_text": "Verified buyer"
       }
     },
-    "tlw_custom_wigs_rkePRq": {
+    "tlw_custom_wigs_N7RKfc": {
       "type": "tlw-custom-wigs",
       "blocks": {
-        "field_FRnG4b": {
+        "field_CqqAwq": {
           "type": "field",
           "settings": {
             "label": "Name",
@@ -515,7 +515,7 @@
             "full_width": false
           }
         },
-        "field_yN9kqd": {
+        "field_gYFhnp": {
           "type": "field",
           "settings": {
             "label": "Email",
@@ -525,7 +525,7 @@
             "full_width": false
           }
         },
-        "field_qAAKeT": {
+        "field_tzmjfY": {
           "type": "field",
           "settings": {
             "label": "Phone",
@@ -535,7 +535,7 @@
             "full_width": false
           }
         },
-        "field_LfUa4q": {
+        "field_mBVcAL": {
           "type": "field",
           "settings": {
             "label": "Instagram",
@@ -545,7 +545,7 @@
             "full_width": false
           }
         },
-        "choice_bmxyN7": {
+        "choice_VXawhL": {
           "type": "choice",
           "settings": {
             "label": "Hair type",
@@ -555,7 +555,7 @@
             "full_width": false
           }
         },
-        "choice_KLUrcb": {
+        "choice_Nn4xR8": {
           "type": "choice",
           "settings": {
             "label": "Lace size",
@@ -565,7 +565,7 @@
             "full_width": false
           }
         },
-        "choice_8z4N9h": {
+        "choice_WhQhpP": {
           "type": "choice",
           "settings": {
             "label": "Length",
@@ -575,7 +575,7 @@
             "full_width": false
           }
         },
-        "choice_HjkFUc": {
+        "choice_NMnQfV": {
           "type": "choice",
           "settings": {
             "label": "Texture",
@@ -585,7 +585,7 @@
             "full_width": false
           }
         },
-        "choice_pG94dh": {
+        "choice_ygdeDz": {
           "type": "choice",
           "settings": {
             "label": "Colour",
@@ -595,7 +595,7 @@
             "full_width": false
           }
         },
-        "choice_dtQhgx": {
+        "choice_TdGfcH": {
           "type": "choice",
           "settings": {
             "label": "When do you need it",
@@ -605,7 +605,7 @@
             "full_width": false
           }
         },
-        "message_wLDmfN": {
+        "message_9DmgFb": {
           "type": "message",
           "settings": {
             "label": "Anything else",
@@ -615,17 +615,17 @@
         }
       },
       "block_order": [
-        "field_FRnG4b",
-        "field_yN9kqd",
-        "field_qAAKeT",
-        "field_LfUa4q",
-        "choice_bmxyN7",
-        "choice_KLUrcb",
-        "choice_8z4N9h",
-        "choice_HjkFUc",
-        "choice_pG94dh",
-        "choice_dtQhgx",
-        "message_wLDmfN"
+        "field_CqqAwq",
+        "field_gYFhnp",
+        "field_tzmjfY",
+        "field_mBVcAL",
+        "choice_VXawhL",
+        "choice_Nn4xR8",
+        "choice_WhQhpP",
+        "choice_NMnQfV",
+        "choice_ygdeDz",
+        "choice_TdGfcH",
+        "message_9DmgFb"
       ],
       "name": "TLW Custom Wigs",
       "settings": {
@@ -652,6 +652,6 @@
     "tlw_ready_to_ship_dmXxXg",
     "product_list_fa6P9H",
     "tlw_reviews_zEbaDi",
-    "tlw_custom_wigs_rkePRq"
+    "tlw_custom_wigs_N7RKfc"
   ]
 }
