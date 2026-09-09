@@ -395,3 +395,184 @@ button {
   color: var(--tlw-accent);
   font-style: italic;
 }
+/* ==========================================================================
+   THELACEDWÁY: Judge.me restyling
+   Home of Amare Studio
+
+   Judge.me renders its own markup with jdgm- class names. This pulls it toward
+   the site's design: Fraunces headings, gold stars, square corners, no purple.
+
+   Add this to the bottom of assets/tlw-theme.css.
+
+   Judge.me changes its markup from time to time, so if the carousel suddenly
+   looks like Judge.me again after an app update, that is why, and the class
+   names below will need checking.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Stars
+   -------------------------------------------------------------------------- */
+
+.jdgm-star,
+.jdgm-star.jdgm--on,
+.jdgm-star.jdgm--half,
+.jdgm-widget .jdgm-star {
+  color: var(--tlw-accent) !important;
+}
+
+.jdgm-star.jdgm--off {
+  color: var(--tlw-outline-variant) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Carousel shell
+   -------------------------------------------------------------------------- */
+
+.jdgm-carousel-wrapper {
+  background: transparent !important;
+  padding-block: 0 !important;
+}
+
+.jdgm-carousel-title,
+.jdgm-carousel-wrapper .jdgm-carousel-title {
+  font-family: var(--tlw-font-display) !important;
+  font-weight: 300 !important;
+  font-size: 36px !important;
+  letter-spacing: -0.01em !important;
+  color: var(--tlw-primary) !important;
+  text-transform: none !important;
+}
+
+@media (min-width: 768px) {
+  .jdgm-carousel-title {
+    font-size: 56px !important;
+  }
+}
+
+.jdgm-carousel-number-of-reviews,
+.jdgm-carousel-wrapper .jdgm-carousel-number-of-reviews {
+  font-family: var(--tlw-font-body) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: var(--tlw-accent) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Cards
+   -------------------------------------------------------------------------- */
+
+.jdgm-carousel-item {
+  border: 1px solid var(--tlw-outline-variant) !important;
+  border-radius: 0 !important;
+  background: var(--tlw-surface-lowest) !important;
+  box-shadow: none !important;
+  padding: 28px !important;
+}
+
+.jdgm-carousel-item__review-title,
+.jdgm-rev__title {
+  font-family: var(--tlw-font-display) !important;
+  font-weight: 400 !important;
+  font-size: 22px !important;
+  line-height: 1.2 !important;
+  text-transform: uppercase !important;
+  color: var(--tlw-primary) !important;
+}
+
+.jdgm-carousel-item__review-body,
+.jdgm-rev__body {
+  font-family: var(--tlw-font-body) !important;
+  font-size: 16px !important;
+  font-weight: 300 !important;
+  line-height: 1.65 !important;
+  color: var(--tlw-on-surface-variant) !important;
+}
+
+.jdgm-carousel-item__reviewer-name,
+.jdgm-rev__author {
+  font-family: var(--tlw-font-body) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: var(--tlw-primary) !important;
+  padding-top: 16px !important;
+  border-top: 1px solid var(--tlw-outline-variant) !important;
+}
+
+.jdgm-carousel-item__product-title,
+.jdgm-rev__timestamp {
+  font-family: var(--tlw-font-body) !important;
+  font-size: 12px !important;
+  font-weight: 300 !important;
+  color: var(--tlw-on-surface-variant) !important;
+  opacity: 0.75 !important;
+}
+
+/* The verified buyer line, gold to match the rest of the site */
+.jdgm-rev__buyer-badge,
+.jdgm-carousel-item__verified-buyer {
+  font-family: var(--tlw-font-body) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  color: var(--tlw-accent) !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+/* Customer photos */
+.jdgm-carousel-item__review-thumbnail,
+.jdgm-rev__pic-img {
+  border-radius: 0 !important;
+}
+
+/* --------------------------------------------------------------------------
+   Arrows and dots
+   -------------------------------------------------------------------------- */
+
+.jdgm-carousel__arrows .jdgm-carousel__left-arrow,
+.jdgm-carousel__arrows .jdgm-carousel__right-arrow {
+  border-radius: 0 !important;
+  border: 1px solid var(--tlw-outline-variant) !important;
+  background: transparent !important;
+  color: var(--tlw-primary) !important;
+}
+
+.jdgm-carousel__dots .jdgm-carousel__dot--active {
+  background: var(--tlw-accent) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Buttons, so nothing renders in Judge.me's default blue
+   -------------------------------------------------------------------------- */
+
+.jdgm-write-rev-link,
+.jdgm-btn,
+.jdgm-btn--primary {
+  border-radius: 0 !important;
+  background: var(--tlw-primary) !important;
+  border: 1px solid var(--tlw-primary) !important;
+  color: var(--tlw-on-primary) !important;
+  font-family: var(--tlw-font-body) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+}
+
+.jdgm-write-rev-link:hover,
+.jdgm-btn:hover {
+  background: transparent !important;
+  color: var(--tlw-primary) !important;
+}
+
+/* Judge.me's own branding line under the widget */
+.jdgm-branding-footer,
+.jdgm-powered-by {
+  opacity: 0.4 !important;
+  font-size: 10px !important;
+}
