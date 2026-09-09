@@ -146,7 +146,7 @@
     top: 0;
     display: flex;
     align-items: center;
-    height: 100svh;
+    height: {{ section.settings.panel_height }}svh;
     overflow: hidden;
     background: var(--tlw-surface-lowest);
     color: var(--tlw-primary);
@@ -161,13 +161,14 @@
   @media (min-width: 1024px) {
     #tlw-process-{{ section.id }} .tlw-process__bg {
       right: {{ section.settings.image_width }}%;
+      top: {{ section.settings.image_top }}px;
     }
   }
 
   #tlw-process-{{ section.id }} .tlw-process__img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: {{ section.settings.fit }};
     object-position: 50% {{ section.settings.focal }}%;
     display: block;
   }
@@ -464,6 +465,39 @@
       "step": 2,
       "unit": "%",
       "default": 42
+    },
+    {
+      "type": "select",
+      "id": "fit",
+      "label": "Photo fit",
+      "info": "Fill crops the photo to fill the space. Whole photo shows all of it and may leave gaps.",
+      "options": [
+        { "value": "cover", "label": "Fill the space" },
+        { "value": "contain", "label": "Show the whole photo" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "range",
+      "id": "image_top",
+      "label": "Push the photo down from the top",
+      "info": "Shortens the photo area, so less of the picture gets cropped away",
+      "min": 0,
+      "max": 200,
+      "step": 8,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "panel_height",
+      "label": "Panel height",
+      "info": "Lower it if the photo is cropping too tightly",
+      "min": 60,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
     },
     {
       "type": "range",
