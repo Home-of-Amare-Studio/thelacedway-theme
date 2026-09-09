@@ -141,11 +141,16 @@
         "logo_light": "shopify://shop_images/logo-white-v3.webp",
         "logo_width": 160,
         "overlay_first": true,
-        "height": 68,
+        "hide_until_scroll": true,
+        "top_behaviour": "hide",
+        "reveal_distance": 200,
+        "height": 120,
         "opacity": 90,
         "blur": true,
         "show_border": true,
         "link_size": 13,
+        "link_weight": "400",
+        "logo_nudge": 0,
         "link_gap": 32
       }
     }
