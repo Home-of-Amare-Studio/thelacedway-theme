@@ -72,7 +72,7 @@
                 <h3 class="tlw-rts__name">{{ product.title }}</h3>
                 <span class="tlw-rts__price">
                   {%- if product.available == false -%}
-                    {{ section.settings.soldout_text }}
+                    <span class="tlw-rts__soldout">{{ section.settings.soldout_text }}</span>
                   {%- elsif product.price == 0 -%}
                     {{ section.settings.soon_text }}
                   {%- elsif product.price_varies -%}
@@ -107,6 +107,21 @@
       </div>
 
       <div class="tlw-rts__meter">
+        {%- if section.settings.show_arrows -%}
+          <div class="tlw-rts__arrows">
+            <button type="button" class="tlw-rts__arrow" data-rts-prev aria-label="Previous">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 4 7 12l8 8"/>
+              </svg>
+            </button>
+            <button type="button" class="tlw-rts__arrow" data-rts-next aria-label="Next">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 4l8 8-8 8"/>
+              </svg>
+            </button>
+          </div>
+        {%- endif -%}
+
         <div class="tlw-rts__track">
           <span class="tlw-rts__fill" data-rts-fill></span>
         </div>
@@ -230,7 +245,12 @@
 
   @media (min-width: 1024px) {
     #tlw-rts-{{ section.id }} .tlw-rts__card {
-      flex-basis: calc((100% - ({{ section.settings.per_view | minus: 1 }} * {{ section.settings.gap }}px)) / {{ section.settings.per_view }});
+      /* Slightly narrower than an exact fit, so the next card peeks in at the
+         edge and it reads as something you can scroll. */
+      flex-basis: calc(
+        (100% - ({{ section.settings.peek }}px + ({{ section.settings.per_view | minus: 1 }} * {{ section.settings.gap }}px)))
+        / {{ section.settings.per_view }}
+      );
     }
   }
 
@@ -315,6 +335,12 @@
     color: var(--tlw-on-surface-variant);
   }
 
+  #tlw-rts-{{ section.id }} .tlw-rts__soldout {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 15px;
+  }
+
   #tlw-rts-{{ section.id }} .tlw-rts__was {
     font-size: 13px;
     text-decoration: line-through;
@@ -371,6 +397,37 @@
 
   @media (min-width: 1024px) {
     #tlw-rts-{{ section.id }} .tlw-rts__meter { padding-inline: 0; }
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__arrows {
+    display: flex;
+    gap: 8px;
+    margin-right: 20px;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--tlw-outline-variant);
+    border-radius: var(--tlw-radius);
+    background: transparent;
+    color: var(--tlw-primary);
+    transition: background-color 250ms ease, color 250ms ease, opacity 250ms ease;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__arrow:hover {
+    background: var(--tlw-accent);
+    border-color: var(--tlw-accent);
+    color: #fff;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__arrow[disabled] {
+    opacity: 0.3;
+    pointer-events: none;
   }
 
   #tlw-rts-{{ section.id }} .tlw-rts__track {
@@ -437,7 +494,25 @@
       if (idxEl && total > 0) {
         idxEl.textContent = Math.min(total, Math.round(p * Math.max(0, total - 1)) + 1);
       }
+      if (prev) prev.disabled = scroller.scrollLeft <= 1;
+      if (next) next.disabled = scroller.scrollLeft >= max - 1;
     }
+
+    var prev = root.querySelector('[data-rts-prev]');
+    var next = root.querySelector('[data-rts-next]');
+
+    function step() {
+      var card = scroller.querySelector('.tlw-rts__card');
+      return card ? card.offsetWidth + {{ section.settings.gap }} : scroller.clientWidth * 0.8;
+    }
+
+    if (prev) prev.addEventListener('click', function () {
+      scroller.scrollBy({ left: -step(), behavior: 'smooth' });
+    });
+
+    if (next) next.addEventListener('click', function () {
+      scroller.scrollBy({ left: step(), behavior: 'smooth' });
+    });
 
     scroller.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
@@ -592,6 +667,12 @@
       "default": "Enquire"
     },
     {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Arrows to scroll back and forward",
+      "default": true
+    },
+    {
       "type": "range",
       "id": "per_view",
       "label": "Cards across on desktop",
@@ -608,6 +689,17 @@
       "max": 48,
       "step": 4,
       "default": 24
+    },
+    {
+      "type": "range",
+      "id": "peek",
+      "label": "How much of the next card shows",
+      "info": "The sliver at the right edge that hints you can scroll",
+      "min": 0,
+      "max": 180,
+      "step": 10,
+      "unit": "px",
+      "default": 90
     },
     {
       "type": "select",
