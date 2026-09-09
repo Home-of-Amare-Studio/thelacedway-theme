@@ -113,6 +113,114 @@
         "padding-block-end": 72
       }
     },
+    "tlw_collections_showcase_rCTPQj": {
+      "type": "tlw-collections-showcase",
+      "blocks": {
+        "tile_CbLphh": {
+          "type": "tile",
+          "settings": {
+            "image": "shopify://shop_images/coll-essentials.jpg",
+            "title": "The Essentials",
+            "hook": "Every wardrobe starts with a staple.",
+            "body": "A curated edit of timeless virgin hair wigs, crafted for effortless everyday looks.",
+            "link": "shopify://collections/the-essential",
+            "button_label": "Shop now",
+            "status_label": ""
+          }
+        },
+        "tile_YCgbf9": {
+          "type": "tile",
+          "settings": {
+            "image": "shopify://shop_images/coll-signature.jpg",
+            "title": "The Signature",
+            "hook": "The styles that define TheLacedWay.",
+            "body": "A curated edit of luxury raw hair wigs, featuring our most iconic colours and signature looks, crafted to make a statement.",
+            "link": "shopify://collections/the-signature",
+            "button_label": "Shop now",
+            "status_label": ""
+          }
+        },
+        "tile_6DEWUX": {
+          "type": "tile",
+          "settings": {
+            "image": "shopify://shop_images/coll-bespoq.jpg",
+            "title": "The Bespoq",
+            "hook": "Created without limits.",
+            "body": "Bespoke creations, crafted exclusively for each seasonal drop.",
+            "link": "shopify://collections/the-bespoq",
+            "button_label": "",
+            "status_label": "Coming soon"
+          }
+        }
+      },
+      "block_order": [
+        "tile_CbLphh",
+        "tile_YCgbf9",
+        "tile_6DEWUX"
+      ],
+      "name": "TLW Collections",
+      "settings": {
+        "eyebrow": "The collections",
+        "heading_before": "Find your",
+        "heading_accent": "perfect",
+        "heading_after": "look.",
+        "show_rule": true,
+        "intro": "The right hair doesn't change you, it enhances you. Explore our collections and find the look that feels like you.",
+        "columns": 3,
+        "gap": 16,
+        "ratio": "4 / 5",
+        "focal": "center center",
+        "show_divider": true
+      }
+    },
+    "tlw_process_kXWKc3": {
+      "type": "tlw-process",
+      "blocks": {
+        "feature_XgVjxy": {
+          "type": "feature",
+          "settings": {
+            "icon": "scissors",
+            "label": "Expertly constructed"
+          }
+        },
+        "feature_j4KxhY": {
+          "type": "feature",
+          "settings": {
+            "icon": "ruler",
+            "label": "Precisely customised"
+          }
+        },
+        "feature_TCkCBk": {
+          "type": "feature",
+          "settings": {
+            "icon": "hand",
+            "label": "Finished by hand"
+          }
+        }
+      },
+      "block_order": [
+        "feature_XgVjxy",
+        "feature_j4KxhY",
+        "feature_TCkCBk"
+      ],
+      "name": "TLW Process",
+      "settings": {
+        "image": "shopify://shop_images/RTS003.jpg",
+        "image_width": 42,
+        "fit": "cover",
+        "image_top": 0,
+        "panel_height": 100,
+        "focal": 0,
+        "eyebrow": "Our process",
+        "line_one": "Made with intention.",
+        "line_two": "Finished with",
+        "line_two_accent": "precision.",
+        "body": "Every unit is carefully constructed, customised and finished by hand, with attention to every detail for a seamless, natural finish.",
+        "scroll_label": "Keep scrolling",
+        "scroll_length": 140,
+        "type_end": 28
+      }
+    },
     "product_list_fa6P9H": {
       "type": "product-list",
       "blocks": {
@@ -291,6 +399,7 @@
           ]
         }
       },
+      "disabled": true,
       "name": "t:names.product_list",
       "settings": {
         "collection": "all",
@@ -310,111 +419,6 @@
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 48,
         "padding-block-end": 48
-      }
-    },
-    "tlw_collections_showcase_rCTPQj": {
-      "type": "tlw-collections-showcase",
-      "blocks": {
-        "tile_CbLphh": {
-          "type": "tile",
-          "settings": {
-            "image": "shopify://shop_images/coll-essentials.jpg",
-            "title": "The Essentials",
-            "hook": "Every wardrobe starts with a staple.",
-            "body": "A curated edit of timeless virgin hair wigs, crafted for effortless everyday looks.",
-            "link": "shopify://collections/the-essential",
-            "button_label": "Shop now",
-            "status_label": ""
-          }
-        },
-        "tile_YCgbf9": {
-          "type": "tile",
-          "settings": {
-            "image": "shopify://shop_images/coll-signature.jpg",
-            "title": "The Signature",
-            "hook": "The styles that define TheLacedWay.",
-            "body": "A curated edit of luxury raw hair wigs, featuring our most iconic colours and signature looks, crafted to make a statement.",
-            "link": "shopify://collections/the-signature",
-            "button_label": "Shop now",
-            "status_label": ""
-          }
-        },
-        "tile_6DEWUX": {
-          "type": "tile",
-          "settings": {
-            "image": "shopify://shop_images/coll-bespoq.jpg",
-            "title": "The Bespoq",
-            "hook": "Created without limits.",
-            "body": "Bespoke creations, crafted exclusively for each seasonal drop.",
-            "link": "shopify://collections/the-bespoq",
-            "button_label": "",
-            "status_label": "Coming soon"
-          }
-        }
-      },
-      "block_order": [
-        "tile_CbLphh",
-        "tile_YCgbf9",
-        "tile_6DEWUX"
-      ],
-      "name": "TLW Collections",
-      "settings": {
-        "eyebrow": "The collections",
-        "heading_before": "Find your",
-        "heading_accent": "perfect",
-        "heading_after": "look.",
-        "show_rule": true,
-        "intro": "The right hair doesn't change you, it enhances you. Explore our collections and find the look that feels like you.",
-        "columns": 3,
-        "gap": 16,
-        "ratio": "4 / 5",
-        "focal": "center center",
-        "show_divider": true
-      }
-    },
-    "tlw_process_kXWKc3": {
-      "type": "tlw-process",
-      "blocks": {
-        "feature_XgVjxy": {
-          "type": "feature",
-          "settings": {
-            "icon": "scissors",
-            "label": "Expertly constructed"
-          }
-        },
-        "feature_j4KxhY": {
-          "type": "feature",
-          "settings": {
-            "icon": "ruler",
-            "label": "Precisely customised"
-          }
-        },
-        "feature_TCkCBk": {
-          "type": "feature",
-          "settings": {
-            "icon": "hand",
-            "label": "Finished by hand"
-          }
-        }
-      },
-      "block_order": [
-        "feature_XgVjxy",
-        "feature_j4KxhY",
-        "feature_TCkCBk"
-      ],
-      "name": "TLW Process",
-      "settings": {
-        "image": "shopify://shop_images/RTS003.jpg",
-        "image_width": 42,
-        "focal": 0,
-        "eyebrow": "Our process",
-        "line_one": "Made with intention.",
-        "line_two": "Finished with",
-        "line_two_accent": "precision.",
-        "body": "Every unit is carefully constructed, customised and finished by hand, with attention to every detail for a seamless, natural finish.",
-        "scroll_label": "Keep scrolling",
-        "scroll_length": 140,
-        "type_end": 28
       }
     }
   },
