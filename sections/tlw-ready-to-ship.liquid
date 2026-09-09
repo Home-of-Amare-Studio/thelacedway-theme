@@ -1,0 +1,519 @@
+{% comment %}
+  THELACEDWÁY ready to ship
+  Home of Amare Studio
+
+  A horizontal scroller rather than a grid. Snaps card to card on phones, runs
+  free on desktop, and can be dragged with the mouse or scrolled sideways with
+  a trackpad. Underneath, a progress bar fills and a counter shows where you are.
+
+  Products come straight from the chosen collection, so anything Destinee adds
+  or sells out of updates here on its own.
+{% endcomment %}
+
+{%- liquid
+  assign source = collections[section.settings.collection]
+  assign limit = section.settings.limit
+-%}
+
+<section class="tlw-rts" id="tlw-rts-{{ section.id }}">
+
+  <header class="tlw-rts__head">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="tlw-label-caps tlw-rts__eyebrow">{{ section.settings.eyebrow }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.heading != blank -%}
+      <h2 class="tlw-rts__title">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.body != blank -%}
+      <p class="tlw-rts__text tlw-body-md">{{ section.settings.body }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.dispatch != blank -%}
+      <span class="tlw-rts__dispatch">{{ section.settings.dispatch }}</span>
+    {%- endif -%}
+  </header>
+
+  {%- if source != blank and source.products.size > 0 -%}
+
+    {%- assign shown = 0 -%}
+    <div class="tlw-rts__wrap">
+      <div class="tlw-rts__scroller" data-rts-scroller>
+        <div class="tlw-rts__row">
+          {%- for product in source.products limit: limit -%}
+            {%- if product.tags contains 'addon' -%}{%- continue -%}{%- endif -%}
+            {%- assign shown = shown | plus: 1 -%}
+
+            <a class="tlw-rts__card" href="{{ product.url }}">
+              <div class="tlw-rts__media">
+                {%- if product.featured_media -%}
+                  {{ product.featured_media
+                    | image_url: width: 900
+                    | image_tag:
+                      loading: 'lazy',
+                      sizes: '(min-width: 1024px) 24vw, 72vw',
+                      widths: '300, 450, 600, 900',
+                      alt: product.title,
+                      class: 'tlw-rts__img'
+                  }}
+                {%- else -%}
+                  <div class="tlw-rts__placeholder">
+                    <span class="tlw-label-caps">{{ product.title }}</span>
+                  </div>
+                {%- endif -%}
+
+                {%- if section.settings.show_badge and section.settings.badge_text != blank -%}
+                  <span class="tlw-rts__badge tlw-label-caps">{{ section.settings.badge_text }}</span>
+                {%- endif -%}
+
+                {%- unless product.available -%}
+                  <span class="tlw-rts__soldout tlw-label-caps">Sold out</span>
+                {%- endunless -%}
+              </div>
+
+              <div class="tlw-rts__body">
+                <h3 class="tlw-rts__name">{{ product.title }}</h3>
+                <p class="tlw-rts__price">
+                  {%- if product.price_varies -%}
+                    From {{ product.price_min | money }}
+                  {%- else -%}
+                    {{ product.price | money }}
+                  {%- endif -%}
+                </p>
+              </div>
+            </a>
+          {%- endfor -%}
+
+          {% comment %} Breathing room at the end of the run on mobile {% endcomment %}
+          <div class="tlw-rts__tail" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="tlw-rts__meter">
+        <div class="tlw-rts__track">
+          <span class="tlw-rts__fill" data-rts-fill></span>
+        </div>
+        <div class="tlw-rts__count">
+          <span data-rts-index>1</span>
+          <span class="tlw-rts__slash">/</span>
+          <span data-rts-total>{{ shown }}</span>
+        </div>
+      </div>
+    </div>
+
+  {%- else -%}
+    <p class="tlw-rts__empty tlw-body-lg">{{ section.settings.empty_text }}</p>
+  {%- endif -%}
+
+</section>
+
+<style>
+  #tlw-rts-{{ section.id }} {
+    padding-block: 72px;
+    background: var(--tlw-surface-lowest);
+    color: var(--tlw-primary);
+    overflow: hidden;
+  }
+
+  @media (min-width: 900px) {
+    #tlw-rts-{{ section.id }} { padding-block: 120px; }
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__head {
+    max-width: 900px;
+    margin: 0 auto 64px;
+    padding-inline: var(--tlw-margin);
+    text-align: center;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__eyebrow {
+    color: var(--tlw-on-surface-variant);
+    margin: 0 0 16px;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__title {
+    font-family: var(--tlw-font-display);
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 1.2;
+    margin: 0 auto;
+    max-width: 20ch;
+  }
+
+  @media (min-width: 768px) {
+    #tlw-rts-{{ section.id }} .tlw-rts__title {
+      font-size: 64px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      max-width: none;
+    }
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__text {
+    max-width: 42rem;
+    margin: 16px auto 0;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__dispatch {
+    display: block;
+    margin-top: 16px;
+    color: var(--tlw-accent);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__wrap {
+    max-width: 1400px;
+    margin-inline: auto;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__scroller {
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 11vw;
+    padding-inline: 11vw;
+    scrollbar-width: none;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__scroller::-webkit-scrollbar { display: none; }
+
+  @media (min-width: 1024px) {
+    #tlw-rts-{{ section.id }} .tlw-rts__scroller {
+      scroll-snap-type: none;
+      scroll-padding-left: 0;
+      padding-inline: 0;
+      cursor: grab;
+    }
+    #tlw-rts-{{ section.id }} .tlw-rts__scroller.is-dragging { cursor: grabbing; }
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__row {
+    display: flex;
+    gap: {{ section.settings.gap }}px;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__card {
+    flex: 0 0 72vw;
+    scroll-snap-align: center;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  @media (min-width: 640px) {
+    #tlw-rts-{{ section.id }} .tlw-rts__card { flex-basis: 44vw; }
+  }
+
+  @media (min-width: 1024px) {
+    #tlw-rts-{{ section.id }} .tlw-rts__card {
+      flex-basis: calc((100% - ({{ section.settings.per_view | minus: 1 }} * {{ section.settings.gap }}px)) / {{ section.settings.per_view }});
+    }
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__tail { flex: 0 0 11vw; }
+
+  @media (min-width: 1024px) {
+    #tlw-rts-{{ section.id }} .tlw-rts__tail { display: none; }
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__media {
+    position: relative;
+    overflow: hidden;
+    background: var(--tlw-surface-container);
+    aspect-ratio: {{ section.settings.ratio }};
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1100ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @media (hover: hover) {
+    #tlw-rts-{{ section.id }} .tlw-rts__card:hover .tlw-rts__img { transform: scale(1.04); }
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 16px;
+    color: var(--tlw-outline);
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 7px 12px;
+    background: var(--tlw-accent);
+    color: #fff;
+    font-size: 11px;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__soldout {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    padding: 7px 12px;
+    background: var(--tlw-primary);
+    color: var(--tlw-on-primary);
+    font-size: 11px;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__body { padding-top: 16px; }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__name {
+    font-family: var(--tlw-font-display);
+    font-weight: 400;
+    font-size: 20px;
+    margin: 0 0 4px;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__price {
+    margin: 0;
+    font-size: 15px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__meter {
+    display: flex;
+    align-items: center;
+    margin-top: 32px;
+    padding-inline: 11vw;
+  }
+
+  @media (min-width: 1024px) {
+    #tlw-rts-{{ section.id }} .tlw-rts__meter { padding-inline: 0; }
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__track {
+    position: relative;
+    flex: 1;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--tlw-outline-variant);
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__fill {
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: 0%;
+    border-radius: 2px;
+    background: var(--tlw-accent);
+    transition: width 150ms linear;
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__count {
+    position: relative;
+    z-index: 2;
+    padding: 8px 16px;
+    background: var(--tlw-surface-lowest);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  @media (min-width: 1024px) {
+    #tlw-rts-{{ section.id }} .tlw-rts__count { padding-inline: 20px; }
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__slash {
+    margin-inline: 6px;
+    color: var(--tlw-outline-variant);
+  }
+
+  #tlw-rts-{{ section.id }} .tlw-rts__empty {
+    text-align: center;
+    color: var(--tlw-outline);
+    padding-block: 40px;
+  }
+</style>
+
+<script>
+  (function () {
+    var root = document.getElementById('tlw-rts-{{ section.id }}');
+    if (!root) return;
+
+    var scroller = root.querySelector('[data-rts-scroller]');
+    var fill = root.querySelector('[data-rts-fill]');
+    var idxEl = root.querySelector('[data-rts-index]');
+    var totalEl = root.querySelector('[data-rts-total]');
+    if (!scroller) return;
+
+    var total = parseInt(totalEl ? totalEl.textContent : '0', 10) || 0;
+
+    function update() {
+      var max = scroller.scrollWidth - scroller.clientWidth;
+      var p = max <= 0 ? 0 : Math.min(1, Math.max(0, scroller.scrollLeft / max));
+      if (fill) fill.style.width = (p * 100) + '%';
+      if (idxEl && total > 0) {
+        idxEl.textContent = Math.min(total, Math.round(p * Math.max(0, total - 1)) + 1);
+      }
+    }
+
+    scroller.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+
+    /* Click and drag on a mouse. Touch already works on its own. */
+    var dragging = false, startX = 0, startLeft = 0, moved = false;
+
+    scroller.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      dragging = true;
+      moved = false;
+      startX = e.clientX;
+      startLeft = scroller.scrollLeft;
+      scroller.classList.add('is-dragging');
+    });
+
+    window.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      var dx = e.clientX - startX;
+      if (!moved && Math.abs(dx) < 6) return;
+      moved = true;
+      scroller.scrollLeft = startLeft - dx;
+    });
+
+    window.addEventListener('pointerup', function () {
+      dragging = false;
+      scroller.classList.remove('is-dragging');
+    });
+
+    /* A drag should not also count as a click on the card underneath. */
+    scroller.addEventListener('click', function (e) {
+      if (moved) {
+        e.preventDefault();
+        e.stopPropagation();
+        moved = false;
+      }
+    }, true);
+
+    /* Sideways trackpad and shift plus wheel. */
+    scroller.addEventListener('wheel', function (e) {
+      var dx = e.shiftKey && e.deltaX === 0 ? e.deltaY : e.deltaX;
+      if (dx === 0) return;
+      if (Math.abs(dx) <= Math.abs(e.shiftKey ? 0 : e.deltaY)) return;
+      var max = scroller.scrollWidth - scroller.clientWidth;
+      if ((dx > 0 && scroller.scrollLeft >= max - 1) || (dx < 0 && scroller.scrollLeft <= 0)) return;
+      e.preventDefault();
+      scroller.scrollLeft += dx;
+    }, { passive: false });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "TLW Ready to Ship",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Products come straight from here, so sold or new units update on their own"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Most to show",
+      "min": 4,
+      "max": 24,
+      "step": 2,
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Words"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Small label above the heading",
+      "default": "Ready to ship"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Your next look, without the wait"
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Paragraph",
+      "default": "Our ready-to-ship wigs are already made and available, giving you TheLacedWay finish without the usual lead time."
+    },
+    {
+      "type": "text",
+      "id": "dispatch",
+      "label": "Gold dispatch line",
+      "default": "Dispatched within 1-2 working days"
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "Text when the collection is empty",
+      "default": "New pieces are on their way. Check back soon."
+    },
+    {
+      "type": "header",
+      "content": "Cards"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Gold badge on each card",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge text",
+      "default": "Ready to ship"
+    },
+    {
+      "type": "range",
+      "id": "per_view",
+      "label": "Cards across on desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Space between cards",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "Image shape",
+      "options": [
+        { "value": "3 / 4", "label": "Portrait" },
+        { "value": "4 / 5", "label": "Tall portrait" },
+        { "value": "2 / 3", "label": "Taller still" },
+        { "value": "1 / 1", "label": "Square" }
+      ],
+      "default": "3 / 4"
+    }
+  ],
+  "presets": [{ "name": "TLW Ready to Ship" }]
+}
+{% endschema %}
