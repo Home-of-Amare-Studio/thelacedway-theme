@@ -291,7 +291,6 @@
           ]
         }
       },
-      "disabled": true,
       "name": "t:names.product_list",
       "settings": {
         "collection": "all",
@@ -372,12 +371,58 @@
         "focal": "center center",
         "show_divider": true
       }
+    },
+    "tlw_process_kXWKc3": {
+      "type": "tlw-process",
+      "blocks": {
+        "feature_XgVjxy": {
+          "type": "feature",
+          "settings": {
+            "icon": "scissors",
+            "label": "Expertly constructed"
+          }
+        },
+        "feature_j4KxhY": {
+          "type": "feature",
+          "settings": {
+            "icon": "ruler",
+            "label": "Precisely customised"
+          }
+        },
+        "feature_TCkCBk": {
+          "type": "feature",
+          "settings": {
+            "icon": "hand",
+            "label": "Finished by hand"
+          }
+        }
+      },
+      "block_order": [
+        "feature_XgVjxy",
+        "feature_j4KxhY",
+        "feature_TCkCBk"
+      ],
+      "name": "TLW Process",
+      "settings": {
+        "image": "shopify://shop_images/RTS003.jpg",
+        "image_width": 42,
+        "focal": 0,
+        "eyebrow": "Our process",
+        "line_one": "Made with intention.",
+        "line_two": "Finished with",
+        "line_two_accent": "precision.",
+        "body": "Every unit is carefully constructed, customised and finished by hand, with attention to every detail for a seamless, natural finish.",
+        "scroll_label": "Keep scrolling",
+        "scroll_length": 140,
+        "type_end": 28
+      }
     }
   },
   "order": [
     "tlw_main_hero_Q8N9Jx",
     "hero_jVaWmY",
-    "product_list_fa6P9H",
-    "tlw_collections_showcase_rCTPQj"
+    "tlw_collections_showcase_rCTPQj",
+    "tlw_process_kXWKc3",
+    "product_list_fa6P9H"
   ]
 }
