@@ -166,6 +166,8 @@
   /* Sits over the hero: no bar, white content, nothing behind it. */
   #tlw-header-{{ section.id }}.tlw-header--overlay {
     top: 0;
+    transition: background-color 350ms ease, border-color 350ms ease,
+                opacity 350ms ease, transform 350ms ease;
     position: fixed;
     left: 0;
     right: 0;
@@ -204,6 +206,21 @@
     opacity: 1;
     pointer-events: auto;
   }
+  {% endif %}
+
+  {% if section.settings.top_behaviour == 'hide' %}
+    /* Reveal is driven by scroll position in JS, so opacity and transform are
+       set frame by frame rather than transitioned. */
+    #tlw-header-{{ section.id }}.tlw-header--overlay {
+      opacity: 0;
+      transform: translateY(-100%);
+      pointer-events: none;
+      transition: background-color 350ms ease, border-color 350ms ease;
+    }
+
+    #tlw-header-{{ section.id }}.tlw-header--overlay.is-visible {
+      pointer-events: auto;
+    }
   {% endif %}
 
   /* Scrolled past the hero: solid bar again. */
@@ -496,46 +513,73 @@
       });
     });
 
-    /* Overlay mode: swap to a solid bar once the hero is behind us.
+    /* Overlay mode. Two behaviours, set in the section settings.
 
-       A 1px marker is dropped just below the fold and watched. When it leaves
-       the top of the screen the bar goes solid. This works no matter which
-       element is doing the scrolling, which a plain scroll listener does not. */
+       "hide": the bar is invisible at the very top and fades and slides in as
+       you scroll, driven frame by frame off the scroll position rather than
+       flipped on at a threshold.
+
+       "white": the bar shows in white over the hero and turns solid once the
+       hero is behind you. */
     if (header.hasAttribute('data-overlay')) {
-      var marker = document.createElement('div');
-      marker.setAttribute('aria-hidden', 'true');
-      marker.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:1px;pointer-events:none;';
 
-      var host = document.querySelector('#MainContent') || document.body;
-      if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
-      host.appendChild(marker);
-
-      function placeMarker() {
-        var firstSection = host.firstElementChild;
-        var h = firstSection ? firstSection.offsetHeight : window.innerHeight;
-        marker.style.top = Math.max(h - header.offsetHeight, 60) + 'px';
-      }
-      placeMarker();
-      window.addEventListener('resize', placeMarker);
-
-      if ('IntersectionObserver' in window) {
-        new IntersectionObserver(function (entries) {
-          header.classList.toggle('is-solid', !entries[0].isIntersecting);
-        }, { rootMargin: '0px 0px -100% 0px' }).observe(marker);
-      }
-
-      /* Belt and braces: catch scroll on the window and on any wrapper. */
-      function fallback() {
+      function scrolledBy() {
         var y = window.scrollY || document.documentElement.scrollTop || 0;
         if (y === 0) {
           var wrap = document.querySelector('.page-wrapper');
           if (wrap) y = wrap.scrollTop || 0;
         }
-        header.classList.toggle('is-solid', y > parseInt(marker.style.top, 10));
+        return y;
       }
-      fallback();
-      window.addEventListener('scroll', fallback, { passive: true });
-      document.addEventListener('scroll', fallback, { passive: true, capture: true });
+
+      {% if section.settings.top_behaviour == 'hide' %}
+
+        var reveal = {{ section.settings.reveal_distance }};
+        var ticking = false;
+
+        function paint() {
+          var p = Math.min(Math.max(scrolledBy() / reveal, 0), 1);
+          /* ease out, so it settles gently rather than arriving at full speed */
+          var eased = 1 - Math.pow(1 - p, 3);
+
+          header.style.opacity = eased;
+          header.style.transform = 'translateY(' + ((eased - 1) * 100) + '%)';
+          header.classList.toggle('is-visible', p > 0.02);
+          header.classList.toggle('is-solid', p > 0.02);
+          ticking = false;
+        }
+
+        function onScroll() {
+          if (!ticking) {
+            ticking = true;
+            window.requestAnimationFrame(paint);
+          }
+        }
+
+        paint();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        document.addEventListener('scroll', onScroll, { passive: true, capture: true });
+        window.addEventListener('resize', onScroll);
+
+      {% else %}
+
+        function threshold() {
+          var host = document.querySelector('#MainContent') || document.body;
+          var firstSection = host.firstElementChild;
+          var h = firstSection ? firstSection.offsetHeight : window.innerHeight;
+          return Math.max(h - header.offsetHeight, 60);
+        }
+
+        function onScroll() {
+          header.classList.toggle('is-solid', scrolledBy() > threshold());
+        }
+
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        document.addEventListener('scroll', onScroll, { passive: true, capture: true });
+        window.addEventListener('resize', onScroll);
+
+      {% endif %}
     }
 
     /* Tell the rest of the theme how tall the bar is, and whether it
@@ -622,6 +666,28 @@
       "label": "Hide the bar until you scroll",
       "info": "Nothing at all over the hero. The bar slides in once the hero is behind you.",
       "default": true
+    },
+    {
+      "type": "select",
+      "id": "top_behaviour",
+      "label": "At the very top of the page",
+      "info": "Only applies when the header sits over the hero",
+      "options": [
+        { "value": "hide", "label": "Hide it until you scroll" },
+        { "value": "white", "label": "Show it in white over the video" }
+      ],
+      "default": "hide"
+    },
+    {
+      "type": "range",
+      "id": "reveal_distance",
+      "label": "How far to scroll before it is fully in",
+      "info": "Only used when the bar is hidden at the top. Higher is slower and gentler.",
+      "min": 60,
+      "max": 400,
+      "step": 20,
+      "unit": "px",
+      "default": 200
     },
     {
       "type": "range",
