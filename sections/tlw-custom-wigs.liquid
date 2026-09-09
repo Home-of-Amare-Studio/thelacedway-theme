@@ -1,0 +1,585 @@
+{% comment %}
+  THELACEDWÁY custom wigs
+  Home of Amare Studio
+
+  The enquiry form expands in place rather than sending the visitor to another
+  page, matching the live site.
+
+  It uses Shopify's own contact form, so submissions arrive at the store email
+  set under Settings > Notifications. No app, no monthly cost, nothing to
+  maintain. Every field is a block, so Destinee can add or remove questions
+  herself without touching code.
+{% endcomment %}
+
+<section class="tlw-custom" id="tlw-custom-{{ section.id }}">
+  <div class="tlw-custom__head">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="tlw-custom__eyebrow">{{ section.settings.eyebrow }}</p>
+    {%- endif -%}
+
+    <h2 class="tlw-custom__title">
+      {{ section.settings.heading_before }}
+      {%- if section.settings.heading_accent != blank -%}
+        <em class="tlw-accent-word">{{ section.settings.heading_accent }}</em>
+      {%- endif -%}
+      {{ section.settings.heading_after }}
+    </h2>
+
+    {%- if section.settings.body != blank -%}
+      <p class="tlw-custom__text">{{ section.settings.body }}</p>
+    {%- endif -%}
+
+    <button
+      type="button"
+      class="tlw-custom__toggle"
+      data-custom-toggle
+      aria-expanded="false"
+      aria-controls="tlw-custom-panel-{{ section.id }}"
+      data-open-label="{{ section.settings.open_label | escape }}"
+      data-close-label="{{ section.settings.close_label | escape }}"
+    >
+      {{ section.settings.open_label }}
+    </button>
+  </div>
+
+  <div class="tlw-custom__panel" id="tlw-custom-panel-{{ section.id }}" data-custom-panel>
+    <div class="tlw-custom__clip">
+      <div class="tlw-custom__form" data-custom-form>
+
+        {%- if section.settings.form_intro != blank -%}
+          <p class="tlw-custom__intro">{{ section.settings.form_intro }}</p>
+        {%- endif -%}
+
+        {%- form 'contact', class: 'tlw-form' -%}
+          {%- if form.posted_successfully? -%}
+            <p class="tlw-form__success">{{ section.settings.success_text }}</p>
+          {%- endif -%}
+
+          {%- if form.errors -%}
+            <p class="tlw-form__error">{{ form.errors | default_errors }}</p>
+          {%- endif -%}
+
+          <input type="hidden" name="contact[Enquiry type]" value="{{ section.settings.enquiry_label }}">
+
+          <div class="tlw-form__grid">
+            {%- for block in section.blocks -%}
+              {%- assign fid = 'f-' | append: section.id | append: '-' | append: block.id -%}
+              {%- assign fname = block.settings.label | escape -%}
+
+              {%- case block.type -%}
+
+                {%- when 'field' -%}
+                  <div class="tlw-field{% if block.settings.full_width %} is-wide{% endif %}" {{ block.shopify_attributes }}>
+                    <label class="tlw-field__label" for="{{ fid }}">
+                      {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
+                    </label>
+                    <input
+                      class="tlw-input"
+                      id="{{ fid }}"
+                      type="{{ block.settings.kind }}"
+                      name="contact[{{ fname }}]"
+                      placeholder="{{ block.settings.placeholder }}"
+                      {% if block.settings.required %}required{% endif %}
+                    >
+                  </div>
+
+                {%- when 'choice' -%}
+                  <div class="tlw-field{% if block.settings.full_width %} is-wide{% endif %}" {{ block.shopify_attributes }}>
+                    <label class="tlw-field__label" for="{{ fid }}">
+                      {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
+                    </label>
+                    <select
+                      class="tlw-input tlw-select"
+                      id="{{ fid }}"
+                      name="contact[{{ fname }}]"
+                      {% if block.settings.required %}required{% endif %}
+                    >
+                      <option value="">{{ block.settings.placeholder | default: 'Please choose' }}</option>
+                      {%- assign opts = block.settings.options | split: ',' -%}
+                      {%- for opt in opts -%}
+                        {%- assign clean = opt | strip -%}
+                        <option value="{{ clean | escape }}">{{ clean }}</option>
+                      {%- endfor -%}
+                    </select>
+                  </div>
+
+                {%- when 'message' -%}
+                  <div class="tlw-field is-wide" {{ block.shopify_attributes }}>
+                    <label class="tlw-field__label" for="{{ fid }}">
+                      {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
+                    </label>
+                    <textarea
+                      class="tlw-input tlw-textarea"
+                      id="{{ fid }}"
+                      name="contact[body]"
+                      rows="5"
+                      placeholder="{{ block.settings.placeholder }}"
+                      {% if block.settings.required %}required{% endif %}
+                    ></textarea>
+                  </div>
+
+              {%- endcase -%}
+            {%- endfor -%}
+          </div>
+
+          <button type="submit" class="tlw-form__submit">
+            {{ section.settings.submit_label }}
+          </button>
+
+          {%- if section.settings.small_print != blank -%}
+            <p class="tlw-form__note">{{ section.settings.small_print }}</p>
+          {%- endif -%}
+        {%- endform -%}
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  #tlw-custom-{{ section.id }} {
+    padding: 96px var(--tlw-margin) 72px;
+    background: var(--tlw-secondary-light);
+    color: var(--tlw-primary);
+  }
+
+  @media (min-width: 900px) {
+    #tlw-custom-{{ section.id }} { padding-top: 120px; }
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 48rem;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__eyebrow {
+    margin: 0 0 8px;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--tlw-accent);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__title {
+    margin: 0;
+    font-family: var(--tlw-font-display);
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 1.2;
+  }
+
+  @media (min-width: 768px) {
+    #tlw-custom-{{ section.id }} .tlw-custom__title {
+      font-size: 64px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__text {
+    max-width: 36rem;
+    margin: 24px 0 0;
+    font-size: 16px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__toggle {
+    flex-shrink: 0;
+    margin-top: 40px;
+    padding: 16px 40px;
+    border: 1px solid var(--tlw-accent);
+    border-radius: 999px;
+    background: transparent;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tlw-primary);
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__toggle:hover {
+    background: var(--tlw-accent);
+    color: var(--tlw-on-primary);
+  }
+
+  /* The panel unfolds by animating its row height from nothing to auto. */
+  #tlw-custom-{{ section.id }} .tlw-custom__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 700ms ease-in-out, opacity 700ms ease-in-out;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__panel.is-open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__clip { overflow: hidden; }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__form {
+    max-width: 48rem;
+    margin-inline: auto;
+    padding-top: 56px;
+    text-align: left;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__intro {
+    margin: 0 0 32px;
+    font-size: 16px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-form__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  @media (min-width: 700px) {
+    #tlw-custom-{{ section.id }} .tlw-form__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    #tlw-custom-{{ section.id }} .tlw-field.is-wide { grid-column: 1 / -1; }
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-field__label {
+    display: block;
+    margin-bottom: 8px;
+    font-family: var(--tlw-font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-field__req {
+    margin-left: 4px;
+    color: var(--tlw-accent);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--tlw-outline-variant);
+    border-radius: var(--tlw-radius);
+    background: var(--tlw-surface-lowest);
+    color: var(--tlw-primary);
+    font-family: var(--tlw-font-body);
+    font-size: 15px;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-input:focus {
+    outline: none;
+    border-color: var(--tlw-accent);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23241b15' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-textarea {
+    resize: vertical;
+    min-height: 130px;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-form__submit {
+    margin-top: 36px;
+    padding: 16px 44px;
+    border: 1px solid var(--tlw-primary);
+    border-radius: 999px;
+    background: var(--tlw-primary);
+    color: var(--tlw-on-primary);
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-form__submit:hover {
+    background: transparent;
+    color: var(--tlw-primary);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-form__note {
+    margin: 20px 0 0;
+    font-size: 13px;
+    color: var(--tlw-outline);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-form__success,
+  #tlw-custom-{{ section.id }} .tlw-form__error {
+    margin: 0 0 28px;
+    padding: 16px 20px;
+    border: 1px solid var(--tlw-accent);
+    font-size: 15px;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-form__error {
+    border-color: #a33;
+    color: #a33;
+  }
+</style>
+
+<script>
+  (function () {
+    var root = document.getElementById('tlw-custom-{{ section.id }}');
+    if (!root) return;
+
+    var toggle = root.querySelector('[data-custom-toggle]');
+    var panel = root.querySelector('[data-custom-panel]');
+    var form = root.querySelector('[data-custom-form]');
+    if (!toggle || !panel) return;
+
+    function open(scroll) {
+      panel.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.textContent = toggle.dataset.closeLabel;
+
+      if (scroll === false) return;
+      window.setTimeout(function () {
+        var y = form.getBoundingClientRect().top + window.scrollY - 120;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }, 720);
+    }
+
+    function shut() {
+      panel.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.textContent = toggle.dataset.openLabel;
+    }
+
+    toggle.addEventListener('click', function () {
+      if (panel.classList.contains('is-open')) shut(); else open();
+    });
+
+    /* After a submission Shopify reloads the page, so reopen the panel and
+       show the visitor their confirmation rather than a closed form. */
+    if (root.querySelector('.tlw-form__success') || root.querySelector('.tlw-form__error')) {
+      open(false);
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "TLW Custom Wigs",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Small label above the heading",
+      "default": "Custom wigs"
+    },
+    {
+      "type": "text",
+      "id": "heading_before",
+      "label": "Heading, first part",
+      "default": "Create your"
+    },
+    {
+      "type": "text",
+      "id": "heading_accent",
+      "label": "Heading, gold italic words",
+      "default": "custom wig"
+    },
+    {
+      "type": "text",
+      "id": "heading_after",
+      "label": "Heading, last part"
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Paragraph",
+      "default": "Can't find exactly what you're looking for? Our Custom Wig service allows you to create a unit tailored to your individual preferences."
+    },
+    {
+      "type": "text",
+      "id": "open_label",
+      "label": "Button text, closed",
+      "default": "Start your enquiry"
+    },
+    {
+      "type": "text",
+      "id": "close_label",
+      "label": "Button text, open",
+      "default": "Close enquiry"
+    },
+    {
+      "type": "header",
+      "content": "The form"
+    },
+    {
+      "type": "textarea",
+      "id": "form_intro",
+      "label": "Line above the form",
+      "default": "Tell us what you have in mind and we will come back to you within two working days."
+    },
+    {
+      "type": "text",
+      "id": "enquiry_label",
+      "label": "Label on the email you receive",
+      "info": "Helps you tell custom wig enquiries apart from other messages",
+      "default": "Custom wig enquiry"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit button text",
+      "default": "Send enquiry"
+    },
+    {
+      "type": "textarea",
+      "id": "success_text",
+      "label": "Message after sending",
+      "default": "Thank you. Your enquiry is with us and we will be in touch within two working days."
+    },
+    {
+      "type": "textarea",
+      "id": "small_print",
+      "label": "Small print under the button",
+      "default": "We only use these details to answer your enquiry."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "field",
+      "name": "Text field",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Question",
+          "info": "This is what appears on the email you receive, so keep it clear",
+          "default": "Name"
+        },
+        {
+          "type": "select",
+          "id": "kind",
+          "label": "Kind of answer",
+          "options": [
+            { "value": "text", "label": "Words" },
+            { "value": "email", "label": "Email address" },
+            { "value": "tel", "label": "Phone number" },
+            { "value": "number", "label": "Number" }
+          ],
+          "default": "text"
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Grey hint text"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Must be answered",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "full_width",
+          "label": "Full width",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "name": "Dropdown",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Question",
+          "default": "Length"
+        },
+        {
+          "type": "textarea",
+          "id": "options",
+          "label": "Choices",
+          "info": "Separate with commas",
+          "default": "16, 18, 20, 22, 24, 26"
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "First line of the dropdown",
+          "default": "Please choose"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Must be answered",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "full_width",
+          "label": "Full width",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "name": "Long answer",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Question",
+          "default": "Anything else"
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Grey hint text",
+          "default": "Tell us about the look you have in mind"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Must be answered",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TLW Custom Wigs",
+      "blocks": [
+        { "type": "field", "settings": { "label": "Name", "kind": "text", "required": true } },
+        { "type": "field", "settings": { "label": "Email", "kind": "email", "required": true } },
+        { "type": "field", "settings": { "label": "Phone", "kind": "tel" } },
+        { "type": "field", "settings": { "label": "Instagram" } },
+        { "type": "choice", "settings": { "label": "Hair type", "options": "Virgin, Raw, Not sure" } },
+        { "type": "choice", "settings": { "label": "Lace size", "options": "5x5, 6x6, 7x7, 9x6, 13x6" } },
+        { "type": "choice", "settings": { "label": "Length", "options": "16, 18, 20, 22, 24, 26" } },
+        { "type": "choice", "settings": { "label": "Texture", "options": "Straight, Body wave, Curly, Not sure" } },
+        { "type": "choice", "settings": { "label": "Colour", "options": "Natural, Jet black, Coloured, Not sure" } },
+        { "type": "choice", "settings": { "label": "When do you need it", "options": "No rush, Within a month, Within two weeks, Specific date" } },
+        { "type": "message", "settings": { "label": "Anything else" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
