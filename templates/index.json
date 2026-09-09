@@ -475,7 +475,7 @@
             "corner_styling": "soft",
             "header_text_color": "#000000",
             "text_color": "#000000",
-            "card_color": "#F9F9F9",
+            "card_color": "#f9f9f9",
             "stars_color": "",
             "arrows_color": "#000000",
             "transition_speed": 5,
@@ -501,6 +501,147 @@
         "speed": 28,
         "verified_text": "Verified buyer"
       }
+    },
+    "tlw_custom_wigs_rkePRq": {
+      "type": "tlw-custom-wigs",
+      "blocks": {
+        "field_FRnG4b": {
+          "type": "field",
+          "settings": {
+            "label": "Name",
+            "kind": "text",
+            "placeholder": "",
+            "required": true,
+            "full_width": false
+          }
+        },
+        "field_yN9kqd": {
+          "type": "field",
+          "settings": {
+            "label": "Email",
+            "kind": "email",
+            "placeholder": "",
+            "required": true,
+            "full_width": false
+          }
+        },
+        "field_qAAKeT": {
+          "type": "field",
+          "settings": {
+            "label": "Phone",
+            "kind": "tel",
+            "placeholder": "",
+            "required": false,
+            "full_width": false
+          }
+        },
+        "field_LfUa4q": {
+          "type": "field",
+          "settings": {
+            "label": "Instagram",
+            "kind": "text",
+            "placeholder": "",
+            "required": false,
+            "full_width": false
+          }
+        },
+        "choice_bmxyN7": {
+          "type": "choice",
+          "settings": {
+            "label": "Hair type",
+            "options": "Virgin, Raw, Not sure",
+            "placeholder": "Please choose",
+            "required": false,
+            "full_width": false
+          }
+        },
+        "choice_KLUrcb": {
+          "type": "choice",
+          "settings": {
+            "label": "Lace size",
+            "options": "5x5, 6x6, 7x7, 9x6, 13x6",
+            "placeholder": "Please choose",
+            "required": false,
+            "full_width": false
+          }
+        },
+        "choice_8z4N9h": {
+          "type": "choice",
+          "settings": {
+            "label": "Length",
+            "options": "16, 18, 20, 22, 24, 26",
+            "placeholder": "Please choose",
+            "required": false,
+            "full_width": false
+          }
+        },
+        "choice_HjkFUc": {
+          "type": "choice",
+          "settings": {
+            "label": "Texture",
+            "options": "Straight, Body wave, Curly, Not sure",
+            "placeholder": "Please choose",
+            "required": false,
+            "full_width": false
+          }
+        },
+        "choice_pG94dh": {
+          "type": "choice",
+          "settings": {
+            "label": "Colour",
+            "options": "Natural, Jet black, Coloured, Not sure",
+            "placeholder": "Please choose",
+            "required": false,
+            "full_width": false
+          }
+        },
+        "choice_dtQhgx": {
+          "type": "choice",
+          "settings": {
+            "label": "When do you need it",
+            "options": "No rush, Within a month, Within two weeks, Specific date",
+            "placeholder": "Please choose",
+            "required": false,
+            "full_width": false
+          }
+        },
+        "message_wLDmfN": {
+          "type": "message",
+          "settings": {
+            "label": "Anything else",
+            "placeholder": "Tell us about the look you have in mind",
+            "required": false
+          }
+        }
+      },
+      "block_order": [
+        "field_FRnG4b",
+        "field_yN9kqd",
+        "field_qAAKeT",
+        "field_LfUa4q",
+        "choice_bmxyN7",
+        "choice_KLUrcb",
+        "choice_8z4N9h",
+        "choice_HjkFUc",
+        "choice_pG94dh",
+        "choice_dtQhgx",
+        "message_wLDmfN"
+      ],
+      "name": "TLW Custom Wigs",
+      "settings": {
+        "eyebrow": "Custom wigs",
+        "heading_before": "Create your",
+        "heading_accent": "custom wig",
+        "heading_after": "",
+        "body": "Can't find exactly what you're looking for? Our Custom Wig service allows you to create a unit tailored to your individual preferences.",
+        "open_label": "Start your enquiry",
+        "close_label": "Close enquiry",
+        "form_intro": "Tell us what you have in mind and we will come back to you within two working days.",
+        "enquiry_label": "Custom wig enquiry",
+        "submit_label": "Send enquiry",
+        "success_text": "Thank you. Your enquiry is with us and we will be in touch within two working days.",
+        "small_print": "We only use these details to answer your enquiry."
+      }
     }
   },
   "order": [
@@ -510,6 +651,7 @@
     "tlw_process_kXWKc3",
     "tlw_ready_to_ship_dmXxXg",
     "product_list_fa6P9H",
-    "tlw_reviews_zEbaDi"
+    "tlw_reviews_zEbaDi",
+    "tlw_custom_wigs_rkePRq"
   ]
 }

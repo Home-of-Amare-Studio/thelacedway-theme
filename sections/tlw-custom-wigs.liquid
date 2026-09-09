@@ -61,74 +61,127 @@
 
           <input type="hidden" name="contact[Enquiry type]" value="{{ section.settings.enquiry_label }}">
 
-          <div class="tlw-form__grid">
-            {%- for block in section.blocks -%}
-              {%- assign fid = 'f-' | append: section.id | append: '-' | append: block.id -%}
-              {%- assign fname = block.settings.label | escape -%}
+          {%- assign step_labels = section.settings.step_labels | split: ',' -%}
+          {%- assign step_count = step_labels.size -%}
 
-              {%- case block.type -%}
+          <div class="tlw-wizard" data-wizard data-steps="{{ step_count }}">
 
-                {%- when 'field' -%}
-                  <div class="tlw-field{% if block.settings.full_width %} is-wide{% endif %}" {{ block.shopify_attributes }}>
-                    <label class="tlw-field__label" for="{{ fid }}">
-                      {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
-                    </label>
-                    <input
-                      class="tlw-input"
-                      id="{{ fid }}"
-                      type="{{ block.settings.kind }}"
-                      name="contact[{{ fname }}]"
-                      placeholder="{{ block.settings.placeholder }}"
-                      {% if block.settings.required %}required{% endif %}
-                    >
-                  </div>
+            <div class="tlw-wizard__bar">
+              <p class="tlw-wizard__counter">
+                {{ section.settings.step_word }} <span data-step-now>1</span>
+                {{ section.settings.of_word }} {{ step_count }}
+              </p>
+              <div class="tlw-wizard__segments">
+                {%- for label in step_labels -%}
+                  <span class="tlw-wizard__seg{% if forloop.first %} is-on{% endif %}" data-step-seg></span>
+                {%- endfor -%}
+              </div>
+            </div>
 
-                {%- when 'choice' -%}
-                  <div class="tlw-field{% if block.settings.full_width %} is-wide{% endif %}" {{ block.shopify_attributes }}>
-                    <label class="tlw-field__label" for="{{ fid }}">
-                      {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
-                    </label>
-                    <select
-                      class="tlw-input tlw-select"
-                      id="{{ fid }}"
-                      name="contact[{{ fname }}]"
-                      {% if block.settings.required %}required{% endif %}
-                    >
-                      <option value="">{{ block.settings.placeholder | default: 'Please choose' }}</option>
-                      {%- assign opts = block.settings.options | split: ',' -%}
-                      {%- for opt in opts -%}
-                        {%- assign clean = opt | strip -%}
-                        <option value="{{ clean | escape }}">{{ clean }}</option>
-                      {%- endfor -%}
-                    </select>
-                  </div>
+            {%- for label in step_labels -%}
+              {%- assign step_no = forloop.index -%}
+              <fieldset
+                class="tlw-step{% if forloop.first %} is-current{% endif %}"
+                data-step="{{ step_no }}"
+                {% unless forloop.first %}hidden{% endunless %}
+              >
+                <legend class="tlw-step__label">{{ label | strip }}</legend>
 
-                {%- when 'message' -%}
-                  <div class="tlw-field is-wide" {{ block.shopify_attributes }}>
-                    <label class="tlw-field__label" for="{{ fid }}">
-                      {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
-                    </label>
-                    <textarea
-                      class="tlw-input tlw-textarea"
-                      id="{{ fid }}"
-                      name="contact[body]"
-                      rows="5"
-                      placeholder="{{ block.settings.placeholder }}"
-                      {% if block.settings.required %}required{% endif %}
-                    ></textarea>
-                  </div>
+                <div class="tlw-form__grid">
+                  {%- for block in section.blocks -%}
+                    {%- if block.settings.step != step_no -%}{%- continue -%}{%- endif -%}
+                    {%- assign fid = 'f-' | append: section.id | append: '-' | append: block.id -%}
+                    {%- assign fname = block.settings.label | escape -%}
 
-              {%- endcase -%}
+                    {%- case block.type -%}
+
+                      {%- when 'field' -%}
+                        <div class="tlw-field{% if block.settings.full_width %} is-wide{% endif %}" {{ block.shopify_attributes }}>
+                          <label class="tlw-field__label" for="{{ fid }}">
+                            {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
+                          </label>
+                          <input
+                            class="tlw-input"
+                            id="{{ fid }}"
+                            type="{{ block.settings.kind }}"
+                            name="contact[{{ fname }}]"
+                            placeholder="{{ block.settings.placeholder }}"
+                            {% if block.settings.required %}data-required{% endif %}
+                          >
+                        </div>
+
+                      {%- when 'choice' -%}
+                        <div class="tlw-field{% if block.settings.full_width %} is-wide{% endif %}" {{ block.shopify_attributes }}>
+                          <label class="tlw-field__label" for="{{ fid }}">
+                            {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
+                          </label>
+                          <select
+                            class="tlw-input tlw-select"
+                            id="{{ fid }}"
+                            name="contact[{{ fname }}]"
+                            {% if block.settings.required %}data-required{% endif %}
+                          >
+                            <option value="">{{ block.settings.placeholder | default: 'Please choose' }}</option>
+                            {%- assign opts = block.settings.options | split: ',' -%}
+                            {%- for opt in opts -%}
+                              {%- assign clean = opt | strip -%}
+                              <option value="{{ clean | escape }}">{{ clean }}</option>
+                            {%- endfor -%}
+                          </select>
+                        </div>
+
+                      {%- when 'message' -%}
+                        <div class="tlw-field is-wide" {{ block.shopify_attributes }}>
+                          <label class="tlw-field__label" for="{{ fid }}">
+                            {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
+                          </label>
+                          <textarea
+                            class="tlw-input tlw-textarea"
+                            id="{{ fid }}"
+                            name="contact[body]"
+                            rows="5"
+                            placeholder="{{ block.settings.placeholder }}"
+                            {% if block.settings.required %}data-required{% endif %}
+                          ></textarea>
+                        </div>
+
+                      {%- when 'agree' -%}
+                        <div class="tlw-field is-wide tlw-agree" {{ block.shopify_attributes }}>
+                          <label class="tlw-agree__row">
+                            <input
+                              type="checkbox"
+                              id="{{ fid }}"
+                              name="contact[{{ fname }}]"
+                              value="Yes"
+                              {% if block.settings.required %}data-required{% endif %}
+                            >
+                            <span>{{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}</span>
+                          </label>
+                        </div>
+
+                    {%- endcase -%}
+                  {%- endfor -%}
+                </div>
+              </fieldset>
             {%- endfor -%}
+
+            <div class="tlw-wizard__foot">
+              <button type="button" class="tlw-wizard__back" data-wizard-back hidden>
+                {{ section.settings.back_label }}
+              </button>
+
+              <button type="button" class="tlw-wizard__next" data-wizard-next>
+                {{ section.settings.next_label }}
+              </button>
+
+              <button type="submit" class="tlw-form__submit" data-wizard-submit hidden>
+                {{ section.settings.submit_label }}
+              </button>
+            </div>
+
+            <p class="tlw-wizard__warn" data-wizard-warn hidden>{{ section.settings.incomplete_text }}</p>
           </div>
 
-          <button type="submit" class="tlw-form__submit">
-            {{ section.settings.submit_label }}
-          </button>
-
-          {%- if section.settings.small_print != blank -%}
-            <p class="tlw-form__note">{{ section.settings.small_print }}</p>
-          {%- endif -%}
         {%- endform -%}
 
       </div>
@@ -195,7 +248,7 @@
     margin-top: 40px;
     padding: 16px 40px;
     border: 1px solid var(--tlw-accent);
-    border-radius: 999px;
+    border-radius: var(--tlw-radius);
     background: transparent;
     font-family: var(--tlw-font-body);
     font-size: 12px;
@@ -239,6 +292,143 @@
     color: var(--tlw-on-surface-variant);
   }
 
+  /* The card the wizard sits in */
+  #tlw-custom-{{ section.id }} .tlw-wizard {
+    padding: 40px 32px;
+    border-radius: {{ section.settings.card_radius }}px;
+    background: var(--tlw-surface-lowest);
+  }
+
+  @media (min-width: 768px) {
+    #tlw-custom-{{ section.id }} .tlw-wizard { padding: 56px 56px 48px; }
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__counter {
+    margin: 0 0 16px;
+    font-family: var(--tlw-font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--tlw-primary);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__segments {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 44px;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__seg {
+    flex: 1;
+    height: 2px;
+    background: var(--tlw-outline-variant);
+    transition: background-color 400ms ease;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__seg.is-on {
+    background: var(--tlw-accent);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-step {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-step[hidden] { display: none; }
+
+  #tlw-custom-{{ section.id }} .tlw-step__label {
+    padding: 0;
+    margin-bottom: 28px;
+    font-family: var(--tlw-font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--tlw-accent);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-agree__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-agree__row input {
+    margin-top: 4px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--tlw-accent);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__foot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--tlw-outline-variant);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__back,
+  #tlw-custom-{{ section.id }} .tlw-wizard__next {
+    padding: 16px 40px;
+    border-radius: var(--tlw-radius);
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__back {
+    margin-right: auto;
+    border: 1px solid var(--tlw-outline-variant);
+    background: transparent;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__back:hover {
+    border-color: var(--tlw-primary);
+    color: var(--tlw-primary);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__next {
+    border: 1px solid var(--tlw-accent);
+    background: transparent;
+    color: var(--tlw-primary);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__next:hover {
+    background: var(--tlw-accent);
+    color: var(--tlw-on-primary);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__back[hidden],
+  #tlw-custom-{{ section.id }} .tlw-wizard__next[hidden],
+  #tlw-custom-{{ section.id }} .tlw-form__submit[hidden] { display: none; }
+
+  #tlw-custom-{{ section.id }} .tlw-form__submit { margin-top: 0; }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__warn {
+    margin: 16px 0 0;
+    text-align: right;
+    font-size: 13px;
+    color: #a33;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__warn[hidden] { display: none; }
+
+  #tlw-custom-{{ section.id }} .tlw-input.is-missing {
+    border-color: #a33;
+  }
+
   #tlw-custom-{{ section.id }} .tlw-form__grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -246,7 +436,144 @@
   }
 
   @media (min-width: 700px) {
-    #tlw-custom-{{ section.id }} .tlw-form__grid {
+    /* The card the wizard sits in */
+  #tlw-custom-{{ section.id }} .tlw-wizard {
+    padding: 40px 32px;
+    border-radius: {{ section.settings.card_radius }}px;
+    background: var(--tlw-surface-lowest);
+  }
+
+  @media (min-width: 768px) {
+    #tlw-custom-{{ section.id }} .tlw-wizard { padding: 56px 56px 48px; }
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__counter {
+    margin: 0 0 16px;
+    font-family: var(--tlw-font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--tlw-primary);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__segments {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 44px;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__seg {
+    flex: 1;
+    height: 2px;
+    background: var(--tlw-outline-variant);
+    transition: background-color 400ms ease;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__seg.is-on {
+    background: var(--tlw-accent);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-step {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-step[hidden] { display: none; }
+
+  #tlw-custom-{{ section.id }} .tlw-step__label {
+    padding: 0;
+    margin-bottom: 28px;
+    font-family: var(--tlw-font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--tlw-accent);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-agree__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-agree__row input {
+    margin-top: 4px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--tlw-accent);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__foot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--tlw-outline-variant);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__back,
+  #tlw-custom-{{ section.id }} .tlw-wizard__next {
+    padding: 16px 40px;
+    border-radius: var(--tlw-radius);
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__back {
+    margin-right: auto;
+    border: 1px solid var(--tlw-outline-variant);
+    background: transparent;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__back:hover {
+    border-color: var(--tlw-primary);
+    color: var(--tlw-primary);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__next {
+    border: 1px solid var(--tlw-accent);
+    background: transparent;
+    color: var(--tlw-primary);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__next:hover {
+    background: var(--tlw-accent);
+    color: var(--tlw-on-primary);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__back[hidden],
+  #tlw-custom-{{ section.id }} .tlw-wizard__next[hidden],
+  #tlw-custom-{{ section.id }} .tlw-form__submit[hidden] { display: none; }
+
+  #tlw-custom-{{ section.id }} .tlw-form__submit { margin-top: 0; }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__warn {
+    margin: 16px 0 0;
+    text-align: right;
+    font-size: 13px;
+    color: #a33;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-wizard__warn[hidden] { display: none; }
+
+  #tlw-custom-{{ section.id }} .tlw-input.is-missing {
+    border-color: #a33;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-form__grid {
       grid-template-columns: 1fr 1fr;
     }
     #tlw-custom-{{ section.id }} .tlw-field.is-wide { grid-column: 1 / -1; }
@@ -300,7 +627,7 @@
     margin-top: 36px;
     padding: 16px 44px;
     border: 1px solid var(--tlw-primary);
-    border-radius: 999px;
+    border-radius: var(--tlw-radius);
     background: var(--tlw-primary);
     color: var(--tlw-on-primary);
     font-family: var(--tlw-font-body);
@@ -367,6 +694,71 @@
     toggle.addEventListener('click', function () {
       if (panel.classList.contains('is-open')) shut(); else open();
     });
+
+    /* --- the step by step form --- */
+    var wizard = root.querySelector('[data-wizard]');
+    if (wizard) {
+      var steps = wizard.querySelectorAll('[data-step]');
+      var segs = wizard.querySelectorAll('[data-step-seg]');
+      var nowEl = wizard.querySelector('[data-step-now]');
+      var backBtn = wizard.querySelector('[data-wizard-back]');
+      var nextBtn = wizard.querySelector('[data-wizard-next]');
+      var sendBtn = wizard.querySelector('[data-wizard-submit]');
+      var warn = wizard.querySelector('[data-wizard-warn]');
+      var at = 0;
+
+      function show(i) {
+        at = Math.max(0, Math.min(steps.length - 1, i));
+
+        steps.forEach(function (s, n) { s.hidden = n !== at; });
+        segs.forEach(function (s, n) { s.classList.toggle('is-on', n <= at); });
+
+        if (nowEl) nowEl.textContent = at + 1;
+        if (backBtn) backBtn.hidden = at === 0;
+        if (nextBtn) nextBtn.hidden = at === steps.length - 1;
+        if (sendBtn) sendBtn.hidden = at !== steps.length - 1;
+        if (warn) warn.hidden = true;
+
+        var y = wizard.getBoundingClientRect().top + window.scrollY - 120;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+
+      /* Only checks the step you are on, so an empty later step does not
+         block you from moving forward. */
+      function stepOk() {
+        var fields = steps[at].querySelectorAll('[data-required]');
+        var ok = true;
+
+        fields.forEach(function (f) {
+          var filled = f.type === 'checkbox' ? f.checked : f.value.trim() !== '';
+          f.classList.toggle('is-missing', !filled);
+          if (!filled) ok = false;
+        });
+
+        return ok;
+      }
+
+      if (nextBtn) nextBtn.addEventListener('click', function () {
+        if (!stepOk()) {
+          if (warn) warn.hidden = false;
+          return;
+        }
+        show(at + 1);
+      });
+
+      if (backBtn) backBtn.addEventListener('click', function () { show(at - 1); });
+
+      if (sendBtn) sendBtn.addEventListener('click', function (e) {
+        if (!stepOk()) {
+          e.preventDefault();
+          if (warn) warn.hidden = false;
+        }
+      });
+
+      wizard.addEventListener('input', function (e) {
+        if (e.target.classList) e.target.classList.remove('is-missing');
+      });
+    }
 
     /* After a submission Shopify reloads the page, so reopen the panel and
        show the visitor their confirmation rather than a closed form. */
@@ -439,6 +831,53 @@
       "default": "Custom wig enquiry"
     },
     {
+      "type": "textarea",
+      "id": "step_labels",
+      "label": "Steps",
+      "info": "Separate with commas. One step per label, and each question is assigned to a step.",
+      "default": "Details, Your custom wig, Your inspiration, Additional details"
+    },
+    {
+      "type": "text",
+      "id": "step_word",
+      "label": "The word before the number",
+      "default": "Step"
+    },
+    {
+      "type": "text",
+      "id": "of_word",
+      "label": "The word between the numbers",
+      "default": "of"
+    },
+    {
+      "type": "text",
+      "id": "next_label",
+      "label": "Continue button text",
+      "default": "Continue"
+    },
+    {
+      "type": "text",
+      "id": "back_label",
+      "label": "Back button text",
+      "default": "Back"
+    },
+    {
+      "type": "text",
+      "id": "incomplete_text",
+      "label": "Message when something is missing",
+      "default": "Please fill in the fields marked with a star."
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Corner rounding on the form card",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
       "type": "text",
       "id": "submit_label",
       "label": "Submit button text",
@@ -497,6 +936,15 @@
           "id": "full_width",
           "label": "Full width",
           "default": false
+        },
+        {
+          "type": "range",
+          "id": "step",
+          "label": "Which step",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 1
         }
       ]
     },
@@ -534,6 +982,15 @@
           "id": "full_width",
           "label": "Full width",
           "default": false
+        },
+        {
+          "type": "range",
+          "id": "step",
+          "label": "Which step",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 2
         }
       ]
     },
@@ -559,6 +1016,42 @@
           "id": "required",
           "label": "Must be answered",
           "default": false
+        },
+        {
+          "type": "range",
+          "id": "step",
+          "label": "Which step",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 3
+        }
+      ]
+    },
+    {
+      "type": "agree",
+      "name": "Tick box",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Wording",
+          "default": "I am happy to be contacted about this enquiry"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Must be ticked",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "step",
+          "label": "Which step",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 4
         }
       ]
     }
@@ -567,17 +1060,21 @@
     {
       "name": "TLW Custom Wigs",
       "blocks": [
-        { "type": "field", "settings": { "label": "Name", "kind": "text", "required": true } },
-        { "type": "field", "settings": { "label": "Email", "kind": "email", "required": true } },
-        { "type": "field", "settings": { "label": "Phone", "kind": "tel" } },
-        { "type": "field", "settings": { "label": "Instagram" } },
-        { "type": "choice", "settings": { "label": "Hair type", "options": "Virgin, Raw, Not sure" } },
-        { "type": "choice", "settings": { "label": "Lace size", "options": "5x5, 6x6, 7x7, 9x6, 13x6" } },
-        { "type": "choice", "settings": { "label": "Length", "options": "16, 18, 20, 22, 24, 26" } },
-        { "type": "choice", "settings": { "label": "Texture", "options": "Straight, Body wave, Curly, Not sure" } },
-        { "type": "choice", "settings": { "label": "Colour", "options": "Natural, Jet black, Coloured, Not sure" } },
-        { "type": "choice", "settings": { "label": "When do you need it", "options": "No rush, Within a month, Within two weeks, Specific date" } },
-        { "type": "message", "settings": { "label": "Anything else" } }
+        { "type": "field",  "settings": { "label": "Full name", "kind": "text",  "required": true, "step": 1, "placeholder": "Your full name" } },
+        { "type": "field",  "settings": { "label": "Email address", "kind": "email", "required": true, "step": 1, "placeholder": "you@email.com" } },
+        { "type": "field",  "settings": { "label": "Contact number", "kind": "tel", "step": 1, "placeholder": "7123 456789" } },
+
+        { "type": "choice", "settings": { "label": "Hair type", "options": "Virgin, Raw, Not sure", "step": 2, "required": true } },
+        { "type": "choice", "settings": { "label": "Length", "options": "16, 18, 20, 22, 24, 26", "step": 2, "required": true } },
+        { "type": "choice", "settings": { "label": "Lace size", "options": "5x5, 6x6, 7x7, 9x6, 13x6", "step": 2, "required": true } },
+        { "type": "choice", "settings": { "label": "Texture", "options": "Straight, Body wave, Curly, Not sure", "step": 2 } },
+        { "type": "choice", "settings": { "label": "Style", "options": "Natural, Styled, Curled, Not sure", "step": 2 } },
+        { "type": "choice", "settings": { "label": "Cap size", "options": "Small, Medium, Large, Not sure", "step": 2 } },
+
+        { "type": "message", "settings": { "label": "Your inspiration", "step": 3, "placeholder": "Tell us about the look you have in mind, and feel free to mention any references" } },
+
+        { "type": "choice", "settings": { "label": "Installation", "options": "Yes please, No thank you, Not sure yet", "step": 4, "full_width": true } },
+        { "type": "agree",  "settings": { "label": "I am happy to be contacted about this enquiry", "required": true, "step": 4 } }
       ]
     }
   ]
