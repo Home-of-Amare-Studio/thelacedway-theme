@@ -1,0 +1,302 @@
+{% comment %}
+  THELACEDWÁY contact page
+  Home of Amare Studio
+
+  Built from src/routes/contact.tsx. Two email cards (Hair & orders,
+  Appointments & bookings) plus two CTA cards (Custom wigs, Appointments),
+  both sets as blocks so Destinee can add, remove or reorder them.
+
+  Assign this section to the Contact page template.
+{% endcomment %}
+
+<div class="tlw-contact tlw-container" id="tlw-contact-{{ section.id }}">
+
+  <h1 class="tlw-headline-md" style="color: var(--tlw-primary); margin: 0;">{{ section.settings.heading }}</h1>
+  <div class="tlw-contact__rule"></div>
+
+  {%- if section.settings.intro != blank -%}
+    <p class="tlw-body-lg tlw-contact__intro">{{ section.settings.intro }}</p>
+  {%- endif -%}
+
+  {%- assign email_blocks = section.blocks | where: 'type', 'email_card' -%}
+  {%- if email_blocks.size > 0 -%}
+    <div class="tlw-contact__grid">
+      {%- for block in email_blocks -%}
+        <div class="tlw-contact__card" {{ block.shopify_attributes }}>
+          <p class="tlw-label-caps" style="color: var(--tlw-accent);">{{ block.settings.label }}</p>
+          {%- if block.settings.email != blank -%}
+            <a href="mailto:{{ block.settings.email }}" class="tlw-contact__email">{{ block.settings.email }}</a>
+          {%- endif -%}
+          {%- if block.settings.note != blank -%}
+            <p class="tlw-body-md tlw-contact__note">{{ block.settings.note }}</p>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+
+  {%- assign cta_blocks = section.blocks | where: 'type', 'cta_card' -%}
+  {%- if cta_blocks.size > 0 -%}
+    <div class="tlw-contact__grid tlw-contact__grid--cta">
+      {%- for block in cta_blocks -%}
+        <div class="tlw-contact__cta-card" {{ block.shopify_attributes }}>
+          <p class="tlw-label-caps" style="color: var(--tlw-accent);">{{ block.settings.label }}</p>
+          <h2 class="tlw-headline-sm tlw-contact__cta-heading">{{ block.settings.heading }}</h2>
+          {%- if block.settings.body != blank -%}
+            <p class="tlw-body-md tlw-contact__cta-body">{{ block.settings.body }}</p>
+          {%- endif -%}
+          {%- if block.settings.button_label != blank and block.settings.button_link != blank -%}
+            <a href="{{ block.settings.button_link }}" class="tlw-contact__cta-btn">{{ block.settings.button_label }}</a>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+
+</div>
+
+<style>
+  #tlw-contact-{{ section.id }} {
+    max-width: 860px;
+    padding-top: 64px;
+    padding-bottom: 96px;
+  }
+
+  #tlw-contact-{{ section.id }} .tlw-contact__rule {
+    margin-top: 24px;
+    height: 1px;
+    width: 80px;
+    background: var(--tlw-accent);
+  }
+
+  #tlw-contact-{{ section.id }} .tlw-contact__intro {
+    margin-top: 40px;
+    max-width: 42rem;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-contact-{{ section.id }} .tlw-contact__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-top: 48px;
+  }
+
+  #tlw-contact-{{ section.id }} .tlw-contact__grid--cta {
+    margin-top: 24px;
+  }
+
+  @media (min-width: 640px) {
+    #tlw-contact-{{ section.id }} .tlw-contact__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  #tlw-contact-{{ section.id }} .tlw-contact__card {
+    border: 1px solid var(--tlw-outline-variant);
+    padding: 24px;
+  }
+
+  @media (min-width: 768px) {
+    #tlw-contact-{{ section.id }} .tlw-contact__card { padding: 32px; }
+  }
+
+  #tlw-contact-{{ section.id }} .tlw-contact__email {
+    display: block;
+    margin-top: 12px;
+    white-space: nowrap;
+    font-family: var(--tlw-font-body);
+    font-size: clamp(1rem, 4vw, 1.5rem);
+    color: var(--tlw-primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @media (min-width: 1100px) {
+    #tlw-contact-{{ section.id }} .tlw-contact__email {
+      font-family: var(--tlw-font-display);
+      font-size: 24px;
+    }
+  }
+
+  #tlw-contact-{{ section.id }} .tlw-contact__note {
+    margin-top: 16px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-contact-{{ section.id }} .tlw-contact__cta-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--tlw-outline-variant);
+    padding: 24px;
+  }
+
+  @media (min-width: 768px) {
+    #tlw-contact-{{ section.id }} .tlw-contact__cta-card { padding: 32px; }
+  }
+
+  #tlw-contact-{{ section.id }} .tlw-contact__cta-heading {
+    color: var(--tlw-primary);
+    margin: 12px 0;
+  }
+
+  #tlw-contact-{{ section.id }} .tlw-contact__cta-body {
+    color: var(--tlw-on-surface-variant);
+    margin-bottom: 32px;
+  }
+
+  #tlw-contact-{{ section.id }} .tlw-contact__cta-btn {
+    margin-top: auto;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    border: 1px solid var(--tlw-accent);
+    border-radius: 999px;
+    padding: 16px 32px;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tlw-primary);
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+
+  @media (min-width: 640px) {
+    #tlw-contact-{{ section.id }} .tlw-contact__cta-btn {
+      width: auto;
+      align-self: flex-start;
+      padding: 12px 32px;
+    }
+  }
+
+  #tlw-contact-{{ section.id }} .tlw-contact__cta-btn:hover {
+    background: var(--tlw-accent);
+    color: var(--tlw-on-primary);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "TLW Contact",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Contact"
+    },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Intro paragraph",
+      "default": "We read every message. For orders, appointments and general questions, email us and we will reply as soon as possible."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "email_card",
+      "name": "Email card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Hair & orders"
+        },
+        {
+          "type": "text",
+          "id": "email",
+          "label": "Email address",
+          "default": "thelabel@thelacedway.com"
+        },
+        {
+          "type": "textarea",
+          "id": "note",
+          "label": "Note below the email",
+          "default": "All hair enquiries, including existing order enquiries."
+        }
+      ]
+    },
+    {
+      "type": "cta_card",
+      "name": "CTA card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Custom wigs"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Start a custom wig enquiry"
+        },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Body text",
+          "default": "Tell us about the unit you have in mind and we will come back to you with everything you need to know."
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Start your enquiry"
+        },
+        {
+          "type": "text",
+          "id": "button_link",
+          "label": "Button link",
+          "default": "/pages/custom-wig-enquiry"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TLW Contact",
+      "blocks": [
+        {
+          "type": "email_card",
+          "settings": {
+            "label": "Hair & orders",
+            "email": "thelabel@thelacedway.com",
+            "note": "All hair enquiries, including existing order enquiries."
+          }
+        },
+        {
+          "type": "email_card",
+          "settings": {
+            "label": "Appointments & bookings",
+            "email": "bookings@thelacedway.com",
+            "note": "All appointment and styling enquiries including photoshoots, weddings and special occasions."
+          }
+        },
+        {
+          "type": "cta_card",
+          "settings": {
+            "label": "Custom wigs",
+            "heading": "Start a custom wig enquiry",
+            "body": "Tell us about the unit you have in mind and we will come back to you with everything you need to know.",
+            "button_label": "Start your enquiry",
+            "button_link": "/pages/custom-wig-enquiry"
+          }
+        },
+        {
+          "type": "cta_card",
+          "settings": {
+            "label": "Appointments",
+            "heading": "Book a studio appointment",
+            "body": "Installs and styling services available to book.",
+            "button_label": "Book an appointment",
+            "button_link": "/pages/services"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
