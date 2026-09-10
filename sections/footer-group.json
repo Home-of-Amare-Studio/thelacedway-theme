@@ -15,7 +15,7 @@
       "type": "tlw-footer",
       "name": "TLW Footer",
       "settings": {
-        "menu_shop": "main-menu",
+        "menu_shop": "footer-shop",
         "menu_info": "footer",
         "logo": "shopify://shop_images/logo-white-v3.webp",
         "contact_label": "Contact",
