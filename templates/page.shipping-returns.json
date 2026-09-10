@@ -22,10 +22,12 @@
             "alignment": "left",
             "type_preset": "h2",
             "font": "var(--font-body--family)",
+            "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
             "case": "none",
             "wrap": "pretty",
+            "text_color": "",
             "background": false,
             "background_color": "#00000026",
             "corner_radius": 0,
@@ -38,7 +40,9 @@
         },
         "page-content": {
           "type": "page-content",
-          "settings": {},
+          "settings": {
+            "text_color": ""
+          },
           "blocks": {}
         }
       },
@@ -46,6 +50,7 @@
         "heading",
         "page-content"
       ],
+      "disabled": true,
       "settings": {
         "content_direction": "column",
         "gap": 32,
@@ -53,9 +58,104 @@
         "padding-block-start": 40,
         "padding-block-end": 80
       }
+    },
+    "tlw_policy_aWLb9j": {
+      "type": "tlw-policy",
+      "blocks": {
+        "clause_trYUYU": {
+          "type": "clause",
+          "settings": {
+            "heading": "Processing Time",
+            "body": "<p>Please allow 7 to 15 working days for your order to be made and prepared for dispatch.</p><p>During busy periods, new launches or promotional sales, processing times may be slightly longer. If this happens, we'll keep you informed.</p>"
+          }
+        },
+        "clause_frDznr": {
+          "type": "clause",
+          "settings": {
+            "heading": "Order Amendments & Cancellations",
+            "body": "<p>As each wig is custom-made, we allow 24 hours from the time your order is placed for any amendments or cancellations.</p><p>After 24 hours, your order enters production and cannot be changed or cancelled. This includes:</p><ul><li>Hair length</li><li>Lace option (Closure or Frontal)</li><li>Texture</li><li>Cap size</li><li>Colour</li><li>Order cancellations</li></ul>"
+          }
+        },
+        "clause_YmyNHw": {
+          "type": "clause",
+          "settings": {
+            "heading": "",
+            "body": "<p>If you've entered the wrong delivery address, please contact us immediately. While we'll do our best to help before dispatch, we cannot guarantee changes once your order has been processed.</p>"
+          }
+        },
+        "clause_6ByaEd": {
+          "type": "clause",
+          "settings": {
+            "heading": "Delivery",
+            "body": "<p>Once your order has been completed and dispatched, please allow:</p>"
+          }
+        },
+        "clause_ijLLFy": {
+          "type": "clause",
+          "settings": {
+            "heading": "Royal Mail Tracked & Signed 24 — £6",
+            "body": "<ul><li>Estimated delivery within 1 to 3 working days</li><li>Fully tracked</li><li>Signature required upon delivery</li></ul>"
+          }
+        },
+        "clause_Nt9z9A": {
+          "type": "clause",
+          "settings": {
+            "heading": "Royal Mail Special Delivery — £11",
+            "body": "<ul><li>Guaranteed next working day delivery before 1pm</li><li>Fully tracked</li><li>Signature required</li><li>Compensation included if parcel is lost</li></ul>"
+          }
+        },
+        "clause_hTnGUQ": {
+          "type": "clause",
+          "settings": {
+            "heading": "",
+            "body": "<p>Once your order has been dispatched, you'll receive a confirmation email containing your tracking details.</p><p>Please ensure your delivery address is correct before placing your order. THELACEDWAY cannot be held responsible for delays or failed deliveries caused by incorrect address details.</p>"
+          }
+        },
+        "clause_K9bR83": {
+          "type": "clause",
+          "settings": {
+            "heading": "International Shipping",
+            "body": "<p>For orders shipped outside of the United Kingdom, import duties, taxes and customs fees may apply once your parcel reaches its destination country. These charges are determined by your local customs authorities and are the responsibility of the customer.</p><p>THELACEDWAY has no control over these charges, and they are not included in the shipping cost at checkout.</p>"
+          }
+        },
+        "clause_diB98e": {
+          "type": "clause",
+          "settings": {
+            "heading": "Lost, Stolen or Missing Packages",
+            "body": "<p>Once your order has been shipped, responsibility for the parcel transfers to the shipping courier. If you believe your package has been lost, stolen or is missing, we recommend contacting the shipping courier directly to open an investigation or submit a claim. THELACEDWAY cannot be held responsible for packages that are lost, stolen or delayed in transit.</p>"
+          }
+        },
+        "clause_hyk6Q3": {
+          "type": "clause",
+          "settings": {
+            "heading": "Returns & Exchanges",
+            "body": "<p>Due to the nature of our products and for hygiene reasons, we are unable to accept returns, exchanges or refunds on any wigs, hair extensions or custom-made products.</p><p>All sales are final.</p><p>If your order arrives damaged or you believe you have received the wrong item, please contact us within 48 hours of delivery with photographs of the issue. We'll investigate and work with you to resolve the matter promptly.</p><p>As our hair is 100% Virgin Human Hair, slight variations in colour, texture and wave pattern may occur. These are natural characteristics of authentic virgin hair and are not considered faults or defects. Each unit is unique while maintaining the same premium quality and longevity.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "clause_trYUYU",
+        "clause_frDznr",
+        "clause_YmyNHw",
+        "clause_6ByaEd",
+        "clause_ijLLFy",
+        "clause_Nt9z9A",
+        "clause_hTnGUQ",
+        "clause_K9bR83",
+        "clause_diB98e",
+        "clause_hyk6Q3"
+      ],
+      "name": "TLW Policy — Shipping & Returns",
+      "settings": {
+        "heading": "Shipping & Returns",
+        "intro": "<p>At THELACEDWAY, every unit is carefully handmade to order using premium quality hair. We take pride in ensuring every wig meets our high standards before it leaves us.</p>",
+        "number_headings": false,
+        "closing_note": "<p>Questions about an order? <a href=\"/pages/contact\">Get in touch</a>.</p>"
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "tlw_policy_aWLb9j"
   ]
 }
