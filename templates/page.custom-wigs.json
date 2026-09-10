@@ -22,10 +22,12 @@
             "alignment": "left",
             "type_preset": "h2",
             "font": "var(--font-body--family)",
+            "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
             "case": "none",
             "wrap": "pretty",
+            "text_color": "",
             "background": false,
             "background_color": "#00000026",
             "corner_radius": 0,
@@ -38,7 +40,9 @@
         },
         "page-content": {
           "type": "page-content",
-          "settings": {},
+          "settings": {
+            "text_color": ""
+          },
           "blocks": {}
         }
       },
@@ -46,6 +50,7 @@
         "heading",
         "page-content"
       ],
+      "disabled": true,
       "settings": {
         "content_direction": "column",
         "gap": 32,
@@ -53,9 +58,182 @@
         "padding-block-start": 40,
         "padding-block-end": 80
       }
+    },
+    "tlw_custom_wigs_TcFYXA": {
+      "type": "tlw-custom-wigs",
+      "blocks": {
+        "field_BQjxJL": {
+          "type": "field",
+          "settings": {
+            "label": "Full name",
+            "kind": "text",
+            "placeholder": "Your full name",
+            "required": true,
+            "full_width": false,
+            "step": 1
+          }
+        },
+        "field_mmRF6U": {
+          "type": "field",
+          "settings": {
+            "label": "Email address",
+            "kind": "email",
+            "placeholder": "you@email.com",
+            "required": true,
+            "full_width": false,
+            "step": 1
+          }
+        },
+        "phone_97Gjza": {
+          "type": "phone",
+          "settings": {
+            "label": "Contact number",
+            "placeholder": "7123 456789",
+            "codes": "🇬🇧 | +44 | 7123 456789\\n🇺🇸 | +1 | (201) 555-0123\\n🇷🇺 | +7 | 912 345 6789\\n🇪🇬 | +20 | 100 123 4567\\n🇿🇦 | +27 | 71 123 4567\\n🇬🇷 | +30 | 691 234 5678\\n🇳🇱 | +31 | 6 12345678\\n🇧🇪 | +32 | 470 12 34 56\\n🇫🇷 | +33 | 6 12 34 56 78\\n🇪🇸 | +34 | 612 34 56 78\\n🇵🇹 | +351 | 912 345 678\\n🇱🇺 | +352 | 628 123 456\\n🇮🇪 | +353 | 85 123 4567\\n🇮🇸 | +354 | 611 1234\\n🇲🇹 | +356 | 9696 1234\\n🇨🇾 | +357 | 96 123456\\n🇫🇮 | +358 | 41 2345678\\n🇭🇺 | +36 | 20 123 4567\\n🇮🇹 | +39 | 312 345 6789\\n🇷🇴 | +40 | 712 345 678\\n🇨🇭 | +41 | 78 123 45 67\\n🇦🇹 | +43 | 664 123456\\n🇩🇰 | +45 | 32 12 34 56\\n🇸🇪 | +46 | 70 123 45 67\\n🇳🇴 | +47 | 406 12 345\\n🇵🇱 | +48 | 512 345 678\\n🇩🇪 | +49 | 151 12345678\\n🇲🇽 | +52 | 222 123 4567\\n🇧🇷 | +55 | 11 91234 5678\\n🇲🇾 | +60 | 12 345 6789\\n🇦🇺 | +61 | 412 345 678\\n🇮🇩 | +62 | 812 345 678\\n🇵🇭 | +63 | 905 123 4567\\n🇳🇿 | +64 | 21 123 4567\\n🇸🇬 | +65 | 8123 4567\\n🇹🇭 | +66 | 81 234 5678\\n🇯🇵 | +81 | 90 1234 5678\\n🇰🇷 | +82 | 10 1234 5678\\n🇻🇳 | +84 | 91 234 56 78\\n🇨🇳 | +86 | 138 1234 5678\\n🇹🇷 | +90 | 501 234 56 78\\n🇮🇳 | +91 | 98765 43210\\n🇵🇰 | +92 | 301 2345678\\n🇲🇦 | +212 | 650 123456\\n🇬🇲 | +220 | 301 2345\\n🇸🇳 | +221 | 70 123 45 67\\n🇬🇭 | +233 | 24 123 4567\\n🇳🇬 | +234 | 805 123 4567\\n🇨🇲 | +237 | 6 71 23 45 67\\n🇷🇼 | +250 | 78 123 4567\\n🇰🇪 | +254 | 712 123456\\n🇹🇿 | +255 | 621 234 567\\n🇺🇬 | +256 | 712 345678\\n🇿🇲 | +260 | 95 5123456\\n🇿🇼 | +263 | 71 234 5678\\n🇳🇦 | +264 | 81 123 4567\\n🇧🇼 | +267 | 71 123 456\\n🇧🇩 | +880 | 1812 345678\\n🇸🇦 | +966 | 51 234 5678\\n🇦🇪 | +971 | 50 123 4567\\n🇮🇱 | +972 | 50 123 4567\\n🇶🇦 | +974 | 3312 3456\\n🇧🇸 | +1242 | 359 1234\\n🇧🇧 | +1246 | 250 1234\\n🇯🇲 | +1876 | 210 1234\\n🇹🇹 | +1868 | 291 1234",
+            "required": false,
+            "full_width": false,
+            "step": 1
+          }
+        },
+        "choice_HJ8UGk": {
+          "type": "choice",
+          "settings": {
+            "label": "Hair type",
+            "options": "Virgin, Raw, Not sure",
+            "placeholder": "Please choose",
+            "required": true,
+            "full_width": false,
+            "step": 2
+          }
+        },
+        "choice_mhYqgN": {
+          "type": "choice",
+          "settings": {
+            "label": "Length",
+            "options": "16, 18, 20, 22, 24, 26",
+            "placeholder": "Please choose",
+            "required": true,
+            "full_width": false,
+            "step": 2
+          }
+        },
+        "choice_MWLUhe": {
+          "type": "choice",
+          "settings": {
+            "label": "Lace size",
+            "options": "5x5, 6x6, 7x7, 9x6, 13x6",
+            "placeholder": "Please choose",
+            "required": true,
+            "full_width": false,
+            "step": 2
+          }
+        },
+        "choice_6HM4yN": {
+          "type": "choice",
+          "settings": {
+            "label": "Texture",
+            "options": "Straight, Body wave, Curly, Not sure",
+            "placeholder": "Please choose",
+            "required": false,
+            "full_width": false,
+            "step": 2
+          }
+        },
+        "choice_X6Tpyh": {
+          "type": "choice",
+          "settings": {
+            "label": "Style",
+            "options": "Natural, Styled, Curled, Not sure",
+            "placeholder": "Please choose",
+            "required": false,
+            "full_width": false,
+            "step": 2
+          }
+        },
+        "choice_j87fxA": {
+          "type": "choice",
+          "settings": {
+            "label": "Cap size",
+            "options": "Small, Medium, Large, Not sure",
+            "placeholder": "Please choose",
+            "required": false,
+            "full_width": false,
+            "step": 2
+          }
+        },
+        "message_NgTQ4w": {
+          "type": "message",
+          "settings": {
+            "label": "Your inspiration",
+            "placeholder": "Tell us about the look you have in mind, and feel free to mention any references",
+            "required": false,
+            "step": 3
+          }
+        },
+        "choice_8rwGza": {
+          "type": "choice",
+          "settings": {
+            "label": "Installation",
+            "options": "Yes please, No thank you, Not sure yet",
+            "placeholder": "Please choose",
+            "required": false,
+            "full_width": true,
+            "step": 4
+          }
+        },
+        "agree_BbJHU8": {
+          "type": "agree",
+          "settings": {
+            "label": "I am happy to be contacted about this enquiry",
+            "required": true,
+            "step": 4
+          }
+        }
+      },
+      "block_order": [
+        "field_BQjxJL",
+        "field_mmRF6U",
+        "phone_97Gjza",
+        "choice_HJ8UGk",
+        "choice_mhYqgN",
+        "choice_MWLUhe",
+        "choice_6HM4yN",
+        "choice_X6Tpyh",
+        "choice_j87fxA",
+        "message_NgTQ4w",
+        "choice_8rwGza",
+        "agree_BbJHU8"
+      ],
+      "name": "TLW Custom Wigs — Standalone Page",
+      "settings": {
+        "eyebrow": "",
+        "heading_before": "Create Your Custom Wig",
+        "heading_accent": "",
+        "heading_after": "",
+        "body": "Can't find exactly what you're looking for?",
+        "extra_paragraphs": "Our Custom Wig service allows you to create a unit tailored to your individual preferences. Whether you have a specific colour, length, lace size or style in mind, complete the form below and tell us your vision.\nOnce your enquiry has been reviewed, we'll be in touch with a personalised quote.",
+        "start_open": true,
+        "success_button_label": "Back to home",
+        "success_button_link": "/",
+        "open_label": "Start your enquiry",
+        "close_label": "Close enquiry",
+        "form_intro": "Tell us what you have in mind and we will come back to you within two working days.",
+        "enquiry_label": "Custom wig enquiry",
+        "step_labels": "Details, Your custom wig, Your inspiration, Additional details",
+        "step_word": "Step",
+        "of_word": "of",
+        "next_label": "Continue",
+        "back_label": "Back",
+        "incomplete_text": "Please fill in the fields marked with a star.",
+        "card_radius": 24,
+        "submit_label": "Send enquiry",
+        "success_text": "Thank you. Your enquiry is with us and we will be in touch within two working days.",
+        "small_print": "We only use these details to answer your enquiry."
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "tlw_custom_wigs_TcFYXA"
   ]
 }
