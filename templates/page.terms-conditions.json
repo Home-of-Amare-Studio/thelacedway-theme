@@ -22,10 +22,12 @@
             "alignment": "left",
             "type_preset": "h2",
             "font": "var(--font-body--family)",
+            "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
             "case": "none",
             "wrap": "pretty",
+            "text_color": "",
             "background": false,
             "background_color": "#00000026",
             "corner_radius": 0,
@@ -38,7 +40,9 @@
         },
         "page-content": {
           "type": "page-content",
-          "settings": {},
+          "settings": {
+            "text_color": ""
+          },
           "blocks": {}
         }
       },
@@ -46,6 +50,7 @@
         "heading",
         "page-content"
       ],
+      "disabled": true,
       "settings": {
         "content_direction": "column",
         "gap": 32,
@@ -53,9 +58,168 @@
         "padding-block-start": 40,
         "padding-block-end": 80
       }
+    },
+    "tlw_policy_fwHxAe": {
+      "type": "tlw-policy",
+      "blocks": {
+        "clause_QiBmYp": {
+          "type": "clause",
+          "settings": {
+            "heading": "About Us",
+            "body": "<p>TheLacedWay is a luxury hair brand specialising in ready-to-ship wigs, bespoke wigs, custom-coloured wigs and premium human hair products.</p>"
+          }
+        },
+        "clause_nEcPQa": {
+          "type": "clause",
+          "settings": {
+            "heading": "Eligibility",
+            "body": "<p>You must be at least 18 years old, or have permission from a parent or guardian, to place an order.</p>"
+          }
+        },
+        "clause_RwDpjG": {
+          "type": "clause",
+          "settings": {
+            "heading": "Products",
+            "body": "<p>All products are described as accurately as possible. However, premium human hair is a natural product, and slight variations in colour, texture, density and wave pattern are normal and are not considered faults. Colours may vary due to lighting and screen settings.</p>"
+          }
+        },
+        "clause_kBwRtx": {
+          "type": "clause",
+          "settings": {
+            "heading": "Bespoke & Custom Orders",
+            "body": "<p>Orders are made to your specifications. Customers are responsible for selecting the correct cap size, lace type, length, density and colour. Once production has started, orders cannot be amended or cancelled after 24 hours.</p>"
+          }
+        },
+        "clause_pKiVxB": {
+          "type": "clause",
+          "settings": {
+            "heading": "Ready to Ship Orders",
+            "body": "<p>Ready-to-ship products are dispatched within 1 to 2 working days unless otherwise stated.</p>"
+          }
+        },
+        "clause_Tm9Dqk": {
+          "type": "clause",
+          "settings": {
+            "heading": "Processing Times",
+            "body": "<p>Made to order and bespoke items generally require 7 to 15 working days before dispatch. Processing times may increase during launches, promotional periods or holidays.</p>"
+          }
+        },
+        "clause_Uhwknh": {
+          "type": "clause",
+          "settings": {
+            "heading": "Prices & Payment",
+            "body": "<p>All prices are displayed at checkout. Full payment is required before production or dispatch begins. TheLacedWay reserves the right to correct pricing errors and cancel affected orders with a full refund.</p>"
+          }
+        },
+        "clause_cLxW6k": {
+          "type": "clause",
+          "settings": {
+            "heading": "Delivery",
+            "body": "<p>Delivery estimates are not guaranteed. Once an order has been handed to the courier, delays caused by the courier, customs or events outside our control are not the responsibility of TheLacedWay.</p>"
+          }
+        },
+        "clause_XpM7Ld": {
+          "type": "clause",
+          "settings": {
+            "heading": "International Orders",
+            "body": "<p>Customers are responsible for all customs duties, VAT, import taxes and brokerage fees charged by their destination country.</p>"
+          }
+        },
+        "clause_bwthDk": {
+          "type": "clause",
+          "settings": {
+            "heading": "Returns & Refunds",
+            "body": "<p>Please refer to our <a href=\"/pages/shipping-returns\">Returns &amp; Refund Policy</a>. Due to hygiene reasons, human hair products may not be eligible for return unless faulty.</p>"
+          }
+        },
+        "clause_wayRtK": {
+          "type": "clause",
+          "settings": {
+            "heading": "Faulty Products",
+            "body": "<p>If you believe your item is faulty, please contact us within 48 hours of delivery with photographs and your order number.</p>"
+          }
+        },
+        "clause_EVWcrr": {
+          "type": "clause",
+          "settings": {
+            "heading": "Product Care",
+            "body": "<p>Customers must follow our <a href=\"/pages/product-care\">Product Care Guide</a>. Damage caused by colouring, bleaching, chemical treatments, misuse or improper maintenance is not covered.</p>"
+          }
+        },
+        "clause_QXyCAQ": {
+          "type": "clause",
+          "settings": {
+            "heading": "Intellectual Property",
+            "body": "<p>All logos, branding, product names, photographs, videos, graphics, website content and descriptions remain the intellectual property of TheLacedWay and may not be copied or reproduced without written permission.</p>"
+          }
+        },
+        "clause_PJ9ggR": {
+          "type": "clause",
+          "settings": {
+            "heading": "Limitation of Liability",
+            "body": "<p>Nothing in these Terms limits any rights you have under applicable consumer law. To the fullest extent permitted by law, TheLacedWay shall not be liable for indirect or consequential losses arising from the use of our products.</p>"
+          }
+        },
+        "clause_h798JN": {
+          "type": "clause",
+          "settings": {
+            "heading": "Force Majeure",
+            "body": "<p>We are not responsible for delays or failure to perform caused by circumstances beyond our reasonable control, including severe weather, strikes, courier disruption, supplier delays, pandemics or government action.</p>"
+          }
+        },
+        "clause_EUGNqX": {
+          "type": "clause",
+          "settings": {
+            "heading": "Privacy",
+            "body": "<p>Your personal information is handled in accordance with our <a href=\"/pages/privacy\">Privacy Policy</a>.</p>"
+          }
+        },
+        "clause_VYEUkA": {
+          "type": "clause",
+          "settings": {
+            "heading": "Governing Law",
+            "body": "<p>These Terms are governed by the laws of England and Wales. Any disputes shall be subject to the exclusive jurisdiction of the courts of England and Wales.</p>"
+          }
+        },
+        "clause_XYgQzm": {
+          "type": "clause",
+          "settings": {
+            "heading": "Contact",
+            "body": "<p>For enquiries regarding these Terms, please contact TheLacedWay using the contact details published on our website.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "clause_QiBmYp",
+        "clause_nEcPQa",
+        "clause_RwDpjG",
+        "clause_kBwRtx",
+        "clause_pKiVxB",
+        "clause_Tm9Dqk",
+        "clause_Uhwknh",
+        "clause_cLxW6k",
+        "clause_XpM7Ld",
+        "clause_bwthDk",
+        "clause_wayRtK",
+        "clause_EVWcrr",
+        "clause_QXyCAQ",
+        "clause_PJ9ggR",
+        "clause_h798JN",
+        "clause_EUGNqX",
+        "clause_VYEUkA",
+        "clause_XYgQzm"
+      ],
+      "name": "TLW Policy — Terms & Conditions",
+      "settings": {
+        "heading": "Terms & Conditions",
+        "intro": "<p>These Terms &amp; Conditions apply to all purchases made through TheLacedWay. By placing an order, you agree to be bound by these terms.</p>",
+        "number_headings": true,
+        "closing_note": ""
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "tlw_policy_fwHxAe"
   ]
 }
