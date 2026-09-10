@@ -22,10 +22,12 @@
             "alignment": "left",
             "type_preset": "h2",
             "font": "var(--font-body--family)",
+            "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
             "case": "none",
             "wrap": "pretty",
+            "text_color": "",
             "background": false,
             "background_color": "#00000026",
             "corner_radius": 0,
@@ -38,7 +40,9 @@
         },
         "page-content": {
           "type": "page-content",
-          "settings": {},
+          "settings": {
+            "text_color": ""
+          },
           "blocks": {}
         }
       },
@@ -46,6 +50,7 @@
         "heading",
         "page-content"
       ],
+      "disabled": true,
       "settings": {
         "content_direction": "column",
         "gap": 32,
@@ -53,9 +58,77 @@
         "padding-block-start": 40,
         "padding-block-end": 80
       }
+    },
+    "tlw_services_yhJhqH": {
+      "type": "tlw-services",
+      "blocks": {
+        "panel_DftVcE": {
+          "type": "panel",
+          "settings": {
+            "label": "Deposit and payment",
+            "body": "<p>All services require a non-refundable <strong>£30</strong> deposit to confirm your appointment. The remaining balance is due in cash on the day. There are no refunds once the service is complete. If something is wrong with your hair, contact us within <strong>48 hours</strong> and we will put it right.</p>"
+          }
+        },
+        "panel_PmthPd": {
+          "type": "panel",
+          "settings": {
+            "label": "Cancelling or rescheduling",
+            "body": "<p>You can reschedule or cancel up to <strong>48 hours</strong> before your appointment. Bookings made within 48 hours, or on a day we are normally closed, carry a <strong>£35</strong> emergency booking charge. Working bank holidays also carry a <strong>£35</strong> charge.</p>"
+          }
+        },
+        "panel_YhKcFt": {
+          "type": "panel",
+          "settings": {
+            "label": "Arriving late",
+            "body": "<p>Arriving more than <strong>15 minutes</strong> late adds a <strong>£15</strong> late fee. Arriving more than <strong>30 minutes</strong> late means the appointment is cancelled.</p>"
+          }
+        },
+        "panel_Bx6FNL": {
+          "type": "panel",
+          "settings": {
+            "label": "How to arrive",
+            "body": "<p>Please come with your hair in <strong>8 to 12</strong> neat cornrows so the unit lays flat and finishes seamlessly. If you need a braid down, select it as an add-on before booking rather than on the day.</p><p>If you bought your unit from us, book under \"Unit Purchased from Us\" and allow at least <strong>7 working days</strong> between your order date and your appointment so your unit can arrive and be prepared. You will get a confirmation email once your order and booking are both in.</p><p>If you are sending or dropping off hair, it needs to reach us at least <strong>7 days</strong> before your appointment. Less than <strong>5 days</strong> before adds a <strong>£15</strong> late fee, and less than <strong>2 days</strong> before is treated as an emergency booking at <strong>£35</strong> or the appointment may be cancelled. Drop off is at the same place as your appointment, so message us or check our Instagram story for times, and confirm the postage address with us first as it is different.</p>"
+          }
+        },
+        "panel_HQ3QLX": {
+          "type": "panel",
+          "settings": {
+            "label": "Your unit",
+            "body": "<p>We only accept <strong>13x6</strong> HD frontals for frontal wig installations. If your head size is <strong>20 inches</strong> or smaller, a <strong>13x4</strong> HD frontal is fine.</p><p>If you are buying a ready-made factory wig, make sure the vendor supplies a full frontal wig and not a \"lace front\", as lace fronts restrict you to a middle part. Thick knots or thick lace are <strong>not accepted</strong>.</p><p>Please check your unit comfortably covers your hairline, as we cannot install a unit that is too small. Units that do not fit will not be installed. If you are unsure, send us a video before your appointment and we will confirm.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "panel_DftVcE",
+        "panel_PmthPd",
+        "panel_YhKcFt",
+        "panel_Bx6FNL",
+        "panel_HQ3QLX"
+      ],
+      "name": "TLW Services",
+      "settings": {
+        "heading": "Services",
+        "hero_intro": "Flawless installs. Seamless melts. Every install is carried out with precision and care to achieve your desired look. Book your appointment today.",
+        "hero_cta_label": "Booking policies",
+        "hours": "Tuesday to Saturday, 10am – 6pm",
+        "closed_note": "Closed Sunday and Monday.",
+        "contact_email": "bookings@thelacedway.com",
+        "deposit_amount": "£30",
+        "cancel_window": "48 hours",
+        "policies_eyebrow": "Before you book",
+        "policies_heading": "Booking policies",
+        "policies_intro": "<p>Slots are released on the 18th of each month at 8pm for the following month. If your date is unavailable we are either fully booked or away that day, so email us and we will see what we can do. We are in Enfield, North London, nearest station Brimsdown, and the exact address comes with your confirmation.</p>",
+        "appointments_eyebrow": "Appointments",
+        "appointments_heading": "Book an appointment",
+        "appointments_body": "Choose a category, see availability and secure your slot on our booking page.",
+        "acuity_url": "https://app.acuityscheduling.com/schedule.php?owner=26439475",
+        "booking_cta_label": "Book and pay on our booking page",
+        "floating_cta_label": "Book now"
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "tlw_services_yhJhqH"
   ]
 }
