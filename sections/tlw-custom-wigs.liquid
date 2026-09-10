@@ -2,8 +2,13 @@
   THELACEDWÁY custom wigs
   Home of Amare Studio
 
-  The enquiry form expands in place rather than sending the visitor to another
-  page, matching the live site.
+  Two modes, one file, picked by the "Show the form open by default" setting:
+
+  - Off (default): the homepage teaser. The form expands in place when
+    clicked, matching the live site.
+  - On: for a dedicated page (e.g. /custom-wig-enquiry). No toggle button,
+    the form is open on load, and the heading renders as an <h1> instead of
+    an <h2> since the page has no other H1.
 
   It uses Shopify's own contact form, so submissions arrive at the store email
   set under Settings > Notifications. No app, no monthly cost, nothing to
@@ -11,38 +16,60 @@
   herself without touching code.
 {% endcomment %}
 
+{%- liquid
+  assign heading_tag = 'h2'
+  if section.settings.start_open
+    assign heading_tag = 'h1'
+  endif
+-%}
+
 <section class="tlw-custom" id="tlw-custom-{{ section.id }}">
   <div class="tlw-custom__head">
     {%- if section.settings.eyebrow != blank -%}
       <p class="tlw-custom__eyebrow">{{ section.settings.eyebrow }}</p>
     {%- endif -%}
 
-    <h2 class="tlw-custom__title">
+    <{{ heading_tag }} class="tlw-custom__title">
       {{ section.settings.heading_before }}
       {%- if section.settings.heading_accent != blank -%}
         <em class="tlw-accent-word">{{ section.settings.heading_accent }}</em>
       {%- endif -%}
       {{ section.settings.heading_after }}
-    </h2>
+    </{{ heading_tag }}>
 
     {%- if section.settings.body != blank -%}
       <p class="tlw-custom__text">{{ section.settings.body }}</p>
     {%- endif -%}
 
-    <button
-      type="button"
-      class="tlw-custom__toggle"
-      data-custom-toggle
-      aria-expanded="false"
-      aria-controls="tlw-custom-panel-{{ section.id }}"
-      data-open-label="{{ section.settings.open_label | escape }}"
-      data-close-label="{{ section.settings.close_label | escape }}"
-    >
-      {{ section.settings.open_label }}
-    </button>
+    {%- assign extra_lines = section.settings.extra_paragraphs | newline_to_br | strip_newlines | split: '<br />' -%}
+    {%- for line in extra_lines -%}
+      {%- assign clean_line = line | strip -%}
+      {%- if clean_line != blank -%}
+        <p class="tlw-custom__text">{{ clean_line }}</p>
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- unless section.settings.start_open -%}
+      <button
+        type="button"
+        class="tlw-custom__toggle"
+        data-custom-toggle
+        aria-expanded="false"
+        aria-controls="tlw-custom-panel-{{ section.id }}"
+        data-open-label="{{ section.settings.open_label | escape }}"
+        data-close-label="{{ section.settings.close_label | escape }}"
+      >
+        {{ section.settings.open_label }}
+      </button>
+    {%- endunless -%}
   </div>
 
-  <div class="tlw-custom__panel" id="tlw-custom-panel-{{ section.id }}" data-custom-panel>
+  <div
+    class="tlw-custom__panel{% if section.settings.start_open %} is-open{% endif %}"
+    id="tlw-custom-panel-{{ section.id }}"
+    data-custom-panel
+    {% if section.settings.start_open %}data-start-open{% endif %}
+  >
     <div class="tlw-custom__clip">
       <div class="tlw-custom__form" data-custom-form>
 
@@ -53,6 +80,11 @@
         {%- form 'contact', class: 'tlw-form' -%}
           {%- if form.posted_successfully? -%}
             <p class="tlw-form__success">{{ section.settings.success_text }}</p>
+            {%- if section.settings.success_button_label != blank and section.settings.success_button_link != blank -%}
+              <a href="{{ section.settings.success_button_link }}" class="tlw-custom__success-btn">
+                {{ section.settings.success_button_label }}
+              </a>
+            {%- endif -%}
           {%- endif -%}
 
           {%- if form.errors -%}
@@ -472,144 +504,7 @@
   }
 
   @media (min-width: 700px) {
-    /* The card the wizard sits in */
-  #tlw-custom-{{ section.id }} .tlw-wizard {
-    padding: 40px 32px;
-    border-radius: {{ section.settings.card_radius }}px;
-    background: var(--tlw-surface-lowest);
-  }
-
-  @media (min-width: 768px) {
-    #tlw-custom-{{ section.id }} .tlw-wizard { padding: 56px 56px 48px; }
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__counter {
-    margin: 0 0 16px;
-    font-family: var(--tlw-font-body);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--tlw-primary);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__segments {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 44px;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__seg {
-    flex: 1;
-    height: 2px;
-    background: var(--tlw-outline-variant);
-    transition: background-color 400ms ease;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__seg.is-on {
-    background: var(--tlw-accent);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-step {
-    margin: 0;
-    padding: 0;
-    border: 0;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-step[hidden] { display: none; }
-
-  #tlw-custom-{{ section.id }} .tlw-step__label {
-    padding: 0;
-    margin-bottom: 28px;
-    font-family: var(--tlw-font-body);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--tlw-accent);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-agree__row {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    font-size: 15px;
-    line-height: 1.6;
-    color: var(--tlw-on-surface-variant);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-agree__row input {
-    margin-top: 4px;
-    width: 18px;
-    height: 18px;
-    accent-color: var(--tlw-accent);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__foot {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 40px;
-    padding-top: 32px;
-    border-top: 1px solid var(--tlw-outline-variant);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__back,
-  #tlw-custom-{{ section.id }} .tlw-wizard__next {
-    padding: 16px 40px;
-    border-radius: var(--tlw-radius);
-    font-family: var(--tlw-font-body);
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    transition: background-color 250ms ease, color 250ms ease;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__back {
-    margin-right: auto;
-    border: 1px solid var(--tlw-outline-variant);
-    background: transparent;
-    color: var(--tlw-on-surface-variant);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__back:hover {
-    border-color: var(--tlw-primary);
-    color: var(--tlw-primary);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__next {
-    border: 1px solid var(--tlw-accent);
-    background: transparent;
-    color: var(--tlw-primary);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__next:hover {
-    background: var(--tlw-accent);
-    color: var(--tlw-on-primary);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__back[hidden],
-  #tlw-custom-{{ section.id }} .tlw-wizard__next[hidden],
-  #tlw-custom-{{ section.id }} .tlw-form__submit[hidden] { display: none; }
-
-  #tlw-custom-{{ section.id }} .tlw-form__submit { margin-top: 0; }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__warn {
-    margin: 16px 0 0;
-    text-align: right;
-    font-size: 13px;
-    color: #a33;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__warn[hidden] { display: none; }
-
-  #tlw-custom-{{ section.id }} .tlw-input.is-missing {
-    border-color: #a33;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-form__grid {
+    #tlw-custom-{{ section.id }} .tlw-form__grid {
       grid-template-columns: 1fr 1fr;
     }
     #tlw-custom-{{ section.id }} .tlw-field.is-wide { grid-column: 1 / -1; }
@@ -714,6 +609,26 @@
     border-color: #a33;
     color: #a33;
   }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__success-btn {
+    display: inline-block;
+    margin: -8px 0 28px;
+    padding: 16px 40px;
+    border: 1px solid var(--tlw-accent);
+    border-radius: 999px;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tlw-primary);
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__success-btn:hover {
+    background: var(--tlw-accent);
+    color: var(--tlw-on-primary);
+  }
 </style>
 
 <script>
@@ -724,29 +639,36 @@
     var toggle = root.querySelector('[data-custom-toggle]');
     var panel = root.querySelector('[data-custom-panel]');
     var form = root.querySelector('[data-custom-form]');
-    if (!toggle || !panel) return;
+    /* No toggle button means this is the standalone-page mode: the panel is
+       already open in the server-rendered HTML (data-start-open), so there
+       is nothing to wire up here. The wizard logic below still needs to run
+       either way, so this only skips the toggle behaviour, not the return
+       that used to skip everything after it. */
+    if (!panel) return;
 
-    function open(scroll) {
-      panel.classList.add('is-open');
-      toggle.setAttribute('aria-expanded', 'true');
-      toggle.textContent = toggle.dataset.closeLabel;
+    if (toggle) {
+      function open(scroll) {
+        panel.classList.add('is-open');
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.textContent = toggle.dataset.closeLabel;
 
-      if (scroll === false) return;
-      window.setTimeout(function () {
-        var y = form.getBoundingClientRect().top + window.scrollY - 120;
-        window.scrollTo({ top: y, behavior: 'smooth' });
-      }, 720);
+        if (scroll === false) return;
+        window.setTimeout(function () {
+          var y = form.getBoundingClientRect().top + window.scrollY - 120;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }, 720);
+      }
+
+      function shut() {
+        panel.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.textContent = toggle.dataset.openLabel;
+      }
+
+      toggle.addEventListener('click', function () {
+        if (panel.classList.contains('is-open')) shut(); else open();
+      });
     }
-
-    function shut() {
-      panel.classList.remove('is-open');
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.textContent = toggle.dataset.openLabel;
-    }
-
-    toggle.addEventListener('click', function () {
-      if (panel.classList.contains('is-open')) shut(); else open();
-    });
 
     /* --- the step by step form --- */
     var wizard = root.querySelector('[data-wizard]');
@@ -826,9 +748,12 @@
     }
 
     /* After a submission Shopify reloads the page, so reopen the panel and
-       show the visitor their confirmation rather than a closed form. */
-    if (root.querySelector('.tlw-form__success') || root.querySelector('.tlw-form__error')) {
-      open(false);
+       show the visitor their confirmation rather than a closed form. In
+       start-open mode the panel never closes, so there is nothing to do. */
+    if (toggle && (root.querySelector('.tlw-form__success') || root.querySelector('.tlw-form__error'))) {
+      panel.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.textContent = toggle.dataset.closeLabel;
     }
   })();
 </script>
@@ -865,6 +790,40 @@
       "id": "body",
       "label": "Paragraph",
       "default": "Can't find exactly what you're looking for? Our Custom Wig service allows you to create a unit tailored to your individual preferences."
+    },
+    {
+      "type": "textarea",
+      "id": "extra_paragraphs",
+      "label": "Extra paragraphs",
+      "info": "Optional. One per line, each becomes its own paragraph after the one above."
+    },
+    {
+      "type": "header",
+      "content": "Standalone page"
+    },
+    {
+      "type": "checkbox",
+      "id": "start_open",
+      "label": "Show the form open by default",
+      "info": "Turn on when this section is the whole page (e.g. /custom-wig-enquiry) rather than a homepage teaser. Hides the toggle button and uses an H1 for the heading.",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "success_button_label",
+      "label": "Button after a successful submission",
+      "info": "Optional. Shows next to the success message. Leave blank for none.",
+      "default": "Back to home"
+    },
+    {
+      "type": "text",
+      "id": "success_button_link",
+      "label": "Where that button goes",
+      "default": "/"
+    },
+    {
+      "type": "header",
+      "content": "Teaser button"
     },
     {
       "type": "text",
@@ -1172,6 +1131,38 @@
   "presets": [
     {
       "name": "TLW Custom Wigs",
+      "blocks": [
+        { "type": "field",  "settings": { "label": "Full name", "kind": "text",  "required": true, "step": 1, "placeholder": "Your full name" } },
+        { "type": "field",  "settings": { "label": "Email address", "kind": "email", "required": true, "step": 1, "placeholder": "you@email.com" } },
+        { "type": "phone",  "settings": { "label": "Contact number", "step": 1 } },
+
+        { "type": "choice", "settings": { "label": "Hair type", "options": "Virgin, Raw, Not sure", "step": 2, "required": true } },
+        { "type": "choice", "settings": { "label": "Length", "options": "16, 18, 20, 22, 24, 26", "step": 2, "required": true } },
+        { "type": "choice", "settings": { "label": "Lace size", "options": "5x5, 6x6, 7x7, 9x6, 13x6", "step": 2, "required": true } },
+        { "type": "choice", "settings": { "label": "Texture", "options": "Straight, Body wave, Curly, Not sure", "step": 2 } },
+        { "type": "choice", "settings": { "label": "Style", "options": "Natural, Styled, Curled, Not sure", "step": 2 } },
+        { "type": "choice", "settings": { "label": "Cap size", "options": "Small, Medium, Large, Not sure", "step": 2 } },
+
+        { "type": "message", "settings": { "label": "Your inspiration", "step": 3, "placeholder": "Tell us about the look you have in mind, and feel free to mention any references" } },
+
+        { "type": "choice", "settings": { "label": "Installation", "options": "Yes please, No thank you, Not sure yet", "step": 4, "full_width": true } },
+        { "type": "agree",  "settings": { "label": "I am happy to be contacted about this enquiry", "required": true, "step": 4 } }
+      ]
+    },
+    {
+      "name": "TLW Custom Wigs — Standalone Page",
+      "settings": {
+        "eyebrow": "",
+        "heading_before": "Create Your Custom Wig",
+        "heading_accent": "",
+        "heading_after": "",
+        "body": "Can't find exactly what you're looking for?",
+        "extra_paragraphs": "Our Custom Wig service allows you to create a unit tailored to your individual preferences. Whether you have a specific colour, length, lace size or style in mind, complete the form below and tell us your vision.\nOnce your enquiry has been reviewed, we'll be in touch with a personalised quote.",
+        "start_open": true,
+        "success_button_label": "Back to home",
+        "success_button_link": "/",
+        "form_intro": "Tell us what you have in mind and we will come back to you within two working days."
+      },
       "blocks": [
         { "type": "field",  "settings": { "label": "Full name", "kind": "text",  "required": true, "step": 1, "placeholder": "Your full name" } },
         { "type": "field",  "settings": { "label": "Email address", "kind": "email", "required": true, "step": 1, "placeholder": "you@email.com" } },
