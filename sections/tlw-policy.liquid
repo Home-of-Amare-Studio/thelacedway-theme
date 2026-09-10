@@ -1,0 +1,262 @@
+{% comment %}
+  THELACEDWÁY policy page
+  Home of Amare Studio
+
+  One reusable section for Product Care, Shipping & Returns, Terms &
+  Conditions and Privacy Policy — all four follow the same shape in the
+  React export (src/routes/product-care.tsx, shipping-returns.tsx,
+  termsandconditions.tsx, privacy.tsx): a heading, an optional intro
+  paragraph, a list of clause blocks (heading + body), and an optional
+  closing note.
+
+  Add this section 4 times, once per page, and pick the matching preset
+  from "Add section" — each one loads pre-filled with that page's real
+  copy as editable blocks, so Destinee can edit wording or fees later
+  without touching code.
+
+  Terms & Conditions and Privacy Policy use numbered headings ("1. About
+  Us"); Product Care and Shipping & Returns don't — that's the
+  "Number the headings" setting below.
+{% endcomment %}
+
+<div class="tlw-policy tlw-container" id="tlw-policy-{{ section.id }}">
+
+  <h1 class="tlw-headline-md" style="color: var(--tlw-primary); margin: 0;">{{ section.settings.heading }}</h1>
+  <div class="tlw-policy__rule"></div>
+
+  {%- if section.settings.intro != blank -%}
+    <div class="tlw-body-md tlw-policy__intro">{{ section.settings.intro }}</div>
+  {%- endif -%}
+
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'clause' -%}
+      <section class="tlw-policy__clause" {{ block.shopify_attributes }}>
+        {%- if block.settings.heading != blank -%}
+          <h2 class="tlw-headline-sm tlw-policy__clause-heading">
+            {%- if section.settings.number_headings -%}{{ forloop.index }}. {%- endif -%}{{ block.settings.heading }}
+          </h2>
+        {%- endif -%}
+        <div class="tlw-body-md tlw-policy__clause-body">{{ block.settings.body }}</div>
+      </section>
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if section.settings.closing_note != blank -%}
+    <section class="tlw-policy__clause tlw-policy__closing">
+      <div class="tlw-body-md tlw-policy__clause-body">{{ section.settings.closing_note }}</div>
+    </section>
+  {%- endif -%}
+
+</div>
+
+<style>
+  #tlw-policy-{{ section.id }} {
+    max-width: 860px;
+    padding-top: 64px;
+    padding-bottom: 96px;
+  }
+
+  #tlw-policy-{{ section.id }} .tlw-policy__rule {
+    margin-top: 24px;
+    height: 1px;
+    width: 80px;
+    background: var(--tlw-accent);
+  }
+
+  #tlw-policy-{{ section.id }} .tlw-policy__intro {
+    margin-top: 40px;
+    color: var(--tlw-on-surface-variant);
+    line-height: 1.6;
+  }
+
+  #tlw-policy-{{ section.id }} .tlw-policy__clause {
+    margin-top: 48px;
+  }
+
+  #tlw-policy-{{ section.id }} .tlw-policy__clause-heading {
+    color: var(--tlw-primary);
+    margin: 0 0 16px;
+  }
+
+  #tlw-policy-{{ section.id }} .tlw-policy__clause-body {
+    color: var(--tlw-on-surface-variant);
+    line-height: 1.6;
+  }
+
+  #tlw-policy-{{ section.id }} .tlw-policy__clause-body p {
+    margin: 0 0 16px;
+  }
+
+  #tlw-policy-{{ section.id }} .tlw-policy__clause-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  #tlw-policy-{{ section.id }} .tlw-policy__clause-body ul {
+    margin: 8px 0 0;
+    padding-left: 24px;
+  }
+
+  #tlw-policy-{{ section.id }} .tlw-policy__clause-body li {
+    margin-bottom: 8px;
+  }
+
+  #tlw-policy-{{ section.id }} .tlw-policy__clause-body a {
+    color: var(--tlw-primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  #tlw-policy-{{ section.id }} .tlw-policy__closing {
+    border-top: 1px solid var(--tlw-outline-variant);
+    padding-top: 40px;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "TLW Policy",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Page heading",
+      "default": "Policy"
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Intro paragraph",
+      "info": "Leave blank for none"
+    },
+    {
+      "type": "checkbox",
+      "id": "number_headings",
+      "label": "Number the headings",
+      "info": "Used for Terms & Conditions and Privacy Policy, not Product Care or Shipping & Returns",
+      "default": false
+    },
+    {
+      "type": "richtext",
+      "id": "closing_note",
+      "label": "Closing note",
+      "info": "Optional paragraph after the last clause. Add links using the text editor's link tool."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "clause",
+      "name": "Clause",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "info": "Leave blank for a paragraph with no heading"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Body"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TLW Policy — Product Care",
+      "settings": {
+        "heading": "Product Care",
+        "intro": "<p>Thank you for choosing TheLacedWay. Our premium human hair wigs are designed to provide a natural, luxurious finish. Proper care will help maintain the quality and extend the lifespan of your wig.</p>",
+        "number_headings": false,
+        "closing_note": "<p>If you have any questions about caring for your wig, please contact TheLacedWay. We are always happy to help you get the best from your purchase.</p>"
+      },
+      "blocks": [
+        { "type": "clause", "settings": { "heading": "Before Wearing", "body": "<p>Gently brush the hair using a wide-tooth comb or paddle brush, starting from the ends and working upwards. Avoid pulling on the lace.</p>" } },
+        { "type": "clause", "settings": { "heading": "Washing", "body": "<p>Wash your wig every 2 to 4 weeks or as needed using lukewarm water and a sulphate-free shampoo. Follow with a moisturising conditioner, avoiding excessive product on the knots and lace.</p>" } },
+        { "type": "clause", "settings": { "heading": "Drying", "body": "<p>Pat dry with a towel and allow the wig to air dry on a wig stand where possible. Avoid rubbing the hair vigorously.</p>" } },
+        { "type": "clause", "settings": { "heading": "Heat Styling", "body": "<p>Human hair can be heat styled. Always apply a heat protectant first and use the lowest effective temperature to reduce damage.</p>" } },
+        { "type": "clause", "settings": { "heading": "Storage", "body": "<p>Store your wig on a mannequin head, box or in a silk or satin bag, away from direct sunlight, humidity and excessive heat.</p>" } },
+        { "type": "clause", "settings": { "heading": "Swimming & Holidays", "body": "<p>Avoid chlorine and salt water where possible. If exposed, rinse immediately with clean water and deep condition the hair afterwards.</p>" } },
+        { "type": "clause", "settings": { "heading": "Colouring & Chemical Treatments", "body": "<p>Colouring, bleaching or chemical processing should only be carried out by an experienced professional. These services are undertaken at the customer's own risk and may reduce the lifespan of the hair.</p>" } },
+        { "type": "clause", "settings": { "heading": "Lace Care", "body": "<p>Handle the lace gently. Avoid excessive pulling, scratching or harsh adhesives. Remove adhesive carefully using suitable lace-safe products.</p>" } },
+        { "type": "clause", "settings": { "heading": "Product Recommendations", "body": "<p>Use sulphate-free shampoo, moisturising conditioner, leave-in conditioner, heat protectant and lightweight hair serum for best results.</p>" } },
+        { "type": "clause", "settings": { "heading": "Expected Longevity", "body": "<p>With proper care, premium human hair wigs can last 1 to 3 years or longer. Longevity depends on wear frequency, styling, maintenance and storage.</p>" } }
+      ]
+    },
+    {
+      "name": "TLW Policy — Shipping & Returns",
+      "settings": {
+        "heading": "Shipping & Returns",
+        "intro": "<p>At THELACEDWAY, every unit is carefully handmade to order using premium quality hair. We take pride in ensuring every wig meets our high standards before it leaves us.</p>",
+        "number_headings": false,
+        "closing_note": "<p>Questions about an order? <a href=\"/pages/contact\">Get in touch</a>.</p>"
+      },
+      "blocks": [
+        { "type": "clause", "settings": { "heading": "Processing Time", "body": "<p>Please allow 7 to 15 working days for your order to be made and prepared for dispatch.</p><p>During busy periods, new launches or promotional sales, processing times may be slightly longer. If this happens, we'll keep you informed.</p>" } },
+        { "type": "clause", "settings": { "heading": "Order Amendments & Cancellations", "body": "<p>As each wig is custom-made, we allow 24 hours from the time your order is placed for any amendments or cancellations.</p><p>After 24 hours, your order enters production and cannot be changed or cancelled. This includes:</p><ul><li>Hair length</li><li>Lace option (Closure or Frontal)</li><li>Texture</li><li>Cap size</li><li>Colour</li><li>Order cancellations</li></ul>" } },
+        { "type": "clause", "settings": { "heading": "", "body": "<p>If you've entered the wrong delivery address, please contact us immediately. While we'll do our best to help before dispatch, we cannot guarantee changes once your order has been processed.</p>" } },
+        { "type": "clause", "settings": { "heading": "Delivery", "body": "<p>Once your order has been completed and dispatched, please allow:</p>" } },
+        { "type": "clause", "settings": { "heading": "Royal Mail Tracked & Signed 24 — £6", "body": "<ul><li>Estimated delivery within 1 to 3 working days</li><li>Fully tracked</li><li>Signature required upon delivery</li></ul>" } },
+        { "type": "clause", "settings": { "heading": "Royal Mail Special Delivery — £11", "body": "<ul><li>Guaranteed next working day delivery before 1pm</li><li>Fully tracked</li><li>Signature required</li><li>Compensation included if parcel is lost</li></ul>" } },
+        { "type": "clause", "settings": { "heading": "", "body": "<p>Once your order has been dispatched, you'll receive a confirmation email containing your tracking details.</p><p>Please ensure your delivery address is correct before placing your order. THELACEDWAY cannot be held responsible for delays or failed deliveries caused by incorrect address details.</p>" } },
+        { "type": "clause", "settings": { "heading": "International Shipping", "body": "<p>For orders shipped outside of the United Kingdom, import duties, taxes and customs fees may apply once your parcel reaches its destination country. These charges are determined by your local customs authorities and are the responsibility of the customer.</p><p>THELACEDWAY has no control over these charges, and they are not included in the shipping cost at checkout.</p>" } },
+        { "type": "clause", "settings": { "heading": "Lost, Stolen or Missing Packages", "body": "<p>Once your order has been shipped, responsibility for the parcel transfers to the shipping courier. If you believe your package has been lost, stolen or is missing, we recommend contacting the shipping courier directly to open an investigation or submit a claim. THELACEDWAY cannot be held responsible for packages that are lost, stolen or delayed in transit.</p>" } },
+        { "type": "clause", "settings": { "heading": "Returns & Exchanges", "body": "<p>Due to the nature of our products and for hygiene reasons, we are unable to accept returns, exchanges or refunds on any wigs, hair extensions or custom-made products.</p><p>All sales are final.</p><p>If your order arrives damaged or you believe you have received the wrong item, please contact us within 48 hours of delivery with photographs of the issue. We'll investigate and work with you to resolve the matter promptly.</p><p>As our hair is 100% Virgin Human Hair, slight variations in colour, texture and wave pattern may occur. These are natural characteristics of authentic virgin hair and are not considered faults or defects. Each unit is unique while maintaining the same premium quality and longevity.</p>" } }
+      ]
+    },
+    {
+      "name": "TLW Policy — Terms & Conditions",
+      "settings": {
+        "heading": "Terms & Conditions",
+        "intro": "<p>These Terms &amp; Conditions apply to all purchases made through TheLacedWay. By placing an order, you agree to be bound by these terms.</p>",
+        "number_headings": true,
+        "closing_note": ""
+      },
+      "blocks": [
+        { "type": "clause", "settings": { "heading": "About Us", "body": "<p>TheLacedWay is a luxury hair brand specialising in ready-to-ship wigs, bespoke wigs, custom-coloured wigs and premium human hair products.</p>" } },
+        { "type": "clause", "settings": { "heading": "Eligibility", "body": "<p>You must be at least 18 years old, or have permission from a parent or guardian, to place an order.</p>" } },
+        { "type": "clause", "settings": { "heading": "Products", "body": "<p>All products are described as accurately as possible. However, premium human hair is a natural product, and slight variations in colour, texture, density and wave pattern are normal and are not considered faults. Colours may vary due to lighting and screen settings.</p>" } },
+        { "type": "clause", "settings": { "heading": "Bespoke & Custom Orders", "body": "<p>Orders are made to your specifications. Customers are responsible for selecting the correct cap size, lace type, length, density and colour. Once production has started, orders cannot be amended or cancelled after 24 hours.</p>" } },
+        { "type": "clause", "settings": { "heading": "Ready to Ship Orders", "body": "<p>Ready-to-ship products are dispatched within 1 to 2 working days unless otherwise stated.</p>" } },
+        { "type": "clause", "settings": { "heading": "Processing Times", "body": "<p>Made to order and bespoke items generally require 7 to 15 working days before dispatch. Processing times may increase during launches, promotional periods or holidays.</p>" } },
+        { "type": "clause", "settings": { "heading": "Prices & Payment", "body": "<p>All prices are displayed at checkout. Full payment is required before production or dispatch begins. TheLacedWay reserves the right to correct pricing errors and cancel affected orders with a full refund.</p>" } },
+        { "type": "clause", "settings": { "heading": "Delivery", "body": "<p>Delivery estimates are not guaranteed. Once an order has been handed to the courier, delays caused by the courier, customs or events outside our control are not the responsibility of TheLacedWay.</p>" } },
+        { "type": "clause", "settings": { "heading": "International Orders", "body": "<p>Customers are responsible for all customs duties, VAT, import taxes and brokerage fees charged by their destination country.</p>" } },
+        { "type": "clause", "settings": { "heading": "Returns & Refunds", "body": "<p>Please refer to our <a href=\"/pages/shipping-returns\">Returns &amp; Refund Policy</a>. Due to hygiene reasons, human hair products may not be eligible for return unless faulty.</p>" } },
+        { "type": "clause", "settings": { "heading": "Faulty Products", "body": "<p>If you believe your item is faulty, please contact us within 48 hours of delivery with photographs and your order number.</p>" } },
+        { "type": "clause", "settings": { "heading": "Product Care", "body": "<p>Customers must follow our <a href=\"/pages/product-care\">Product Care Guide</a>. Damage caused by colouring, bleaching, chemical treatments, misuse or improper maintenance is not covered.</p>" } },
+        { "type": "clause", "settings": { "heading": "Intellectual Property", "body": "<p>All logos, branding, product names, photographs, videos, graphics, website content and descriptions remain the intellectual property of TheLacedWay and may not be copied or reproduced without written permission.</p>" } },
+        { "type": "clause", "settings": { "heading": "Limitation of Liability", "body": "<p>Nothing in these Terms limits any rights you have under applicable consumer law. To the fullest extent permitted by law, TheLacedWay shall not be liable for indirect or consequential losses arising from the use of our products.</p>" } },
+        { "type": "clause", "settings": { "heading": "Force Majeure", "body": "<p>We are not responsible for delays or failure to perform caused by circumstances beyond our reasonable control, including severe weather, strikes, courier disruption, supplier delays, pandemics or government action.</p>" } },
+        { "type": "clause", "settings": { "heading": "Privacy", "body": "<p>Your personal information is handled in accordance with our <a href=\"/pages/privacy\">Privacy Policy</a>.</p>" } },
+        { "type": "clause", "settings": { "heading": "Governing Law", "body": "<p>These Terms are governed by the laws of England and Wales. Any disputes shall be subject to the exclusive jurisdiction of the courts of England and Wales.</p>" } },
+        { "type": "clause", "settings": { "heading": "Contact", "body": "<p>For enquiries regarding these Terms, please contact TheLacedWay using the contact details published on our website.</p>" } }
+      ]
+    },
+    {
+      "name": "TLW Policy — Privacy Policy",
+      "settings": {
+        "heading": "Privacy Policy",
+        "intro": "",
+        "number_headings": true,
+        "closing_note": ""
+      },
+      "blocks": [
+        { "type": "clause", "settings": { "heading": "Introduction", "body": "<p>This Privacy Policy explains how TheLacedWay collects, uses, stores and protects your personal information when you visit our website, place an order or contact us. We are committed to protecting your privacy and handling your data in accordance with UK GDPR and the Data Protection Act 2018.</p>" } },
+        { "type": "clause", "settings": { "heading": "Information We Collect", "body": "<p>We may collect your name, billing and delivery address, email address, telephone number, order history, payment confirmations, communications with us, IP address, browser information and website usage data.</p>" } },
+        { "type": "clause", "settings": { "heading": "How We Use Your Information", "body": "<p>We use your information to process and fulfil orders, provide customer support, personalise your experience, improve our website, prevent fraud, comply with legal obligations and send marketing communications where you have consented.</p>" } },
+        { "type": "clause", "settings": { "heading": "Payment Information", "body": "<p>Payments are processed securely by trusted third-party providers. TheLacedWay does not store your full card details.</p>" } },
+        { "type": "clause", "settings": { "heading": "Marketing", "body": "<p>If you opt in, we may send you emails or SMS messages about new collections, launches, offers and updates. You can unsubscribe at any time using the unsubscribe link or by contacting us.</p>" } },
+        { "type": "clause", "settings": { "heading": "Cookies", "body": "<p>Our website uses cookies and similar technologies to operate the website, remember your preferences, analyse website traffic and improve your shopping experience.</p>" } },
+        { "type": "clause", "settings": { "heading": "Sharing Your Information", "body": "<p>We only share your information where necessary with trusted service providers such as payment processors, delivery couriers, website hosting providers and professional advisers, or where required by law.</p>" } },
+        { "type": "clause", "settings": { "heading": "Data Retention", "body": "<p>We keep your personal information only for as long as necessary to fulfil orders, meet legal and tax obligations, resolve disputes and enforce our agreements.</p>" } },
+        { "type": "clause", "settings": { "heading": "Your Rights", "body": "<p>Subject to applicable law, you may request access to your personal information, ask us to correct inaccurate information, request deletion, restrict processing, object to certain processing or request a copy of your data.</p>" } },
+        { "type": "clause", "settings": { "heading": "Security", "body": "<p>We take reasonable technical and organisational measures to protect your personal information. However, no method of electronic storage or internet transmission can be guaranteed to be completely secure.</p>" } },
+        { "type": "clause", "settings": { "heading": "Third-Party Links", "body": "<p>Our website may contain links to third-party websites. We are not responsible for their privacy practices or content.</p>" } },
+        { "type": "clause", "settings": { "heading": "Changes to this Policy", "body": "<p>We may update this Privacy Policy from time to time. The latest version will always be published on our website.</p>" } },
+        { "type": "clause", "settings": { "heading": "Contact Us", "body": "<p>For questions about this Privacy Policy or your personal information, please contact TheLacedWay using the contact details published on our website.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
