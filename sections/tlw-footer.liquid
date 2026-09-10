@@ -1,0 +1,331 @@
+{% comment %}
+  THELACEDWÁY footer
+  Home of Amare Studio
+
+  Built from src/components/SitePage.tsx (SiteFooter). Logo, plus two link
+  columns, plus a contact column with email and Instagram, plus a bottom
+  copyright bar.
+
+  Unlike the React version, the Shop and Information links come from real
+  Shopify menus (Content > Menus) rather than hardcoded routes, matching how
+  tlw-header.liquid works — so Destinee can edit them without touching code.
+{% endcomment %}
+
+{%- liquid
+  assign shop_menu = section.settings.menu_shop
+  assign info_menu = section.settings.menu_info
+-%}
+
+<footer
+  class="tlw-footer"
+  id="tlw-footer-{{ section.id }}"
+  {% if section.settings.anchor_id != blank %}data-anchor="{{ section.settings.anchor_id }}"{% endif %}
+>
+  <div class="tlw-footer__inner">
+
+    <div class="tlw-footer__brand">
+      {%- if section.settings.logo != blank -%}
+        {{ section.settings.logo
+          | image_url: width: 400
+          | image_tag: loading: 'lazy', alt: shop.name, class: 'tlw-footer__logo'
+        }}
+      {%- else -%}
+        <span class="tlw-footer__wordmark">{{ shop.name }}</span>
+      {%- endif -%}
+    </div>
+
+    {%- if shop_menu != blank -%}
+      <nav class="tlw-footer__col" aria-label="{{ shop_menu.title | default: 'Shop' }}">
+        <p class="tlw-footer__heading">{{ shop_menu.title | default: 'Shop' }}</p>
+        <ul class="tlw-footer__list">
+          {%- for link in shop_menu.links -%}
+            <li><a href="{{ link.url }}" class="tlw-footer__link">{{ link.title }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+
+    {%- if info_menu != blank -%}
+      <nav class="tlw-footer__col" aria-label="{{ info_menu.title | default: 'Information' }}">
+        <p class="tlw-footer__heading">{{ info_menu.title | default: 'Information' }}</p>
+        <ul class="tlw-footer__list">
+          {%- for link in info_menu.links -%}
+            <li><a href="{{ link.url }}" class="tlw-footer__link">{{ link.title }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+
+    <nav class="tlw-footer__col" aria-label="{{ section.settings.contact_label }}">
+      {%- if section.settings.contact_url != blank -%}
+        <a href="{{ section.settings.contact_url }}" class="tlw-footer__heading tlw-footer__heading--link">
+          {{ section.settings.contact_label }}
+        </a>
+      {%- else -%}
+        <p class="tlw-footer__heading">{{ section.settings.contact_label }}</p>
+      {%- endif -%}
+      <ul class="tlw-footer__list">
+        {%- if section.settings.email != blank -%}
+          <li><a href="mailto:{{ section.settings.email }}" class="tlw-footer__link">{{ section.settings.email }}</a></li>
+        {%- endif -%}
+        {%- if section.settings.instagram_url != blank -%}
+          <li>
+            <a href="{{ section.settings.instagram_url }}" target="_blank" rel="noreferrer" class="tlw-footer__link tlw-footer__link--icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="17.4" cy="6.6" r="1.1" fill="currentColor"/>
+              </svg>
+              <span>{{ section.settings.instagram_label }}</span>
+            </a>
+          </li>
+        {%- endif -%}
+      </ul>
+    </nav>
+
+  </div>
+
+  <div class="tlw-footer__bottom">
+    <p class="tlw-footer__copyright">
+      &copy; {{ 'now' | date: '%Y' }} {{ section.settings.copyright_text }}
+    </p>
+  </div>
+</footer>
+
+<style>
+  #tlw-footer-{{ section.id }} {
+    width: 100%;
+    background-color: var(--tlw-primary-container);
+    border-top: 1px solid var(--tlw-outline);
+    padding: 48px var(--tlw-margin) 0;
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__inner {
+    max-width: 1600px;
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 40px;
+  }
+
+  @media (min-width: 640px) {
+    #tlw-footer-{{ section.id }} .tlw-footer__inner {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    #tlw-footer-{{ section.id }} .tlw-footer__inner {
+      grid-template-columns: 1.6fr 1fr 1fr 1.15fr;
+      gap: 32px;
+    }
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__logo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  @media (min-width: 1100px) {
+    #tlw-footer-{{ section.id }} .tlw-footer__logo {
+      height: 48px;
+    }
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__wordmark {
+    font-family: var(--tlw-font-display);
+    font-size: 22px;
+    color: var(--tlw-primary-light);
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__heading {
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--tlw-accent);
+    margin: 0;
+    width: fit-content;
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__heading--link {
+    text-underline-offset: 4px;
+    transition: opacity 1100ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__heading--link:hover,
+  #tlw-footer-{{ section.id }} .tlw-footer__heading--link:focus-visible {
+    text-decoration: underline;
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__link {
+    font-family: var(--tlw-font-body);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    color: var(--tlw-primary-light);
+    opacity: 0.8;
+    text-underline-offset: 4px;
+    transition: opacity 1100ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__link:hover,
+  #tlw-footer-{{ section.id }} .tlw-footer__link:focus-visible {
+    opacity: 1;
+    text-decoration: underline;
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__link--icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__link--icon:hover {
+    text-decoration: none;
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__link--icon span {
+    text-underline-offset: 4px;
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__link--icon:hover span {
+    text-decoration: underline;
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__bottom {
+    max-width: 1600px;
+    margin: 48px auto 0;
+    border-top: 1px solid var(--tlw-outline);
+    padding: 24px 0;
+  }
+
+  #tlw-footer-{{ section.id }} .tlw-footer__copyright {
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tlw-primary-light);
+    opacity: 0.7;
+    margin: 0;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "TLW Footer",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Menus"
+    },
+    {
+      "type": "link_list",
+      "id": "menu_shop",
+      "label": "Shop menu",
+      "info": "Edit under Content > Menus"
+    },
+    {
+      "type": "link_list",
+      "id": "menu_info",
+      "label": "Information menu",
+      "info": "Edit under Content > Menus"
+    },
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Footer logo",
+      "info": "Use the white version, the footer background is dark"
+    },
+    {
+      "type": "header",
+      "content": "Contact"
+    },
+    {
+      "type": "text",
+      "id": "contact_label",
+      "label": "Contact heading",
+      "default": "Contact"
+    },
+    {
+      "type": "url",
+      "id": "contact_url",
+      "label": "Contact link",
+      "info": "Suggested: /pages/contact"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Email address",
+      "default": "thelabel@thelacedway.com"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL",
+      "info": "Suggested: https://www.instagram.com/thelacedwayuk/"
+    },
+    {
+      "type": "text",
+      "id": "instagram_label",
+      "label": "Instagram link label",
+      "default": "Instagram"
+    },
+    {
+      "type": "header",
+      "content": "Bottom bar"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright text",
+      "info": "The year is added automatically",
+      "default": "THELACEDWÁY. All rights reserved."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "info": "Lets a menu link (e.g. Contact) jump straight to the footer using #contact. Leave blank for none.",
+      "default": "contact"
+    }
+  ],
+  "presets": [{ "name": "TLW Footer" }]
+}
+{% endschema %}
