@@ -1,0 +1,689 @@
+{% comment %}
+  THELACEDWÁY services page
+  Home of Amare Studio
+
+  Built from src/routes/services.tsx + src/components/BookingPolicies.tsx.
+  Full-bleed video hero (separate desktop/mobile clips, matching tlw-main-hero's
+  convention), opening hours + contact card, booking summary line, a 5-panel
+  booking policy accordion (native <details>, no JS needed), an appointment
+  CTA linking to Acuity, and a pinned floating "Book now" button.
+
+  Assign this section to the Services page template. Desktop video must be
+  uploaded as mp4, not .mov, same rule as the homepage hero.
+{% endcomment %}
+
+{%- liquid
+  assign desktop = section.settings.video_desktop
+  assign mobile = section.settings.video_mobile
+  if mobile == blank
+    assign mobile = desktop
+  endif
+-%}
+
+<div class="tlw-services" id="tlw-services-{{ section.id }}">
+
+  {% comment %} Mobile hero: 16:9 clip, title overlaid lower third {% endcomment %}
+  <section class="tlw-services__hero-mobile">
+    <div class="tlw-services__hero-mobile-media">
+      {%- if mobile != blank -%}
+        <video
+          class="tlw-services__video"
+          autoplay muted loop playsinline webkit-playsinline preload="auto" disableremoteplayback
+          {% if section.settings.poster_mobile != blank %}poster="{{ section.settings.poster_mobile | image_url: width: 900 }}"
+          {% elsif mobile.preview_image %}poster="{{ mobile.preview_image | image_url: width: 900 }}"{% endif %}
+        >
+          {%- for source in mobile.sources -%}
+            {%- if source.format == 'mp4' -%}
+              <source src="{{ source.url }}" type="{{ source.mime_type }}">
+            {%- endif -%}
+          {%- endfor -%}
+        </video>
+      {%- elsif section.settings.poster_mobile != blank -%}
+        {{ section.settings.poster_mobile | image_url: width: 1200 | image_tag: loading: 'eager', alt: '', class: 'tlw-services__video' }}
+      {%- endif -%}
+      <div class="tlw-services__hero-mobile-scrim"></div>
+      <div class="tlw-services__hero-mobile-title">
+        <h1 class="tlw-headline-sm" style="color: var(--tlw-surface-lowest); margin: 0;">{{ section.settings.heading }}</h1>
+      </div>
+    </div>
+    <div class="tlw-services__hero-mobile-copy">
+      <p class="tlw-body-md" style="color: var(--tlw-on-surface-variant);">{{ section.settings.hero_intro }}</p>
+      <div class="tlw-services__rule"></div>
+    </div>
+  </section>
+
+  {% comment %} Desktop hero: full-bleed clip, copy overlaid {% endcomment %}
+  <section class="tlw-services__hero-desktop">
+    {%- if desktop != blank -%}
+      <video
+        class="tlw-services__video"
+        autoplay muted loop playsinline webkit-playsinline preload="auto" disableremoteplayback
+        {% if section.settings.poster != blank %}poster="{{ section.settings.poster | image_url: width: 1800 }}"
+        {% elsif desktop.preview_image %}poster="{{ desktop.preview_image | image_url: width: 1800 }}"{% endif %}
+      >
+        {%- for source in desktop.sources -%}
+          {%- if source.format == 'mp4' -%}
+            <source src="{{ source.url }}" type="{{ source.mime_type }}">
+          {%- endif -%}
+        {%- endfor -%}
+      </video>
+    {%- elsif section.settings.poster != blank -%}
+      {{ section.settings.poster | image_url: width: 2000 | image_tag: loading: 'eager', alt: '', class: 'tlw-services__video' }}
+    {%- endif -%}
+    <div class="tlw-services__hero-desktop-scrim"></div>
+    <div class="tlw-services__hero-desktop-content">
+      <div class="tlw-services__hero-desktop-inner">
+        <h1 class="tlw-display-lg" style="color: var(--tlw-surface-lowest); margin: 0;">{{ section.settings.heading }}</h1>
+        <div class="tlw-services__rule"></div>
+        <p class="tlw-body-lg" style="color: rgba(255,255,255,0.85); margin-top: 24px;">{{ section.settings.hero_intro }}</p>
+        {%- if section.settings.hero_cta_label != blank -%}
+          <a href="#tlw-booking-policies-{{ section.id }}" class="tlw-services__hero-cta">{{ section.settings.hero_cta_label }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </section>
+
+  <div class="tlw-container tlw-services__body">
+
+    {% comment %} Opening hours / contact card {% endcomment %}
+    <div class="tlw-services__card">
+      <div class="tlw-services__card-block">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="color: var(--tlw-accent); flex-shrink: 0; margin-top: 3px;">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <p class="tlw-label-caps" style="color: var(--tlw-accent);">Opening hours</p>
+          <p class="tlw-headline-sm" style="color: var(--tlw-primary); margin-top: 8px;">{{ section.settings.hours }}</p>
+          <p class="tlw-body-md" style="color: var(--tlw-on-surface-variant); margin-top: 4px;">{{ section.settings.closed_note }}</p>
+        </div>
+      </div>
+      <div class="tlw-services__card-block tlw-services__card-block--contact">
+        <p class="tlw-label-caps" style="color: var(--tlw-accent);">Contact us</p>
+        <a href="mailto:{{ section.settings.contact_email }}" class="tlw-services__link" style="margin-top: 8px; display: block; word-break: break-all;">
+          {{ section.settings.contact_email }}
+        </a>
+      </div>
+    </div>
+
+    {% comment %} Booking summary line {% endcomment %}
+    <div class="tlw-services__summary">
+      <p class="tlw-body-md" style="color: var(--tlw-on-surface-variant); margin: 0;">
+        <span style="font-weight: 500; color: var(--tlw-primary);">{{ section.settings.deposit_amount }}</span> deposit
+        <span style="color: var(--tlw-accent); opacity: 0.5; margin: 0 4px;">&middot;</span>
+        cancel <span style="font-weight: 500; color: var(--tlw-primary);">{{ section.settings.cancel_window }}</span> ahead
+        <span style="color: var(--tlw-accent); opacity: 0.5; margin: 0 4px;">&middot;</span>
+        <a href="#tlw-booking-policies-{{ section.id }}" class="tlw-services__link">Read full booking policies</a>
+      </p>
+    </div>
+
+    {% comment %} Booking policies accordion {% endcomment %}
+    <section class="tlw-services__policies" id="tlw-booking-policies-{{ section.id }}">
+      <p class="tlw-label-caps" style="color: var(--tlw-accent);">{{ section.settings.policies_eyebrow }}</p>
+      <h2 class="tlw-headline-md" style="color: var(--tlw-primary); margin-top: 12px;">{{ section.settings.policies_heading }}</h2>
+      <div class="tlw-body-md tlw-services__policies-intro" style="color: var(--tlw-on-surface-variant);">
+        {{ section.settings.policies_intro }}
+      </div>
+
+      <div class="tlw-services__panels">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'panel' -%}
+            <details class="tlw-services__panel" {{ block.shopify_attributes }}>
+              <summary class="tlw-services__panel-summary">
+                <span class="tlw-body-md" style="color: var(--tlw-primary);">{{ block.settings.label }}</span>
+                <svg class="tlw-services__panel-chevron" viewBox="0 0 12 8" width="14" height="10" aria-hidden="true">
+                  <path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </summary>
+              <div class="tlw-services__panel-body tlw-body-md">
+                {{ block.settings.body }}
+              </div>
+            </details>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </section>
+
+    {% comment %} Appointment CTA {% endcomment %}
+    <div class="tlw-services__appointments">
+      <p class="tlw-label-caps" style="color: var(--tlw-accent);">{{ section.settings.appointments_eyebrow }}</p>
+      <h2 class="tlw-display-lg" style="color: var(--tlw-primary); margin-top: 16px;">{{ section.settings.appointments_heading }}</h2>
+      <p class="tlw-body-md" style="color: var(--tlw-on-surface-variant); max-width: 42ch; margin: 24px auto 0;">
+        {{ section.settings.appointments_body }}
+      </p>
+    </div>
+
+    {%- if section.settings.acuity_url != blank -%}
+      <div class="tlw-services__book-btn-wrap">
+        <a href="{{ section.settings.acuity_url }}" target="_blank" rel="noopener noreferrer" class="tlw-btn">
+          {{ section.settings.booking_cta_label }}
+        </a>
+      </div>
+    {%- endif -%}
+
+  </div>
+
+  {% comment %} Pinned floating CTA {% endcomment %}
+  {%- if section.settings.acuity_url != blank -%}
+    <div class="tlw-services__pinned">
+      <a href="{{ section.settings.acuity_url }}" target="_blank" rel="noopener noreferrer" class="tlw-services__pinned-btn">
+        {{ section.settings.floating_cta_label }}
+      </a>
+    </div>
+  {%- endif -%}
+
+</div>
+
+<style>
+  #tlw-services-{{ section.id }} {
+    width: 100%;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Mobile hero */
+  #tlw-services-{{ section.id }} .tlw-services__hero-mobile {
+    display: block;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__hero-mobile-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--tlw-scrim);
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__hero-mobile-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10,10,10,0.85), rgba(10,10,10,0.45) 55%, transparent);
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__hero-mobile-title {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0 var(--tlw-margin) 20px;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__hero-mobile-copy {
+    width: 100%;
+    padding: 32px var(--tlw-margin) 0;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__rule {
+    margin-top: 24px;
+    height: 1px;
+    width: 80px;
+    background: var(--tlw-accent);
+  }
+
+  /* Desktop hero */
+  #tlw-services-{{ section.id }} .tlw-services__hero-desktop {
+    display: none;
+    position: relative;
+    width: 100%;
+    height: 56vh;
+    overflow: hidden;
+    background: var(--tlw-scrim);
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__hero-desktop-scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(10,10,10,0.5);
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__hero-desktop-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--tlw-margin);
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__hero-desktop-inner {
+    max-width: 640px;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__hero-cta {
+    margin-top: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--tlw-surface-lowest);
+    padding: 12px 24px;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--tlw-surface-lowest);
+    transition: background-color 300ms ease, color 300ms ease;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__hero-cta:hover {
+    background: var(--tlw-surface-lowest);
+    color: var(--tlw-scrim);
+  }
+
+  @media (min-width: 768px) {
+    #tlw-services-{{ section.id }} .tlw-services__hero-mobile { display: none; }
+    #tlw-services-{{ section.id }} .tlw-services__hero-desktop { display: block; height: 56vh; }
+  }
+
+  @media (min-width: 1100px) {
+    #tlw-services-{{ section.id }} .tlw-services__hero-desktop { height: 62vh; }
+  }
+
+  /* Body */
+  #tlw-services-{{ section.id }} .tlw-services__body {
+    max-width: 900px;
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  @media (min-width: 768px) {
+    #tlw-services-{{ section.id }} .tlw-services__body { padding-top: 128px; }
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__card {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    border: 1px solid var(--tlw-outline-variant);
+    padding: 24px;
+  }
+
+  @media (min-width: 640px) {
+    #tlw-services-{{ section.id }} .tlw-services__card {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 32px;
+    }
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__card-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__card-block--contact {
+    display: block;
+    border-top: 1px solid var(--tlw-outline-variant);
+    padding-top: 24px;
+  }
+
+  @media (min-width: 640px) {
+    #tlw-services-{{ section.id }} .tlw-services__card-block--contact {
+      border-top: 0;
+      padding-top: 0;
+      text-align: right;
+    }
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__link {
+    color: var(--tlw-accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: color 250ms ease;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__link:hover {
+    color: var(--tlw-primary);
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__summary {
+    margin-top: 40px;
+    border-top: 1px solid var(--tlw-outline-variant);
+    border-bottom: 1px solid var(--tlw-outline-variant);
+    padding: 16px 0;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__policies {
+    margin-top: 48px;
+    scroll-margin-top: calc(var(--tlw-header-h, 96px) + 16px);
+  }
+
+  @media (min-width: 768px) {
+    #tlw-services-{{ section.id }} .tlw-services__policies { margin-top: 64px; }
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__policies-intro {
+    margin-top: 24px;
+    max-width: 58ch;
+    line-height: 1.6;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__panels {
+    margin-top: 48px;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__panel {
+    border-top: 1px solid var(--tlw-outline-variant);
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__panel:last-child {
+    border-bottom: 1px solid var(--tlw-outline-variant);
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__panel-summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 44px;
+    padding: 20px 0;
+    cursor: pointer;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__panel-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__panel-chevron {
+    color: var(--tlw-primary);
+    flex-shrink: 0;
+    transition: transform 400ms ease;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__panel[open] .tlw-services__panel-chevron {
+    transform: rotate(180deg);
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__panel-body {
+    max-width: 62ch;
+    padding-bottom: 28px;
+    color: var(--tlw-on-surface-variant);
+    line-height: 1.65;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__panel-body p {
+    margin: 0 0 14px;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__panel-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__panel-body strong {
+    font-weight: 500;
+    color: var(--tlw-primary);
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__appointments {
+    margin-top: 96px;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    #tlw-services-{{ section.id }} .tlw-services__appointments { margin-top: 144px; }
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__book-btn-wrap {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__pinned {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 40;
+    padding: 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__pinned-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: rgba(10,10,10,0.9);
+    padding: 12px 20px;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--tlw-surface-lowest);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    backdrop-filter: blur(4px);
+    transition: background-color 250ms ease;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__pinned-btn:hover {
+    background: var(--tlw-scrim);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "TLW Services",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Video"
+    },
+    {
+      "type": "video",
+      "id": "video_desktop",
+      "label": "Desktop video",
+      "info": "Upload to Content > Files first. Must be mp4, not .mov."
+    },
+    {
+      "type": "video",
+      "id": "video_mobile",
+      "label": "Mobile video",
+      "info": "Optional. Falls back to the desktop video."
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "Desktop still image",
+      "info": "Shown while the video loads, or instead of it if no video is set"
+    },
+    {
+      "type": "image_picker",
+      "id": "poster_mobile",
+      "label": "Mobile still image"
+    },
+    {
+      "type": "header",
+      "content": "Hero copy"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Services"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_intro",
+      "label": "Intro text",
+      "default": "Flawless installs. Seamless melts. Every install is carried out with precision and care to achieve your desired look. Book your appointment today."
+    },
+    {
+      "type": "text",
+      "id": "hero_cta_label",
+      "label": "Hero button label",
+      "info": "Scrolls to the booking policies section. Desktop only.",
+      "default": "Booking policies"
+    },
+    {
+      "type": "header",
+      "content": "Opening hours & contact"
+    },
+    {
+      "type": "text",
+      "id": "hours",
+      "label": "Opening hours",
+      "default": "Tuesday to Saturday, 10am \u2013 6pm"
+    },
+    {
+      "type": "text",
+      "id": "closed_note",
+      "label": "Closed note",
+      "default": "Closed Sunday and Monday."
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Contact email",
+      "default": "bookings@thelacedway.com"
+    },
+    {
+      "type": "header",
+      "content": "Booking summary line"
+    },
+    {
+      "type": "text",
+      "id": "deposit_amount",
+      "label": "Deposit amount",
+      "default": "\u00a330"
+    },
+    {
+      "type": "text",
+      "id": "cancel_window",
+      "label": "Cancellation window",
+      "default": "48 hours"
+    },
+    {
+      "type": "header",
+      "content": "Booking policies"
+    },
+    {
+      "type": "text",
+      "id": "policies_eyebrow",
+      "label": "Eyebrow",
+      "default": "Before you book"
+    },
+    {
+      "type": "text",
+      "id": "policies_heading",
+      "label": "Heading",
+      "default": "Booking policies"
+    },
+    {
+      "type": "richtext",
+      "id": "policies_intro",
+      "label": "Intro text",
+      "default": "<p>Slots are released on the 18th of each month at 8pm for the following month. If your date is unavailable we are either fully booked or away that day, so email us and we will see what we can do. We are in Enfield, North London, nearest station Brimsdown, and the exact address comes with your confirmation.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Appointment CTA"
+    },
+    {
+      "type": "text",
+      "id": "appointments_eyebrow",
+      "label": "Eyebrow",
+      "default": "Appointments"
+    },
+    {
+      "type": "text",
+      "id": "appointments_heading",
+      "label": "Heading",
+      "default": "Book an appointment"
+    },
+    {
+      "type": "textarea",
+      "id": "appointments_body",
+      "label": "Body text",
+      "default": "Choose a category, see availability and secure your slot on our booking page."
+    },
+    {
+      "type": "text",
+      "id": "acuity_url",
+      "label": "Booking page URL",
+      "info": "Your Acuity Scheduling link",
+      "default": "https://app.acuityscheduling.com/schedule.php?owner=26439475"
+    },
+    {
+      "type": "text",
+      "id": "booking_cta_label",
+      "label": "Booking button label",
+      "default": "Book and pay on our booking page"
+    },
+    {
+      "type": "text",
+      "id": "floating_cta_label",
+      "label": "Pinned button label",
+      "default": "Book now"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "panel",
+      "name": "Policy panel",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Panel label"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Panel body"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "TLW Services",
+      "blocks": [
+        {
+          "type": "panel",
+          "settings": {
+            "label": "Deposit and payment",
+            "body": "<p>All services require a non-refundable <strong>\u00a330</strong> deposit to confirm your appointment. The remaining balance is due in cash on the day. There are no refunds once the service is complete. If something is wrong with your hair, contact us within <strong>48 hours</strong> and we will put it right.</p>"
+          }
+        },
+        {
+          "type": "panel",
+          "settings": {
+            "label": "Cancelling or rescheduling",
+            "body": "<p>You can reschedule or cancel up to <strong>48 hours</strong> before your appointment. Bookings made within 48 hours, or on a day we are normally closed, carry a <strong>\u00a335</strong> emergency booking charge. Working bank holidays also carry a <strong>\u00a335</strong> charge.</p>"
+          }
+        },
+        {
+          "type": "panel",
+          "settings": {
+            "label": "Arriving late",
+            "body": "<p>Arriving more than <strong>15 minutes</strong> late adds a <strong>\u00a315</strong> late fee. Arriving more than <strong>30 minutes</strong> late means the appointment is cancelled.</p>"
+          }
+        },
+        {
+          "type": "panel",
+          "settings": {
+            "label": "How to arrive",
+            "body": "<p>Please come with your hair in <strong>8 to 12</strong> neat cornrows so the unit lays flat and finishes seamlessly. If you need a braid down, select it as an add-on before booking rather than on the day.</p><p>If you bought your unit from us, book under \"Unit Purchased from Us\" and allow at least <strong>7 working days</strong> between your order date and your appointment so your unit can arrive and be prepared. You will get a confirmation email once your order and booking are both in.</p><p>If you are sending or dropping off hair, it needs to reach us at least <strong>7 days</strong> before your appointment. Less than <strong>5 days</strong> before adds a <strong>\u00a315</strong> late fee, and less than <strong>2 days</strong> before is treated as an emergency booking at <strong>\u00a335</strong> or the appointment may be cancelled. Drop off is at the same place as your appointment, so message us or check our Instagram story for times, and confirm the postage address with us first as it is different.</p>"
+          }
+        },
+        {
+          "type": "panel",
+          "settings": {
+            "label": "Your unit",
+            "body": "<p>We only accept <strong>13x6</strong> HD frontals for frontal wig installations. If your head size is <strong>20 inches</strong> or smaller, a <strong>13x4</strong> HD frontal is fine.</p><p>If you are buying a ready-made factory wig, make sure the vendor supplies a full frontal wig and not a \"lace front\", as lace fronts restrict you to a middle part. Thick knots or thick lace are <strong>not accepted</strong>.</p><p>Please check your unit comfortably covers your hairline, as we cannot install a unit that is too small. Units that do not fit will not be installed. If you are unsure, send us a video before your appointment and we will confirm.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
