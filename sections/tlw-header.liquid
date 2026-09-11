@@ -6,19 +6,30 @@
   for the left side and one for the right, so Destinee edits them under
   Content > Menus like any other navigation.
 
+  The transparent, hide-until-scroll "over the hero" treatment is homepage
+  only, matching src/components/HomePage.tsx passing <SiteNav overlay /> —
+  every other page used plain <SiteNav />, a normal solid sticky bar that's
+  visible immediately. That's driven automatically by the template here
+  (template.name == 'index'), not a setting, since no other page should ever
+  want the hero treatment.
+
   Any menu item with children becomes a dropdown automatically.
 {% endcomment %}
 
 {%- liquid
   assign left = section.settings.menu_left
   assign right = section.settings.menu_right
+  assign is_home = false
+  if template.name == 'index'
+    assign is_home = true
+  endif
 -%}
 
 <header
-  class="tlw-header{% if section.settings.overlay_first %} tlw-header--overlay{% endif %}"
+  class="tlw-header{% if is_home %} tlw-header--overlay{% endif %}"
   id="tlw-header-{{ section.id }}"
   data-tlw-header
-  {% if section.settings.overlay_first %}data-overlay{% endif %}
+  {% if is_home %}data-overlay{% endif %}
 >
   <div class="tlw-header__inner">
 
@@ -654,17 +665,14 @@
       "content": "Appearance"
     },
     {
-      "type": "checkbox",
-      "id": "overlay_first",
-      "label": "Sit over the hero",
-      "info": "No bar at the top of the page, white text over the video. Turns into a solid bar once you scroll past.",
-      "default": true
+      "type": "paragraph",
+      "content": "The transparent \"over the hero\" bar only ever shows on the homepage \u2014 this happens automatically, not via a setting, since no other page has a hero for it to sit over."
     },
     {
       "type": "checkbox",
       "id": "hide_until_scroll",
       "label": "Hide the bar until you scroll",
-      "info": "Nothing at all over the hero. The bar slides in once the hero is behind you.",
+      "info": "Homepage only. Nothing at all over the hero. The bar slides in once the hero is behind you.",
       "default": true
     },
     {
