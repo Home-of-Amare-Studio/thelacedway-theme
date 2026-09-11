@@ -1,0 +1,264 @@
+{% comment %}
+  THELACEDWÁY needle cursor
+  Home of Amare Studio
+
+  Built from src/components/NeedleCursor.tsx + GlobalNeedleCursor.tsx. A
+  brown needle follows the pointer with a short, smoothed thread trail
+  behind it; both turn white automatically over any element carrying
+  data-cursor-dark (e.g. the homepage hero, or any section using the dark
+  theme variant). Desktop only — hidden on touch/coarse pointers and when
+  the visitor has reduced motion set.
+
+  SETUP NEEDED, both in Shopify:
+  1. Upload needle.png as a theme ASSET (not a Content > Files upload) —
+     in the code editor, Assets > Add a new asset. This snippet reads it
+     via the asset_url filter, so the filename has to match exactly.
+  2. Render this snippet once, globally. Open layout/theme.liquid and add
+     {% render 'tlw-needle-cursor' %} on its own line right before
+     </body>. Nothing else in theme.liquid needs to change.
+
+  To make an element keep the normal pointer (inputs, buttons that need a
+  precise click target, etc.), add data-no-needle to it — matches the
+  React version's ignoreSelector prop.
+{% endcomment %}
+
+<div class="tlw-needle" data-needle-cursor aria-hidden="true">
+  <svg class="tlw-needle__svg">
+    <defs>
+      <linearGradient id="tlw-thread-fade" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="rgba(20,16,14,0.55)" />
+        <stop offset="100%" stop-color="rgba(20,16,14,0)" />
+      </linearGradient>
+      <linearGradient id="tlw-thread-fade-light" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="rgba(255,255,255,0.65)" />
+        <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+      </linearGradient>
+    </defs>
+    <path data-needle-glow fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" transform="translate(0.8, 1.2)" />
+    <path data-needle-thread fill="none" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+  <div class="tlw-needle__icon" data-needle-icon>
+    <img src="{{ 'needle.png' | asset_url }}" alt="" width="56" height="56">
+  </div>
+</div>
+
+<style>
+  .tlw-needle {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 300ms ease;
+    overflow: visible;
+  }
+
+  .tlw-needle.is-active {
+    opacity: 1;
+  }
+
+  .tlw-needle__svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .tlw-needle__svg [data-needle-glow] {
+    stroke: rgba(20, 16, 14, 0.12);
+  }
+
+  .tlw-needle__svg [data-needle-thread] {
+    stroke: url(#tlw-thread-fade);
+  }
+
+  .tlw-needle.is-dark .tlw-needle__svg [data-needle-glow] {
+    stroke: rgba(255, 255, 255, 0.12);
+  }
+
+  .tlw-needle.is-dark .tlw-needle__svg [data-needle-thread] {
+    stroke: url(#tlw-thread-fade-light);
+  }
+
+  .tlw-needle__icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+    will-change: transform;
+  }
+
+  .tlw-needle__icon img {
+    display: block;
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    transform: translate(-12px, -49.6px);
+    filter: sepia(1) saturate(2.2) hue-rotate(340deg) brightness(0.75);
+  }
+
+  .tlw-needle.is-dark .tlw-needle__icon img {
+    filter: brightness(0) invert(1) drop-shadow(0 0 2px rgba(0, 0, 0, 0.35));
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .tlw-needle {
+      display: block;
+    }
+
+    body {
+      cursor: none;
+    }
+
+    [data-no-needle],
+    [data-no-needle] * {
+      cursor: auto;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    var root = document.querySelector('[data-needle-cursor]');
+    if (!root) return;
+
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var iconEl = root.querySelector('[data-needle-icon]');
+    var threadPath = root.querySelector('[data-needle-thread]');
+    var glowPath = root.querySelector('[data-needle-glow]');
+
+    /* Offset from the pointer (needle tip) to the needle's eye at the top. */
+    var EYE = { x: 30, y: -38 };
+    /* Maximum thread length in px — keeps the trail short and controlled. */
+    var MAX_LENGTH = 120;
+    /* A pointer move larger than this is a teleport (re-entry, page change) — re-anchor instead of drawing. */
+    var JUMP = 260;
+
+    var active = false;
+    var hasMoved = false;
+    var points = [];
+    var pos = { x: 0, y: 0 };
+    var target = { x: 0, y: 0 };
+    var raf = null;
+
+    function updateDark(e) {
+      var isDark = !!(e.target && e.target.closest('[data-cursor-dark]'));
+      root.classList.toggle('is-dark', isDark);
+    }
+
+    function onMove(e) {
+      if (e.target && e.target.closest('[data-no-needle]')) {
+        if (active) {
+          active = false;
+          root.classList.remove('is-active');
+        }
+        hasMoved = false;
+        points = [];
+        return;
+      }
+
+      var next = { x: e.clientX, y: e.clientY };
+      var jumped = !hasMoved || !active || Math.hypot(next.x - target.x, next.y - target.y) > JUMP;
+      target = next;
+      if (jumped) {
+        pos = { x: next.x, y: next.y };
+        points = [];
+      }
+      hasMoved = true;
+      if (!active) {
+        active = true;
+        root.classList.add('is-active');
+      }
+      updateDark(e);
+    }
+
+    function onLeave() {
+      active = false;
+      hasMoved = false;
+      root.classList.remove('is-active');
+      points = [];
+      if (threadPath) threadPath.setAttribute('d', '');
+      if (glowPath) glowPath.setAttribute('d', '');
+    }
+
+    /* Smooth the raw trail so it always curves, even on sharp mouse moves. */
+    function smoothTrail(pts) {
+      if (pts.length < 3) return pts;
+      var out = [];
+      for (var i = 0; i < pts.length; i++) {
+        var prev = pts[i - 1] || pts[i];
+        var curr = pts[i];
+        var next = pts[i + 1] || pts[i];
+        out.push({
+          x: prev.x * 0.25 + curr.x * 0.5 + next.x * 0.25,
+          y: prev.y * 0.25 + curr.y * 0.5 + next.y * 0.25
+        });
+      }
+      return out;
+    }
+
+    function toPath(pts) {
+      var smoothed = smoothTrail(pts);
+      if (smoothed.length < 2) return '';
+      var d = 'M ' + smoothed[0].x + ' ' + smoothed[0].y;
+      for (var i = 0; i < smoothed.length - 1; i++) {
+        var p0 = smoothed[i - 1] || smoothed[i];
+        var p1 = smoothed[i];
+        var p2 = smoothed[i + 1];
+        var p3 = smoothed[i + 2] || p2;
+        var c1x = p1.x + (p2.x - p0.x) / 5;
+        var c1y = p1.y + (p2.y - p0.y) / 5;
+        var c2x = p2.x - (p3.x - p1.x) / 5;
+        var c2y = p2.y - (p3.y - p1.y) / 5;
+        d += ' C ' + c1x + ' ' + c1y + ', ' + c2x + ' ' + c2y + ', ' + p2.x + ' ' + p2.y;
+      }
+      return d;
+    }
+
+    /* Trim the trail so its total arc length never exceeds MAX_LENGTH,
+       and cut it at any single segment long enough to be a teleport. */
+    function trimByLength(pts) {
+      var total = 0;
+      for (var i = 1; i < pts.length; i++) {
+        var seg = Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+        if (seg > JUMP) return pts.slice(0, i);
+        total += seg;
+        if (total > MAX_LENGTH) return pts.slice(0, i + 1);
+      }
+      return pts;
+    }
+
+    function tick() {
+      raf = requestAnimationFrame(tick);
+      if (!hasMoved || !active) return;
+
+      pos.x += (target.x - pos.x) * 0.18;
+      pos.y += (target.y - pos.y) * 0.18;
+
+      if (iconEl) iconEl.style.transform = 'translate3d(' + pos.x + 'px, ' + pos.y + 'px, 0)';
+
+      if (!reduced) {
+        var ex = pos.x + EYE.x;
+        var ey = pos.y + EYE.y;
+        var last = points[0];
+        if (!last || Math.hypot(last.x - ex, last.y - ey) > 0.8) {
+          points.unshift({ x: ex, y: ey });
+          points = trimByLength(points.slice(0, 40));
+        } else {
+          points = trimByLength(points);
+        }
+        var d = toPath(points);
+        if (threadPath) threadPath.setAttribute('d', d);
+        if (glowPath) glowPath.setAttribute('d', d);
+      }
+    }
+
+    raf = requestAnimationFrame(tick);
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseleave', onLeave);
+    window.addEventListener('blur', onLeave);
+  })();
+</script>
