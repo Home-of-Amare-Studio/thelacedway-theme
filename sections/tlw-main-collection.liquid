@@ -2,14 +2,76 @@
   THELACEDWÁY collection section
   Home of Amare Studio
 
-  One file serves every collection. Shopify already knows which collection the
-  visitor is on, so there is no need for a separate file per collection the way
-  the React app had separate route files.
+  One file serves every collection. The hero copy (eyebrow, italic lead line,
+  body, note badge) is hardcoded per collection handle below, matching how
+  the React export did it (src/routes/collections.*.tsx, bespoke.tsx,
+  hair.*.tsx) — each collection had its own literal marketing copy, not a
+  Shopify field. Any collection handle not listed falls back to Shopify's
+  own collection title/description.
 
-  Add-on products are tagged 'addon' in Shopify. They are published so they can
-  be added to the cart, but customers should never browse them, so they are
-  skipped here.
+  This is the same kind of hardcoded content the eventual metafields pass
+  (Phase 5) will move into Shopify admin fields, so it's an interim step,
+  not a dead end.
+
+  Add-on products are tagged 'addon' in Shopify. They are published so they
+  can be added to the cart, but customers should never browse them, so they
+  are skipped here.
 {% endcomment %}
+
+{%- liquid
+  assign eyebrow = ''
+  assign lead = ''
+  assign note = ''
+  assign display_name = collection.title
+  assign body_text = collection.description
+  assign cta_heading = 'Not sure which wig?'
+  assign cta_body = "Every piece is built to your measurements. Tell us how you wear your hair and we'll guide the fit."
+  assign cta_style = 'contact'
+
+  case collection.handle
+    when 'essentials'
+      assign display_name = 'The Essentials'
+      assign lead = 'Every wardrobe starts with a staple.'
+      assign body_text = 'A curated edit of timeless virgin hair wigs, crafted for effortless everyday looks.'
+    when 'signature'
+      assign display_name = 'The Signature'
+      assign lead = 'The styles that define TheLacedWay.'
+      assign body_text = 'A curated edit of luxury raw hair wigs, featuring our most iconic colours and signature looks, crafted to make a statement.'
+    when 'ready-to-ship'
+      assign display_name = 'Ready to Ship'
+      assign eyebrow = 'Available now'
+      assign lead = 'Luxury, without the wait.'
+      assign body_text = 'A curated edit of premium wigs, ready to ship within 1 to 2 working days.'
+      assign note = 'Dispatched within 1-2 working days'
+    when 'accessories'
+      assign display_name = 'Accessories'
+      assign lead = 'Style. Maintain. Perfect.'
+      assign body_text = ''
+      assign cta_heading = 'Not sure what you need?'
+      assign cta_body = "Tell us how you wear your pieces and we'll point you to the right care and styling essentials."
+      assign cta_style = 'enquire'
+    when 'bespoq'
+      assign display_name = 'The Bespoq'
+      assign lead = 'Created without limits.'
+      assign body_text = 'Bespoke creations, crafted exclusively for each seasonal drop.'
+    when 'bundles'
+      assign display_name = 'Bundles'
+      assign eyebrow = 'Hair'
+      assign lead = 'Virgin and raw hair, by the bundle.'
+      assign body_text = 'Choose your lengths and quantity, and build the look your way. Our bundles arrive soft, full and ready to install.'
+      assign cta_heading = 'Not sure how many bundles?'
+      assign cta_body = "Tell us the length and fullness you have in mind and we'll advise on the right quantity."
+      assign cta_style = 'enquire'
+    when 'lace-systems'
+      assign display_name = 'Premium Lace Systems'
+      assign eyebrow = 'Hair'
+      assign lead = 'Closures and frontals, finished by hand.'
+      assign body_text = 'Choose your lace size and length. Every system is prepared to sit flat and blend seamlessly.'
+      assign cta_heading = 'Not sure which lace size?'
+      assign cta_body = "Tell us how you part and style your hair and we'll point you to the right closure or frontal."
+      # cta_style stays 'contact' here — the React source's Enquire check compared against the literal name "Lace Systems", but this collection's real name is "Premium Lace Systems", so it never actually matched. Matching that real behaviour rather than the probably-intended one.
+  endcase
+-%}
 
 <section
   class="tlw-collection tlw-container"
@@ -18,12 +80,25 @@
 
   {%- if section.settings.show_header -%}
     <header class="tlw-collection__header">
-      <h1 class="tlw-display-lg">{{ collection.title }}</h1>
+      {%- if eyebrow != blank -%}
+        <span class="tlw-label-caps tlw-collection__eyebrow">{{ eyebrow }}</span>
+      {%- endif -%}
 
-      {%- if section.settings.show_description and collection.description != blank -%}
-        <div class="tlw-collection__intro tlw-body-lg">
-          {{ collection.description }}
+      <h1 class="tlw-display-lg">{{ display_name }}</h1>
+      <div class="tlw-collection__rule"></div>
+
+      {%- if lead != blank -%}
+        <p class="tlw-collection__lead">{{ lead }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.show_description and body_text != blank -%}
+        <div class="tlw-collection__intro tlw-body-md">
+          {{ body_text }}
         </div>
+      {%- endif -%}
+
+      {%- if note != blank -%}
+        <span class="tlw-label-caps tlw-collection__note">{{ note }}</span>
       {%- endif -%}
 
       {%- if section.settings.show_count -%}
@@ -38,6 +113,14 @@
         </p>
       {%- endif -%}
     </header>
+  {%- endif -%}
+
+  {%- if section.settings.show_breadcrumb -%}
+    <p class="tlw-label-caps tlw-collection__breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span class="tlw-collection__breadcrumb-sep">/</span>
+      <span>{{ display_name }}</span>
+    </p>
   {%- endif -%}
 
   {%- paginate collection.products by section.settings.per_page -%}
@@ -82,6 +165,10 @@
                 </div>
               {%- endif -%}
 
+              {%- if collection.handle == 'ready-to-ship' -%}
+                <span class="tlw-card__collection-badge">Ready to Ship</span>
+              {%- endif -%}
+
               {%- unless product.available -%}
                 <span class="tlw-card__badge tlw-label-caps">Sold out</span>
               {%- endunless -%}
@@ -120,6 +207,20 @@
 
     {%- endif -%}
   {%- endpaginate -%}
+
+  {%- if section.settings.show_cta -%}
+    <section class="tlw-collection__cta">
+      <h2 class="tlw-headline-md">{{ cta_heading }}</h2>
+      <p class="tlw-body-md">{{ cta_body }}</p>
+      <a href="{{ section.settings.contact_page_url }}" class="tlw-collection__cta-btn">
+        {%- if cta_style == 'enquire' -%}
+          {{ section.settings.enquire_label }}
+        {%- else -%}
+          {{ section.settings.contact_label }}
+        {%- endif -%}
+      </a>
+    </section>
+  {%- endif -%}
 </section>
 
 <style>
@@ -129,17 +230,72 @@
 
   #tlw-collection-{{ section.id }} .tlw-collection__header {
     max-width: 640px;
-    margin-bottom: 48px;
+    margin: 0 auto 32px;
+    text-align: center;
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__eyebrow {
+    display: block;
+    margin-bottom: 16px;
+    color: var(--tlw-accent);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__rule {
+    margin: 24px auto;
+    height: 1px;
+    width: 80px;
+    background: var(--tlw-accent);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__lead {
+    font-family: var(--tlw-font-display);
+    font-style: italic;
+    font-size: 20px;
+    color: var(--tlw-primary);
+    margin: 0 auto;
+    max-width: 42rem;
   }
 
   #tlw-collection-{{ section.id }} .tlw-collection__intro {
     margin-top: 16px;
+    max-width: 34rem;
+    margin-inline: auto;
     color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__note {
+    display: block;
+    margin-top: 32px;
+    white-space: nowrap;
+    color: var(--tlw-accent);
   }
 
   #tlw-collection-{{ section.id }} .tlw-collection__count {
     margin-top: 20px;
     color: var(--tlw-outline);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__breadcrumb {
+    margin: 0 0 48px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__breadcrumb a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 250ms ease;
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__breadcrumb a:hover {
+    color: var(--tlw-primary);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__breadcrumb-sep {
+    margin: 0 8px;
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__breadcrumb span:last-child {
+    color: var(--tlw-primary);
   }
 
   #tlw-collection-{{ section.id }} .tlw-collection__grid {
@@ -207,10 +363,23 @@
     color: var(--tlw-outline);
   }
 
-  #tlw-collection-{{ section.id }} .tlw-card__badge {
+  #tlw-collection-{{ section.id }} .tlw-card__collection-badge {
     position: absolute;
     top: 12px;
     left: 12px;
+    background: var(--tlw-accent);
+    color: #fff;
+    padding: 6px 10px;
+    font-family: var(--tlw-font-body);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-card__badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
     background: var(--tlw-primary);
     color: var(--tlw-on-primary);
     padding: 6px 10px;
@@ -247,6 +416,43 @@
   #tlw-collection-{{ section.id }} .tlw-pagination__count {
     color: var(--tlw-outline);
   }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__cta {
+    max-width: 640px;
+    margin: 96px auto 0;
+    padding-top: 64px;
+    border-top: 1px solid rgba(178, 141, 76, 0.4);
+    text-align: center;
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__cta h2 {
+    margin: 0 0 16px;
+    color: var(--tlw-primary);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__cta p {
+    margin: 0 0 32px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__cta-btn {
+    display: inline-block;
+    border: 1px solid var(--tlw-accent);
+    border-radius: 999px;
+    padding: 16px 40px;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tlw-primary);
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+
+  #tlw-collection-{{ section.id }} .tlw-collection__cta-btn:hover {
+    background: var(--tlw-accent);
+    color: var(--tlw-on-primary);
+  }
 </style>
 
 {% schema %}
@@ -264,7 +470,13 @@
       "type": "checkbox",
       "id": "show_description",
       "label": "Show collection description",
-      "info": "The description written on the collection in Shopify admin",
+      "info": "Uses the hardcoded copy for known collections, or the description written in Shopify admin for any other collection",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "label": "Show Home / Collection breadcrumb",
       "default": true
     },
     {
@@ -302,6 +514,35 @@
       "id": "empty_text",
       "label": "Text when a collection is empty",
       "default": "New pieces are on their way. Check back soon."
+    },
+    {
+      "type": "header",
+      "content": "Bottom CTA"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show the 'Not sure which wig?' CTA below the grid",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "contact_page_url",
+      "label": "Contact page link",
+      "info": "Both the Enquire and Contact us buttons link here. The original site opened a live chat modal for Enquire, which hasn't been built \u2014 this links to your Contact page instead.",
+      "default": "/pages/contact"
+    },
+    {
+      "type": "text",
+      "id": "contact_label",
+      "label": "Button label \u2014 most collections",
+      "default": "Contact us"
+    },
+    {
+      "type": "text",
+      "id": "enquire_label",
+      "label": "Button label \u2014 Bundles & Accessories",
+      "default": "Enquire"
     }
   ],
   "presets": [{ "name": "TLW Collection" }]
