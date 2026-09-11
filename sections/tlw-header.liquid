@@ -166,12 +166,19 @@
     transition: background-color 350ms ease, border-color 350ms ease;
   }
 
-  /* Horizon wraps the header group in #header-group, and that wrapper keeps
-     its height even when the header inside it floats. Collapse it so the hero
-     starts at the very top of the page. */
+  /* Horizon's own #header-group wrapper can clip a position:sticky header if
+     it sets any overflow other than visible — sticky silently stops working
+     the moment an ancestor clips overflow. This must apply on every page,
+     not just the homepage, or the header scrolls away instead of sticking. */
+  #header-group {
+    overflow: visible;
+  }
+
+  /* Homepage only: the header floats fully over the hero, so the group's
+     own height needs collapsing too, or it leaves a gap where the header
+     would otherwise have reserved space. */
   #header-group:has(#tlw-header-{{ section.id }}.tlw-header--overlay) {
     height: 0;
-    overflow: visible;
   }
 
   /* Sits over the hero: no bar, white content, nothing behind it. */
@@ -220,13 +227,17 @@
   {% endif %}
 
   {% if section.settings.top_behaviour == 'hide' %}
-    /* Reveal is driven by scroll position in JS, so opacity and transform are
-       set frame by frame rather than transitioned. */
+    /* Reveal position is driven by scroll in JS (see script below), but a
+       short transition here smooths the gap between scroll-event frames so
+       it reads as fluid motion rather than a series of small steps. Keep
+       this well under the JS reveal_distance duration, or it'll visibly lag
+       behind the scroll instead of following it. */
     #tlw-header-{{ section.id }}.tlw-header--overlay {
       opacity: 0;
       transform: translateY(-100%);
       pointer-events: none;
-      transition: background-color 350ms ease, border-color 350ms ease;
+      transition: background-color 350ms ease, border-color 350ms ease,
+                  opacity 160ms ease-out, transform 160ms ease-out;
     }
 
     #tlw-header-{{ section.id }}.tlw-header--overlay.is-visible {
@@ -299,6 +310,7 @@
   }
 
   #tlw-header-{{ section.id }} .tlw-nav__link {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 7px;
@@ -314,6 +326,21 @@
 
   #tlw-header-{{ section.id }} .tlw-nav__link:hover {
     color: var(--tlw-accent);
+  }
+
+  #tlw-header-{{ section.id }} .tlw-nav__link::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: currentColor;
+    transition: width 0.3s ease;
+  }
+
+  #tlw-header-{{ section.id }} .tlw-nav__link:hover::after {
+    width: 100%;
   }
 
   #tlw-header-{{ section.id }} .tlw-nav__drop {
@@ -550,8 +577,9 @@
 
         function paint() {
           var p = Math.min(Math.max(scrolledBy() / reveal, 0), 1);
-          /* ease out, so it settles gently rather than arriving at full speed */
-          var eased = 1 - Math.pow(1 - p, 3);
+          /* Quartic ease-out — gentler tail than cubic, so the last bit of
+             the reveal settles softly instead of stopping abruptly. */
+          var eased = 1 - Math.pow(1 - p, 4);
 
           header.style.opacity = eased;
           header.style.transform = 'translateY(' + ((eased - 1) * 100) + '%)';
