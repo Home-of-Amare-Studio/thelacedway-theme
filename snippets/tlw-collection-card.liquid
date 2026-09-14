@@ -15,6 +15,10 @@
   unless product.featured_media
     assign coming_soon = true
   endunless
+  assign sold_out = false
+  if product.available == false and coming_soon == false
+    assign sold_out = true
+  endif
 -%}
 
 <a class="tlw-card" href="{{ product.url }}">
@@ -52,10 +56,6 @@
     {%- if collection.handle == 'ready-to-ship' -%}
       <span class="tlw-card__collection-badge">Ready to Ship</span>
     {%- endif -%}
-
-    {%- unless product.available or coming_soon -%}
-      <span class="tlw-card__badge tlw-label-caps">Sold out</span>
-    {%- endunless -%}
   </div>
 
   <div class="tlw-card__body">
@@ -64,6 +64,8 @@
     <p class="tlw-card__price tlw-body-md">
       {%- if coming_soon -%}
         {{ section.settings.coming_soon_label }}
+      {%- elsif sold_out -%}
+        <span class="tlw-label-caps">Sold out</span>
       {%- elsif product.price_varies -%}
         From {{ product.price_min | money }}
       {%- else -%}
