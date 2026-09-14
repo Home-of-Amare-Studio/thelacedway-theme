@@ -2,18 +2,18 @@
   THELACEDWÁY custom wigs
   Home of Amare Studio
 
-  Two modes, one file, picked by the "Show the form open by default" setting:
+  Replaces the earlier multi-step wizard with Shopify's plain native contact
+  form (Name, Email, Phone, Message) — no custom fields, no JS steps, no app.
+  Submissions arrive as an email at whatever address is set under
+  Settings > Notifications > Contact form, tagged "Custom Wig Enquiry" in the
+  hidden field below so they're easy to tell apart from any other contact
+  form on the site.
 
+  Two modes, picked by the "Show the form open by default" setting:
   - Off (default): the homepage teaser. The form expands in place when
-    clicked, matching the live site.
+    clicked.
   - On: for a dedicated page (e.g. /custom-wig-enquiry). No toggle button,
-    the form is open on load, and the heading renders as an <h1> instead of
-    an <h2> since the page has no other H1.
-
-  It uses Shopify's own contact form, so submissions arrive at the store email
-  set under Settings > Notifications. No app, no monthly cost, nothing to
-  maintain. Every field is a block, so Destinee can add or remove questions
-  herself without touching code.
+    the form is open on load, and the heading renders as an <h1>.
 {% endcomment %}
 
 {%- liquid
@@ -21,6 +21,7 @@
   if section.settings.start_open
     assign heading_tag = 'h1'
   endif
+  assign form_id = 'CustomWigForm-' | append: section.id
 -%}
 
 <section class="tlw-custom" id="tlw-custom-{{ section.id }}">
@@ -31,9 +32,9 @@
 
     <{{ heading_tag }} class="tlw-custom__title">
       {{ section.settings.heading_before }}
-      {%- if section.settings.heading_accent != blank -%}
+      {% if section.settings.heading_accent != blank -%}
         <em class="tlw-accent-word">{{ section.settings.heading_accent }}</em>
-      {%- endif -%}
+      {%- endif %}
       {{ section.settings.heading_after }}
     </{{ heading_tag }}>
 
@@ -68,262 +69,136 @@
     class="tlw-custom__panel{% if section.settings.start_open %} is-open{% endif %}"
     id="tlw-custom-panel-{{ section.id }}"
     data-custom-panel
-    {% if section.settings.start_open %}data-start-open{% endif %}
   >
-    <div class="tlw-custom__clip">
-      <div class="tlw-custom__form" data-custom-form>
+    <div class="tlw-custom__form-wrap">
+      {%- form 'contact', id: form_id, class: 'tlw-custom__form' -%}
 
-        {%- if section.settings.form_intro != blank -%}
-          <p class="tlw-custom__intro">{{ section.settings.form_intro }}</p>
+        {%- if form.posted_successfully? -%}
+          <p class="tlw-form__success">{{ section.settings.success_text }}</p>
+          {%- if section.settings.success_button_label != blank and section.settings.success_button_link != blank -%}
+            <a href="{{ section.settings.success_button_link }}" class="tlw-custom__success-btn">
+              {{ section.settings.success_button_label }}
+            </a>
+          {%- endif -%}
         {%- endif -%}
 
-        {%- form 'contact', class: 'tlw-form' -%}
-          {%- if form.posted_successfully? -%}
-            <p class="tlw-form__success">{{ section.settings.success_text }}</p>
-            {%- if section.settings.success_button_label != blank and section.settings.success_button_link != blank -%}
-              <a href="{{ section.settings.success_button_link }}" class="tlw-custom__success-btn">
-                {{ section.settings.success_button_label }}
-              </a>
-            {%- endif -%}
-          {%- endif -%}
+        {%- if form.errors -%}
+          <p class="tlw-form__error">{{ form.errors | default_errors }}</p>
+        {%- endif -%}
 
-          {%- if form.errors -%}
-            <p class="tlw-form__error">{{ form.errors | default_errors }}</p>
-          {%- endif -%}
+        <input type="hidden" name="contact[enquiry_type]" value="Custom Wig Enquiry">
 
-          <input type="hidden" name="contact[Enquiry type]" value="{{ section.settings.enquiry_label }}">
+        <div class="tlw-custom__field">
+          <label for="{{ form_id }}-name">Full name</label>
+          <input
+            type="text"
+            id="{{ form_id }}-name"
+            name="contact[name]"
+            value="{{ form.name }}"
+            autocomplete="name"
+            required
+          >
+        </div>
 
-          {%- assign step_labels = section.settings.step_labels | split: ',' -%}
-          {%- assign step_count = step_labels.size -%}
+        <div class="tlw-custom__field">
+          <label for="{{ form_id }}-email">Email address</label>
+          <input
+            type="email"
+            id="{{ form_id }}-email"
+            name="contact[email]"
+            value="{{ form.email }}"
+            autocomplete="email"
+            required
+          >
+        </div>
 
-          <div class="tlw-wizard" data-wizard data-steps="{{ step_count }}">
-
-            <div class="tlw-wizard__bar">
-              <p class="tlw-wizard__counter">
-                {{ section.settings.step_word }} <span data-step-now>1</span>
-                {{ section.settings.of_word }} {{ step_count }}
-              </p>
-              <div class="tlw-wizard__segments">
-                {%- for label in step_labels -%}
-                  <span class="tlw-wizard__seg{% if forloop.first %} is-on{% endif %}" data-step-seg></span>
-                {%- endfor -%}
-              </div>
-            </div>
-
-            {%- for label in step_labels -%}
-              {%- assign step_no = forloop.index -%}
-              <fieldset
-                class="tlw-step{% if forloop.first %} is-current{% endif %}"
-                data-step="{{ step_no }}"
-                {% unless forloop.first %}hidden{% endunless %}
-              >
-                <legend class="tlw-step__label">{{ label | strip }}</legend>
-
-                <div class="tlw-form__grid">
-                  {%- for block in section.blocks -%}
-                    {%- if block.settings.step != step_no -%}{%- continue -%}{%- endif -%}
-                    {%- assign fid = 'f-' | append: section.id | append: '-' | append: block.id -%}
-                    {%- assign fname = block.settings.label | escape -%}
-
-                    {%- case block.type -%}
-
-                      {%- when 'field' -%}
-                        <div class="tlw-field{% if block.settings.full_width %} is-wide{% endif %}" {{ block.shopify_attributes }}>
-                          <label class="tlw-field__label" for="{{ fid }}">
-                            {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
-                          </label>
-                          <input
-                            class="tlw-input"
-                            id="{{ fid }}"
-                            type="{{ block.settings.kind }}"
-                            name="contact[{{ fname }}]"
-                            placeholder="{{ block.settings.placeholder }}"
-                            {% if block.settings.required %}data-required{% endif %}
-                          >
-                        </div>
-
-                      {%- when 'phone' -%}
-                        {%- assign codes = block.settings.codes | newline_to_br | strip_newlines | split: '<br />' -%}
-                        <div class="tlw-field{% if block.settings.full_width %} is-wide{% endif %}" {{ block.shopify_attributes }}>
-                          <label class="tlw-field__label" for="{{ fid }}">
-                            {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
-                          </label>
-                          <div class="tlw-phone">
-                            <select
-                              class="tlw-input tlw-select tlw-phone__code"
-                              name="contact[{{ fname }} country code]"
-                              data-phone-code
-                              aria-label="Country code"
-                            >
-                              {%- for row in codes -%}
-                                {%- assign bits = row | strip | split: '|' -%}
-                                {%- if bits.size >= 2 -%}
-                                  <option
-                                    value="{{ bits[1] | strip | escape }}"
-                                    data-hint="{{ bits[2] | default: '' | strip | escape }}"
-                                    {% if forloop.first %}selected{% endif %}
-                                  >{{ bits[0] | strip }} {{ bits[1] | strip }}</option>
-                                {%- endif -%}
-                              {%- endfor -%}
-                            </select>
-                            <input
-                              class="tlw-input tlw-phone__number"
-                              id="{{ fid }}"
-                              type="tel"
-                              name="contact[{{ fname }}]"
-                              placeholder="{{ block.settings.placeholder }}"
-                              data-phone-number
-                              {% if block.settings.required %}data-required{% endif %}
-                            >
-                          </div>
-                        </div>
-
-                      {%- when 'choice' -%}
-                        <div class="tlw-field{% if block.settings.full_width %} is-wide{% endif %}" {{ block.shopify_attributes }}>
-                          <label class="tlw-field__label" for="{{ fid }}">
-                            {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
-                          </label>
-                          <select
-                            class="tlw-input tlw-select"
-                            id="{{ fid }}"
-                            name="contact[{{ fname }}]"
-                            {% if block.settings.required %}data-required{% endif %}
-                          >
-                            <option value="">{{ block.settings.placeholder | default: 'Please choose' }}</option>
-                            {%- assign opts = block.settings.options | split: ',' -%}
-                            {%- for opt in opts -%}
-                              {%- assign clean = opt | strip -%}
-                              <option value="{{ clean | escape }}">{{ clean }}</option>
-                            {%- endfor -%}
-                          </select>
-                        </div>
-
-                      {%- when 'message' -%}
-                        <div class="tlw-field is-wide" {{ block.shopify_attributes }}>
-                          <label class="tlw-field__label" for="{{ fid }}">
-                            {{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}
-                          </label>
-                          <textarea
-                            class="tlw-input tlw-textarea"
-                            id="{{ fid }}"
-                            name="contact[body]"
-                            rows="5"
-                            placeholder="{{ block.settings.placeholder }}"
-                            {% if block.settings.required %}data-required{% endif %}
-                          ></textarea>
-                        </div>
-
-                      {%- when 'agree' -%}
-                        <div class="tlw-field is-wide tlw-agree" {{ block.shopify_attributes }}>
-                          <label class="tlw-agree__row">
-                            <input
-                              type="checkbox"
-                              id="{{ fid }}"
-                              name="contact[{{ fname }}]"
-                              value="Yes"
-                              {% if block.settings.required %}data-required{% endif %}
-                            >
-                            <span>{{ block.settings.label }}{% if block.settings.required %}<span class="tlw-field__req">*</span>{% endif %}</span>
-                          </label>
-                        </div>
-
-                    {%- endcase -%}
-                  {%- endfor -%}
-                </div>
-              </fieldset>
-            {%- endfor -%}
-
-            <div class="tlw-wizard__foot">
-              <button type="button" class="tlw-wizard__back" data-wizard-back hidden>
-                {{ section.settings.back_label }}
-              </button>
-
-              <button type="button" class="tlw-wizard__next" data-wizard-next>
-                {{ section.settings.next_label }}
-              </button>
-
-              <button type="submit" class="tlw-form__submit" data-wizard-submit hidden>
-                {{ section.settings.submit_label }}
-              </button>
-            </div>
-
-            <p class="tlw-wizard__warn" data-wizard-warn hidden>{{ section.settings.incomplete_text }}</p>
+        {%- if section.settings.show_phone -%}
+          <div class="tlw-custom__field">
+            <label for="{{ form_id }}-phone">Contact number</label>
+            <input
+              type="tel"
+              id="{{ form_id }}-phone"
+              name="contact[phone]"
+              value="{{ form.phone }}"
+              autocomplete="tel"
+            >
           </div>
+        {%- endif -%}
 
-        {%- endform -%}
+        <div class="tlw-custom__field tlw-custom__field--wide">
+          <label for="{{ form_id }}-body">{{ section.settings.message_label }}</label>
+          <textarea
+            id="{{ form_id }}-body"
+            name="contact[body]"
+            rows="5"
+            required
+          >{{ form.body }}</textarea>
+        </div>
 
-      </div>
+        <button type="submit" class="tlw-custom__submit">{{ section.settings.submit_label }}</button>
+
+      {%- endform -%}
     </div>
   </div>
+
 </section>
 
 <style>
   #tlw-custom-{{ section.id }} {
-    padding: 96px var(--tlw-margin) 72px;
-    background: var(--tlw-secondary-light);
-    color: var(--tlw-primary);
-  }
-
-  @media (min-width: 900px) {
-    #tlw-custom-{{ section.id }} { padding-top: 120px; }
+    padding-block: 72px;
+    background: var(--tlw-surface-container-low);
   }
 
   #tlw-custom-{{ section.id }} .tlw-custom__head {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 48rem;
-    margin-inline: auto;
+    max-width: 640px;
+    margin: 0 auto;
+    padding-inline: var(--tlw-margin);
     text-align: center;
   }
 
   #tlw-custom-{{ section.id }} .tlw-custom__eyebrow {
-    margin: 0 0 8px;
     font-family: var(--tlw-font-body);
     font-size: 12px;
-    font-weight: 500;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--tlw-accent);
+    margin: 0 0 16px;
   }
 
   #tlw-custom-{{ section.id }} .tlw-custom__title {
-    margin: 0;
     font-family: var(--tlw-font-display);
-    font-weight: 400;
-    font-size: 30px;
-    line-height: 1.2;
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--tlw-primary);
+    margin: 0;
   }
 
   @media (min-width: 768px) {
     #tlw-custom-{{ section.id }} .tlw-custom__title {
-      font-size: 64px;
-      font-weight: 300;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
+      font-size: 44px;
     }
   }
 
   #tlw-custom-{{ section.id }} .tlw-custom__text {
-    max-width: 36rem;
-    margin: 24px 0 0;
-    font-size: 16px;
+    margin: 20px 0 0;
     color: var(--tlw-on-surface-variant);
+    line-height: 1.6;
   }
 
   #tlw-custom-{{ section.id }} .tlw-custom__toggle {
-    flex-shrink: 0;
-    margin-top: 40px;
-    padding: 16px 40px;
+    margin-top: 32px;
+    display: inline-block;
     border: 1px solid var(--tlw-accent);
-    border-radius: var(--tlw-radius);
-    background: transparent;
+    border-radius: 999px;
+    padding: 14px 36px;
     font-family: var(--tlw-font-body);
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--tlw-primary);
+    background: transparent;
+    cursor: pointer;
     transition: background-color 250ms ease, color 250ms ease;
   }
 
@@ -332,12 +207,11 @@
     color: var(--tlw-on-primary);
   }
 
-  /* The panel unfolds by animating its row height from nothing to auto. */
   #tlw-custom-{{ section.id }} .tlw-custom__panel {
     display: grid;
     grid-template-rows: 0fr;
     opacity: 0;
-    transition: grid-template-rows 700ms ease-in-out, opacity 700ms ease-in-out;
+    transition: grid-template-rows 500ms cubic-bezier(0.4, 0, 0.2, 1), opacity 400ms ease;
   }
 
   #tlw-custom-{{ section.id }} .tlw-custom__panel.is-open {
@@ -345,263 +219,81 @@
     opacity: 1;
   }
 
-  #tlw-custom-{{ section.id }} .tlw-custom__clip { overflow: hidden; }
+  #tlw-custom-{{ section.id }} .tlw-custom__panel > .tlw-custom__form-wrap {
+    overflow: hidden;
+  }
 
   #tlw-custom-{{ section.id }} .tlw-custom__form {
-    max-width: 48rem;
-    margin-inline: auto;
-    padding-top: 56px;
-    text-align: left;
+    max-width: 560px;
+    margin: 48px auto 0;
+    padding-inline: var(--tlw-margin);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
   }
 
-  #tlw-custom-{{ section.id }} .tlw-custom__intro {
-    margin: 0 0 32px;
-    font-size: 16px;
-    color: var(--tlw-on-surface-variant);
-  }
-
-  /* The card the wizard sits in */
-  #tlw-custom-{{ section.id }} .tlw-wizard {
-    padding: 40px 32px;
-    border-radius: {{ section.settings.card_radius }}px;
-    background: var(--tlw-surface-lowest);
-  }
-
-  @media (min-width: 768px) {
-    #tlw-custom-{{ section.id }} .tlw-wizard { padding: 56px 56px 48px; }
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__counter {
-    margin: 0 0 16px;
-    font-family: var(--tlw-font-body);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--tlw-primary);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__segments {
+  #tlw-custom-{{ section.id }} .tlw-custom__field {
     display: flex;
-    gap: 12px;
-    margin-bottom: 44px;
+    flex-direction: column;
+    gap: 8px;
   }
 
-  #tlw-custom-{{ section.id }} .tlw-wizard__seg {
-    flex: 1;
-    height: 2px;
-    background: var(--tlw-outline-variant);
-    transition: background-color 400ms ease;
+  #tlw-custom-{{ section.id }} .tlw-custom__field--wide {
+    grid-column: 1 / -1;
   }
 
-  #tlw-custom-{{ section.id }} .tlw-wizard__seg.is-on {
-    background: var(--tlw-accent);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-step {
-    margin: 0;
-    padding: 0;
-    border: 0;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-step[hidden] { display: none; }
-
-  #tlw-custom-{{ section.id }} .tlw-step__label {
-    padding: 0;
-    margin-bottom: 28px;
-    font-family: var(--tlw-font-body);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--tlw-accent);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-agree__row {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    font-size: 15px;
-    line-height: 1.6;
-    color: var(--tlw-on-surface-variant);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-agree__row input {
-    margin-top: 4px;
-    width: 18px;
-    height: 18px;
-    accent-color: var(--tlw-accent);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__foot {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 40px;
-    padding-top: 32px;
-    border-top: 1px solid var(--tlw-outline-variant);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__back,
-  #tlw-custom-{{ section.id }} .tlw-wizard__next {
-    padding: 16px 40px;
-    border-radius: var(--tlw-radius);
+  #tlw-custom-{{ section.id }} .tlw-custom__field label {
     font-family: var(--tlw-font-body);
     font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    transition: background-color 250ms ease, color 250ms ease;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__back {
-    margin-right: auto;
-    border: 1px solid var(--tlw-outline-variant);
-    background: transparent;
-    color: var(--tlw-on-surface-variant);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__back:hover {
-    border-color: var(--tlw-primary);
-    color: var(--tlw-primary);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__next {
-    border: 1px solid var(--tlw-accent);
-    background: transparent;
-    color: var(--tlw-primary);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__next:hover {
-    background: var(--tlw-accent);
-    color: var(--tlw-on-primary);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__back[hidden],
-  #tlw-custom-{{ section.id }} .tlw-wizard__next[hidden],
-  #tlw-custom-{{ section.id }} .tlw-form__submit[hidden] { display: none; }
-
-  #tlw-custom-{{ section.id }} .tlw-form__submit { margin-top: 0; }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__warn {
-    margin: 16px 0 0;
-    text-align: right;
-    font-size: 13px;
-    color: #a33;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-wizard__warn[hidden] { display: none; }
-
-  #tlw-custom-{{ section.id }} .tlw-input.is-missing {
-    border-color: #a33;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-form__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  @media (min-width: 700px) {
-    #tlw-custom-{{ section.id }} .tlw-form__grid {
-      grid-template-columns: 1fr 1fr;
-    }
-    #tlw-custom-{{ section.id }} .tlw-field.is-wide { grid-column: 1 / -1; }
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-field__label {
-    display: block;
-    margin-bottom: 8px;
-    font-family: var(--tlw-font-body);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--tlw-on-surface-variant);
   }
 
-  #tlw-custom-{{ section.id }} .tlw-field__req {
-    margin-left: 4px;
-    color: var(--tlw-accent);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-input {
-    width: 100%;
-    padding: 14px 16px;
+  #tlw-custom-{{ section.id }} .tlw-custom__field input,
+  #tlw-custom-{{ section.id }} .tlw-custom__field textarea {
     border: 1px solid var(--tlw-outline-variant);
-    border-radius: var(--tlw-radius);
     background: var(--tlw-surface-lowest);
-    color: var(--tlw-primary);
+    padding: 14px 16px;
     font-family: var(--tlw-font-body);
     font-size: 15px;
+    color: var(--tlw-primary);
+    resize: vertical;
   }
 
-  #tlw-custom-{{ section.id }} .tlw-input:focus {
+  #tlw-custom-{{ section.id }} .tlw-custom__field input:focus,
+  #tlw-custom-{{ section.id }} .tlw-custom__field textarea:focus {
     outline: none;
     border-color: var(--tlw-accent);
   }
 
-  #tlw-custom-{{ section.id }} .tlw-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23241b15' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-phone {
-    display: flex;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-phone__code {
-    width: auto;
-    flex: 0 0 auto;
-    min-width: 108px;
-    padding-right: 38px;
-    border-right: 0;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-phone__number {
-    flex: 1;
-    min-width: 0;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-textarea {
-    resize: vertical;
-    min-height: 130px;
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-form__submit {
-    margin-top: 36px;
-    padding: 16px 44px;
-    border: 1px solid var(--tlw-primary);
-    border-radius: var(--tlw-radius);
-    background: var(--tlw-primary);
-    color: var(--tlw-on-primary);
+  #tlw-custom-{{ section.id }} .tlw-custom__submit {
+    grid-column: 1 / -1;
+    margin-top: 8px;
+    padding: 16px 40px;
+    border: 1px solid var(--tlw-accent);
+    border-radius: 999px;
+    background: transparent;
     font-family: var(--tlw-font-body);
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.18em;
     text-transform: uppercase;
+    color: var(--tlw-primary);
+    cursor: pointer;
     transition: background-color 250ms ease, color 250ms ease;
   }
 
-  #tlw-custom-{{ section.id }} .tlw-form__submit:hover {
-    background: transparent;
-    color: var(--tlw-primary);
-  }
-
-  #tlw-custom-{{ section.id }} .tlw-form__note {
-    margin: 20px 0 0;
-    font-size: 13px;
-    color: var(--tlw-outline);
+  #tlw-custom-{{ section.id }} .tlw-custom__submit:hover {
+    background: var(--tlw-accent);
+    color: var(--tlw-on-primary);
   }
 
   #tlw-custom-{{ section.id }} .tlw-form__success,
   #tlw-custom-{{ section.id }} .tlw-form__error {
-    margin: 0 0 28px;
-    padding: 16px 20px;
-    border: 1px solid var(--tlw-accent);
+    grid-column: 1 / -1;
+    padding: 16px;
+    border: 1px solid var(--tlw-outline-variant);
     font-size: 15px;
   }
 
@@ -611,9 +303,11 @@
   }
 
   #tlw-custom-{{ section.id }} .tlw-custom__success-btn {
+    grid-column: 1 / -1;
     display: inline-block;
-    margin: -8px 0 28px;
-    padding: 16px 40px;
+    width: fit-content;
+    margin: -8px auto 0;
+    padding: 14px 32px;
     border: 1px solid var(--tlw-accent);
     border-radius: 999px;
     font-family: var(--tlw-font-body);
@@ -629,6 +323,12 @@
     background: var(--tlw-accent);
     color: var(--tlw-on-primary);
   }
+
+  @media (max-width: 480px) {
+    #tlw-custom-{{ section.id }} .tlw-custom__form {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 
 <script>
@@ -638,25 +338,19 @@
 
     var toggle = root.querySelector('[data-custom-toggle]');
     var panel = root.querySelector('[data-custom-panel]');
-    var form = root.querySelector('[data-custom-form]');
-    /* No toggle button means this is the standalone-page mode: the panel is
-       already open in the server-rendered HTML (data-start-open), so there
-       is nothing to wire up here. The wizard logic below still needs to run
-       either way, so this only skips the toggle behaviour, not the return
-       that used to skip everything after it. */
+    var form = root.querySelector('.tlw-custom__form');
     if (!panel) return;
 
     if (toggle) {
-      function open(scroll) {
+      function open() {
         panel.classList.add('is-open');
         toggle.setAttribute('aria-expanded', 'true');
         toggle.textContent = toggle.dataset.closeLabel;
-
-        if (scroll === false) return;
         window.setTimeout(function () {
+          if (!form) return;
           var y = form.getBoundingClientRect().top + window.scrollY - 120;
           window.scrollTo({ top: y, behavior: 'smooth' });
-        }, 720);
+        }, 520);
       }
 
       function shut() {
@@ -668,92 +362,15 @@
       toggle.addEventListener('click', function () {
         if (panel.classList.contains('is-open')) shut(); else open();
       });
-    }
 
-    /* --- the step by step form --- */
-    var wizard = root.querySelector('[data-wizard]');
-    if (wizard) {
-      var steps = wizard.querySelectorAll('[data-step]');
-      var segs = wizard.querySelectorAll('[data-step-seg]');
-      var nowEl = wizard.querySelector('[data-step-now]');
-      var backBtn = wizard.querySelector('[data-wizard-back]');
-      var nextBtn = wizard.querySelector('[data-wizard-next]');
-      var sendBtn = wizard.querySelector('[data-wizard-submit]');
-      var warn = wizard.querySelector('[data-wizard-warn]');
-      var at = 0;
-
-      function show(i) {
-        at = Math.max(0, Math.min(steps.length - 1, i));
-
-        steps.forEach(function (s, n) { s.hidden = n !== at; });
-        segs.forEach(function (s, n) { s.classList.toggle('is-on', n <= at); });
-
-        if (nowEl) nowEl.textContent = at + 1;
-        if (backBtn) backBtn.hidden = at === 0;
-        if (nextBtn) nextBtn.hidden = at === steps.length - 1;
-        if (sendBtn) sendBtn.hidden = at !== steps.length - 1;
-        if (warn) warn.hidden = true;
-
-        var y = wizard.getBoundingClientRect().top + window.scrollY - 120;
-        window.scrollTo({ top: y, behavior: 'smooth' });
+      /* After a submission Shopify reloads the page, so reopen the panel
+         and show the visitor their confirmation rather than a closed form.
+         In start-open mode the panel never closes, so nothing to do. */
+      if (root.querySelector('.tlw-form__success') || root.querySelector('.tlw-form__error')) {
+        panel.classList.add('is-open');
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.textContent = toggle.dataset.closeLabel;
       }
-
-      /* Only checks the step you are on, so an empty later step does not
-         block you from moving forward. */
-      function stepOk() {
-        var fields = steps[at].querySelectorAll('[data-required]');
-        var ok = true;
-
-        fields.forEach(function (f) {
-          var filled = f.type === 'checkbox' ? f.checked : f.value.trim() !== '';
-          f.classList.toggle('is-missing', !filled);
-          if (!filled) ok = false;
-        });
-
-        return ok;
-      }
-
-      if (nextBtn) nextBtn.addEventListener('click', function () {
-        if (!stepOk()) {
-          if (warn) warn.hidden = false;
-          return;
-        }
-        show(at + 1);
-      });
-
-      if (backBtn) backBtn.addEventListener('click', function () { show(at - 1); });
-
-      if (sendBtn) sendBtn.addEventListener('click', function (e) {
-        if (!stepOk()) {
-          e.preventDefault();
-          if (warn) warn.hidden = false;
-        }
-      });
-
-      /* Each country carries its own example number, the way the live site does */
-      wizard.querySelectorAll('[data-phone-code]').forEach(function (sel) {
-        var input = sel.parentElement.querySelector('[data-phone-number]');
-        function hint() {
-          var opt = sel.options[sel.selectedIndex];
-          var h = opt && opt.dataset.hint;
-          if (input && h) input.placeholder = h;
-        }
-        sel.addEventListener('change', hint);
-        hint();
-      });
-
-      wizard.addEventListener('input', function (e) {
-        if (e.target.classList) e.target.classList.remove('is-missing');
-      });
-    }
-
-    /* After a submission Shopify reloads the page, so reopen the panel and
-       show the visitor their confirmation rather than a closed form. In
-       start-open mode the panel never closes, so there is nothing to do. */
-    if (toggle && (root.querySelector('.tlw-form__success') || root.querySelector('.tlw-form__error'))) {
-      panel.classList.add('is-open');
-      toggle.setAttribute('aria-expanded', 'true');
-      toggle.textContent = toggle.dataset.closeLabel;
     }
   })();
 </script>
@@ -765,8 +382,7 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Small label above the heading",
-      "default": "Custom wigs"
+      "label": "Small label above the heading"
     },
     {
       "type": "text",
@@ -812,7 +428,7 @@
       "type": "text",
       "id": "success_button_label",
       "label": "Button after a successful submission",
-      "info": "Optional. Shows next to the success message. Leave blank for none.",
+      "info": "Optional. Leave blank for none.",
       "default": "Back to home"
     },
     {
@@ -842,64 +458,16 @@
       "content": "The form"
     },
     {
-      "type": "textarea",
-      "id": "form_intro",
-      "label": "Line above the form",
-      "default": "Tell us what you have in mind and we will come back to you within two working days."
+      "type": "checkbox",
+      "id": "show_phone",
+      "label": "Include a phone number field",
+      "default": true
     },
     {
       "type": "text",
-      "id": "enquiry_label",
-      "label": "Label on the email you receive",
-      "info": "Helps you tell custom wig enquiries apart from other messages",
-      "default": "Custom wig enquiry"
-    },
-    {
-      "type": "textarea",
-      "id": "step_labels",
-      "label": "Steps",
-      "info": "Separate with commas. One step per label, and each question is assigned to a step.",
-      "default": "Details, Your custom wig, Your inspiration, Additional details"
-    },
-    {
-      "type": "text",
-      "id": "step_word",
-      "label": "The word before the number",
-      "default": "Step"
-    },
-    {
-      "type": "text",
-      "id": "of_word",
-      "label": "The word between the numbers",
-      "default": "of"
-    },
-    {
-      "type": "text",
-      "id": "next_label",
-      "label": "Continue button text",
-      "default": "Continue"
-    },
-    {
-      "type": "text",
-      "id": "back_label",
-      "label": "Back button text",
-      "default": "Back"
-    },
-    {
-      "type": "text",
-      "id": "incomplete_text",
-      "label": "Message when something is missing",
-      "default": "Please fill in the fields marked with a star."
-    },
-    {
-      "type": "range",
-      "id": "card_radius",
-      "label": "Corner rounding on the form card",
-      "min": 0,
-      "max": 32,
-      "step": 2,
-      "unit": "px",
-      "default": 24
+      "id": "message_label",
+      "label": "Message field label",
+      "default": "Tell us what you have in mind"
     },
     {
       "type": "text",
@@ -908,278 +476,27 @@
       "default": "Send enquiry"
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "success_text",
-      "label": "Message after sending",
-      "default": "Thank you. Your enquiry is with us and we will be in touch within two working days."
-    },
-    {
-      "type": "textarea",
-      "id": "small_print",
-      "label": "Small print under the button",
-      "default": "We only use these details to answer your enquiry."
-    }
-  ],
-  "blocks": [
-    {
-      "type": "field",
-      "name": "Text field",
-      "settings": [
-        {
-          "type": "text",
-          "id": "label",
-          "label": "Question",
-          "info": "This is what appears on the email you receive, so keep it clear",
-          "default": "Name"
-        },
-        {
-          "type": "select",
-          "id": "kind",
-          "label": "Kind of answer",
-          "options": [
-            { "value": "text", "label": "Words" },
-            { "value": "email", "label": "Email address" },
-            { "value": "tel", "label": "Phone number" },
-            { "value": "number", "label": "Number" }
-          ],
-          "default": "text"
-        },
-        {
-          "type": "text",
-          "id": "placeholder",
-          "label": "Grey hint text"
-        },
-        {
-          "type": "checkbox",
-          "id": "required",
-          "label": "Must be answered",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "full_width",
-          "label": "Full width",
-          "default": false
-        },
-        {
-          "type": "range",
-          "id": "step",
-          "label": "Which step",
-          "min": 1,
-          "max": 6,
-          "step": 1,
-          "default": 1
-        }
-      ]
-    },
-    {
-      "type": "phone",
-      "name": "Phone with country code",
-      "limit": 1,
-      "settings": [
-        {
-          "type": "text",
-          "id": "label",
-          "label": "Question",
-          "default": "Contact number"
-        },
-        {
-          "type": "text",
-          "id": "placeholder",
-          "label": "Grey hint text",
-          "info": "Replaced automatically by the example number for the chosen country",
-          "default": "7123 456789"
-        },
-        {
-          "type": "textarea",
-          "id": "codes",
-          "label": "Countries",
-          "info": "One per line, as flag | code | example number",
-          "default": "\ud83c\uddec\ud83c\udde7 | +44 | 7123 456789\\n\ud83c\uddfa\ud83c\uddf8 | +1 | (201) 555-0123\\n\ud83c\uddf7\ud83c\uddfa | +7 | 912 345 6789\\n\ud83c\uddea\ud83c\uddec | +20 | 100 123 4567\\n\ud83c\uddff\ud83c\udde6 | +27 | 71 123 4567\\n\ud83c\uddec\ud83c\uddf7 | +30 | 691 234 5678\\n\ud83c\uddf3\ud83c\uddf1 | +31 | 6 12345678\\n\ud83c\udde7\ud83c\uddea | +32 | 470 12 34 56\\n\ud83c\uddeb\ud83c\uddf7 | +33 | 6 12 34 56 78\\n\ud83c\uddea\ud83c\uddf8 | +34 | 612 34 56 78\\n\ud83c\uddf5\ud83c\uddf9 | +351 | 912 345 678\\n\ud83c\uddf1\ud83c\uddfa | +352 | 628 123 456\\n\ud83c\uddee\ud83c\uddea | +353 | 85 123 4567\\n\ud83c\uddee\ud83c\uddf8 | +354 | 611 1234\\n\ud83c\uddf2\ud83c\uddf9 | +356 | 9696 1234\\n\ud83c\udde8\ud83c\uddfe | +357 | 96 123456\\n\ud83c\uddeb\ud83c\uddee | +358 | 41 2345678\\n\ud83c\udded\ud83c\uddfa | +36 | 20 123 4567\\n\ud83c\uddee\ud83c\uddf9 | +39 | 312 345 6789\\n\ud83c\uddf7\ud83c\uddf4 | +40 | 712 345 678\\n\ud83c\udde8\ud83c\udded | +41 | 78 123 45 67\\n\ud83c\udde6\ud83c\uddf9 | +43 | 664 123456\\n\ud83c\udde9\ud83c\uddf0 | +45 | 32 12 34 56\\n\ud83c\uddf8\ud83c\uddea | +46 | 70 123 45 67\\n\ud83c\uddf3\ud83c\uddf4 | +47 | 406 12 345\\n\ud83c\uddf5\ud83c\uddf1 | +48 | 512 345 678\\n\ud83c\udde9\ud83c\uddea | +49 | 151 12345678\\n\ud83c\uddf2\ud83c\uddfd | +52 | 222 123 4567\\n\ud83c\udde7\ud83c\uddf7 | +55 | 11 91234 5678\\n\ud83c\uddf2\ud83c\uddfe | +60 | 12 345 6789\\n\ud83c\udde6\ud83c\uddfa | +61 | 412 345 678\\n\ud83c\uddee\ud83c\udde9 | +62 | 812 345 678\\n\ud83c\uddf5\ud83c\udded | +63 | 905 123 4567\\n\ud83c\uddf3\ud83c\uddff | +64 | 21 123 4567\\n\ud83c\uddf8\ud83c\uddec | +65 | 8123 4567\\n\ud83c\uddf9\ud83c\udded | +66 | 81 234 5678\\n\ud83c\uddef\ud83c\uddf5 | +81 | 90 1234 5678\\n\ud83c\uddf0\ud83c\uddf7 | +82 | 10 1234 5678\\n\ud83c\uddfb\ud83c\uddf3 | +84 | 91 234 56 78\\n\ud83c\udde8\ud83c\uddf3 | +86 | 138 1234 5678\\n\ud83c\uddf9\ud83c\uddf7 | +90 | 501 234 56 78\\n\ud83c\uddee\ud83c\uddf3 | +91 | 98765 43210\\n\ud83c\uddf5\ud83c\uddf0 | +92 | 301 2345678\\n\ud83c\uddf2\ud83c\udde6 | +212 | 650 123456\\n\ud83c\uddec\ud83c\uddf2 | +220 | 301 2345\\n\ud83c\uddf8\ud83c\uddf3 | +221 | 70 123 45 67\\n\ud83c\uddec\ud83c\udded | +233 | 24 123 4567\\n\ud83c\uddf3\ud83c\uddec | +234 | 805 123 4567\\n\ud83c\udde8\ud83c\uddf2 | +237 | 6 71 23 45 67\\n\ud83c\uddf7\ud83c\uddfc | +250 | 78 123 4567\\n\ud83c\uddf0\ud83c\uddea | +254 | 712 123456\\n\ud83c\uddf9\ud83c\uddff | +255 | 621 234 567\\n\ud83c\uddfa\ud83c\uddec | +256 | 712 345678\\n\ud83c\uddff\ud83c\uddf2 | +260 | 95 5123456\\n\ud83c\uddff\ud83c\uddfc | +263 | 71 234 5678\\n\ud83c\uddf3\ud83c\udde6 | +264 | 81 123 4567\\n\ud83c\udde7\ud83c\uddfc | +267 | 71 123 456\\n\ud83c\udde7\ud83c\udde9 | +880 | 1812 345678\\n\ud83c\uddf8\ud83c\udde6 | +966 | 51 234 5678\\n\ud83c\udde6\ud83c\uddea | +971 | 50 123 4567\\n\ud83c\uddee\ud83c\uddf1 | +972 | 50 123 4567\\n\ud83c\uddf6\ud83c\udde6 | +974 | 3312 3456\\n\ud83c\udde7\ud83c\uddf8 | +1242 | 359 1234\\n\ud83c\udde7\ud83c\udde7 | +1246 | 250 1234\\n\ud83c\uddef\ud83c\uddf2 | +1876 | 210 1234\\n\ud83c\uddf9\ud83c\uddf9 | +1868 | 291 1234"
-        },
-        {
-          "type": "checkbox",
-          "id": "required",
-          "label": "Must be answered",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "full_width",
-          "label": "Full width",
-          "default": false
-        },
-        {
-          "type": "range",
-          "id": "step",
-          "label": "Which step",
-          "min": 1,
-          "max": 6,
-          "step": 1,
-          "default": 1
-        }
-      ]
-    },
-    {
-      "type": "choice",
-      "name": "Dropdown",
-      "settings": [
-        {
-          "type": "text",
-          "id": "label",
-          "label": "Question",
-          "default": "Length"
-        },
-        {
-          "type": "textarea",
-          "id": "options",
-          "label": "Choices",
-          "info": "Separate with commas",
-          "default": "16, 18, 20, 22, 24, 26"
-        },
-        {
-          "type": "text",
-          "id": "placeholder",
-          "label": "First line of the dropdown",
-          "default": "Please choose"
-        },
-        {
-          "type": "checkbox",
-          "id": "required",
-          "label": "Must be answered",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "full_width",
-          "label": "Full width",
-          "default": false
-        },
-        {
-          "type": "range",
-          "id": "step",
-          "label": "Which step",
-          "min": 1,
-          "max": 6,
-          "step": 1,
-          "default": 2
-        }
-      ]
-    },
-    {
-      "type": "message",
-      "name": "Long answer",
-      "limit": 1,
-      "settings": [
-        {
-          "type": "text",
-          "id": "label",
-          "label": "Question",
-          "default": "Anything else"
-        },
-        {
-          "type": "text",
-          "id": "placeholder",
-          "label": "Grey hint text",
-          "default": "Tell us about the look you have in mind"
-        },
-        {
-          "type": "checkbox",
-          "id": "required",
-          "label": "Must be answered",
-          "default": false
-        },
-        {
-          "type": "range",
-          "id": "step",
-          "label": "Which step",
-          "min": 1,
-          "max": 6,
-          "step": 1,
-          "default": 3
-        }
-      ]
-    },
-    {
-      "type": "agree",
-      "name": "Tick box",
-      "settings": [
-        {
-          "type": "text",
-          "id": "label",
-          "label": "Wording",
-          "default": "I am happy to be contacted about this enquiry"
-        },
-        {
-          "type": "checkbox",
-          "id": "required",
-          "label": "Must be ticked",
-          "default": true
-        },
-        {
-          "type": "range",
-          "id": "step",
-          "label": "Which step",
-          "min": 1,
-          "max": 6,
-          "step": 1,
-          "default": 4
-        }
-      ]
+      "label": "Message after a successful submission",
+      "default": "Thank you — we've received your enquiry and will be in touch soon."
     }
   ],
   "presets": [
     {
-      "name": "TLW Custom Wigs",
-      "blocks": [
-        { "type": "field",  "settings": { "label": "Full name", "kind": "text",  "required": true, "step": 1, "placeholder": "Your full name" } },
-        { "type": "field",  "settings": { "label": "Email address", "kind": "email", "required": true, "step": 1, "placeholder": "you@email.com" } },
-        { "type": "phone",  "settings": { "label": "Contact number", "step": 1 } },
-
-        { "type": "choice", "settings": { "label": "Hair type", "options": "Virgin, Raw, Not sure", "step": 2, "required": true } },
-        { "type": "choice", "settings": { "label": "Length", "options": "16, 18, 20, 22, 24, 26", "step": 2, "required": true } },
-        { "type": "choice", "settings": { "label": "Lace size", "options": "5x5, 6x6, 7x7, 9x6, 13x6", "step": 2, "required": true } },
-        { "type": "choice", "settings": { "label": "Texture", "options": "Straight, Body wave, Curly, Not sure", "step": 2 } },
-        { "type": "choice", "settings": { "label": "Style", "options": "Natural, Styled, Curled, Not sure", "step": 2 } },
-        { "type": "choice", "settings": { "label": "Cap size", "options": "Small, Medium, Large, Not sure", "step": 2 } },
-
-        { "type": "message", "settings": { "label": "Your inspiration", "step": 3, "placeholder": "Tell us about the look you have in mind, and feel free to mention any references" } },
-
-        { "type": "choice", "settings": { "label": "Installation", "options": "Yes please, No thank you, Not sure yet", "step": 4, "full_width": true } },
-        { "type": "agree",  "settings": { "label": "I am happy to be contacted about this enquiry", "required": true, "step": 4 } }
-      ]
+      "name": "TLW Custom Wigs"
     },
     {
       "name": "TLW Custom Wigs — Standalone Page",
       "settings": {
-        "eyebrow": "",
         "heading_before": "Create Your Custom Wig",
         "heading_accent": "",
-        "heading_after": "",
         "body": "Can't find exactly what you're looking for?",
         "extra_paragraphs": "Our Custom Wig service allows you to create a unit tailored to your individual preferences. Whether you have a specific colour, length, lace size or style in mind, complete the form below and tell us your vision.\nOnce your enquiry has been reviewed, we'll be in touch with a personalised quote.",
         "start_open": true,
         "success_button_label": "Back to home",
-        "success_button_link": "/",
-        "form_intro": "Tell us what you have in mind and we will come back to you within two working days."
-      },
-      "blocks": [
-        { "type": "field",  "settings": { "label": "Full name", "kind": "text",  "required": true, "step": 1, "placeholder": "Your full name" } },
-        { "type": "field",  "settings": { "label": "Email address", "kind": "email", "required": true, "step": 1, "placeholder": "you@email.com" } },
-        { "type": "phone",  "settings": { "label": "Contact number", "step": 1 } },
-
-        { "type": "choice", "settings": { "label": "Hair type", "options": "Virgin, Raw, Not sure", "step": 2, "required": true } },
-        { "type": "choice", "settings": { "label": "Length", "options": "16, 18, 20, 22, 24, 26", "step": 2, "required": true } },
-        { "type": "choice", "settings": { "label": "Lace size", "options": "5x5, 6x6, 7x7, 9x6, 13x6", "step": 2, "required": true } },
-        { "type": "choice", "settings": { "label": "Texture", "options": "Straight, Body wave, Curly, Not sure", "step": 2 } },
-        { "type": "choice", "settings": { "label": "Style", "options": "Natural, Styled, Curled, Not sure", "step": 2 } },
-        { "type": "choice", "settings": { "label": "Cap size", "options": "Small, Medium, Large, Not sure", "step": 2 } },
-
-        { "type": "message", "settings": { "label": "Your inspiration", "step": 3, "placeholder": "Tell us about the look you have in mind, and feel free to mention any references" } },
-
-        { "type": "choice", "settings": { "label": "Installation", "options": "Yes please, No thank you, Not sure yet", "step": 4, "full_width": true } },
-        { "type": "agree",  "settings": { "label": "I am happy to be contacted about this enquiry", "required": true, "step": 4 } }
-      ]
+        "success_button_link": "/"
+      }
     }
   ]
 }
