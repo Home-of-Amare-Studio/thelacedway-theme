@@ -19,6 +19,7 @@
 
       <h2 class="tlw-display-lg tlw-showcase__title">
         {{ section.settings.heading_before }}
+        <br class="tlw-showcase__break">
         {% if section.settings.heading_accent != blank -%}
           <em class="tlw-accent-word">{{ section.settings.heading_accent }}</em>
         {%- endif %}
@@ -117,6 +118,28 @@
 
   #tlw-showcase-{{ section.id }} .tlw-showcase__title em {
     font-style: italic;
+  }
+
+  /* Force "Find your" onto its own line so "perfect look." stays together
+     on the second line, rather than an unpredictable natural wrap that can
+     split the accent word from the word after it. Desktop fits the whole
+     phrase on one line, so the break is suppressed there. */
+  #tlw-showcase-{{ section.id }} .tlw-showcase__title {
+    font-size: 38px;
+  }
+
+  #tlw-showcase-{{ section.id }} .tlw-showcase__break {
+    display: block;
+  }
+
+  @media (min-width: 768px) {
+    #tlw-showcase-{{ section.id }} .tlw-showcase__title {
+      font-size: 64px;
+    }
+
+    #tlw-showcase-{{ section.id }} .tlw-showcase__break {
+      display: none;
+    }
   }
 
   #tlw-showcase-{{ section.id }} .tlw-showcase__rule {
