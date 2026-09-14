@@ -110,6 +110,12 @@
                   </option>
                 {%- endfor -%}
               </select>
+              {%- assign option_downcase = option.name | downcase -%}
+              {%- if option_downcase contains 'cap size' -%}
+                <p class="tlw-field__help">
+                  {%- render 'tlw-measure-guide', id: 'variant-' | append: forloop.index -%}
+                </p>
+              {%- endif -%}
             </div>
           {%- endfor -%}
         {%- endunless -%}
@@ -130,7 +136,13 @@
                 class="tlw-label-caps tlw-field__label"
                 for="tlw-svc-{{ block.id }}"
               >
-                {{ block.settings.label }}
+                <span>
+                  {{ block.settings.label }}
+                  {%- assign label_downcase = block.settings.label | downcase -%}
+                  {%- if label_downcase contains 'hairline' -%}
+                    {%- render 'tlw-hairline-guide', id: block.id -%}
+                  {%- endif -%}
+                </span>
                 {%- if addon != blank and block.settings.trigger_value != blank -%}
                   <span class="tlw-field__price">
                     +{{ addon.price | money }} if {{ block.settings.trigger_value | strip }}
@@ -158,6 +170,13 @@
 
               {%- if block.settings.help_text != blank -%}
                 <p class="tlw-field__help">{{ block.settings.help_text }}</p>
+              {%- endif -%}
+
+              {%- assign block_label_downcase = block.settings.label | downcase -%}
+              {%- if block_label_downcase contains 'cap size' -%}
+                <p class="tlw-field__help">
+                  {%- render 'tlw-measure-guide', id: block.id -%}
+                </p>
               {%- endif -%}
             </div>
           {%- endif -%}
@@ -192,8 +211,39 @@
       </form>
 
       {%- if product.description != blank -%}
-        <div class="tlw-product__description tlw-body-md">
-          {{ product.description }}
+        {%- liquid
+          assign raw = product.description | strip_html | strip_newlines
+          assign raw = raw | replace: '<br>', '|||' | replace: '<br />', '|||' | replace: '<br/>', '|||'
+          assign raw = raw | replace: '•', '|||' | replace: '·', '|||' | replace: '‣', '|||' | replace: '▪', '|||'
+          assign chunks = raw | split: '|||'
+        -%}
+
+        <div class="tlw-product__specs">
+          <p class="tlw-label-caps tlw-product__specs-heading">Product Details</p>
+          {%- for chunk in chunks -%}
+            {%- assign clean_chunk = chunk | strip -%}
+            {%- if clean_chunk == blank -%}
+              {%- continue -%}
+            {%- endif -%}
+
+            {%- assign parts = clean_chunk | split: ':' -%}
+            {%- assign label_candidate = parts[0] | strip -%}
+            {%- assign value_candidate = clean_chunk | remove_first: label_candidate | remove_first: ':' | strip -%}
+
+            {%- if parts.size > 1 and label_candidate.size <= 25 and value_candidate != blank -%}
+              {%- assign words = label_candidate | downcase | split: ' ' -%}
+              {%- assign title_label = '' -%}
+              {%- for word in words -%}
+                {%- assign title_label = title_label | append: word | capitalize | append: ' ' -%}
+              {%- endfor -%}
+              <div class="tlw-product__spec-row">
+                <span class="tlw-label-caps tlw-product__spec-label">{{ title_label | strip }}</span>
+                <span class="tlw-product__spec-value">{{ value_candidate }}</span>
+              </div>
+            {%- else -%}
+              <p class="tlw-product__spec-note tlw-body-md">{{ clean_chunk }}</p>
+            {%- endif -%}
+          {%- endfor -%}
         </div>
       {%- endif -%}
 
@@ -304,6 +354,12 @@
     color: var(--tlw-on-surface-variant);
   }
 
+  #tlw-product-{{ section.id }} .tlw-field__label > span:first-child {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
   #tlw-product-{{ section.id }} .tlw-field__price {
     text-transform: none;
     letter-spacing: 0;
@@ -353,10 +409,41 @@
     font-size: 14px;
   }
 
-  #tlw-product-{{ section.id }} .tlw-product__description {
+  #tlw-product-{{ section.id }} .tlw-product__specs {
     margin-top: 40px;
     padding-top: 32px;
     border-top: 1px solid var(--tlw-outline-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__specs-heading {
+    color: var(--tlw-accent);
+    margin: 0 0 20px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__spec-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--tlw-outline-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__spec-row:first-child {
+    padding-top: 0;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__spec-label {
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__spec-value {
+    color: var(--tlw-primary);
+    text-align: right;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__spec-note {
+    margin: 16px 0 0;
+    color: var(--tlw-on-surface-variant);
   }
 </style>
 
