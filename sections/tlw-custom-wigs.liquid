@@ -38,6 +38,8 @@
       {{ section.settings.heading_after }}
     </{{ heading_tag }}>
 
+    <div class="tlw-custom__rule"></div>
+
     {%- if section.settings.body != blank -%}
       <p class="tlw-custom__text">{{ section.settings.body }}</p>
     {%- endif -%}
@@ -156,14 +158,21 @@
 <style>
   #tlw-custom-{{ section.id }} {
     padding-block: 72px;
-    background: var(--tlw-surface-container-low);
+    background: var(--tlw-surface-lowest);
   }
 
   #tlw-custom-{{ section.id }} .tlw-custom__head {
     max-width: 640px;
-    margin: 0 auto;
+    margin: 0;
     padding-inline: var(--tlw-margin);
-    text-align: center;
+    text-align: left;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__rule {
+    margin: 24px 0 0;
+    height: 1px;
+    width: 80px;
+    background: var(--tlw-accent);
   }
 
   #tlw-custom-{{ section.id }} .tlw-custom__eyebrow {
