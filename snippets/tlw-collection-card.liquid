@@ -59,18 +59,26 @@
   </div>
 
   <div class="tlw-card__body">
-    <h2 class="tlw-card__title tlw-headline-sm">{{ product.title }}</h2>
+    <div class="tlw-card__row">
+      <h2 class="tlw-card__title tlw-headline-sm">{{ product.title }}</h2>
 
-    <p class="tlw-card__price tlw-body-md">
-      {%- if coming_soon -%}
-        {{ section.settings.coming_soon_label }}
-      {%- elsif sold_out -%}
-        <span class="tlw-label-caps">Sold out</span>
-      {%- elsif product.price_varies -%}
-        From {{ product.price_min | money }}
-      {%- else -%}
-        {{ product.price | money }}
-      {%- endif -%}
-    </p>
+      <p class="tlw-card__price tlw-body-md">
+        {%- if coming_soon -%}
+          {{ section.settings.coming_soon_label }}
+        {%- elsif sold_out -%}
+          <span class="tlw-label-caps">Sold out</span>
+        {%- elsif product.price_varies -%}
+          From {{ product.price_min | money }}
+        {%- else -%}
+          {{ product.price | money }}
+        {%- endif -%}
+      </p>
+    </div>
+
+    <p class="tlw-card__caption">{{ collection.title }}</p>
+
+    <span class="tlw-card__view">
+      {%- if sold_out -%}Enquire{%- else -%}View{%- endif -%}
+    </span>
   </div>
 </a>
