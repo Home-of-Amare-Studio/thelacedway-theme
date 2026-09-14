@@ -71,73 +71,83 @@
     data-custom-panel
   >
     <div class="tlw-custom__form-wrap">
-      {%- form 'contact', id: form_id, class: 'tlw-custom__form' -%}
+      <div class="tlw-custom__card">
+        {%- if section.settings.form_eyebrow != blank -%}
+          <p class="tlw-custom__form-eyebrow">{{ section.settings.form_eyebrow }}</p>
+        {%- endif -%}
 
-        {%- if form.posted_successfully? -%}
-          <p class="tlw-form__success">{{ section.settings.success_text }}</p>
-          {%- if section.settings.success_button_label != blank and section.settings.success_button_link != blank -%}
-            <a href="{{ section.settings.success_button_link }}" class="tlw-custom__success-btn">
-              {{ section.settings.success_button_label }}
-            </a>
+        {%- form 'contact', id: form_id, class: 'tlw-custom__form' -%}
+
+          {%- if form.posted_successfully? -%}
+            <p class="tlw-form__success">{{ section.settings.success_text }}</p>
+            {%- if section.settings.success_button_label != blank and section.settings.success_button_link != blank -%}
+              <a href="{{ section.settings.success_button_link }}" class="tlw-custom__success-btn">
+                {{ section.settings.success_button_label }}
+              </a>
+            {%- endif -%}
           {%- endif -%}
-        {%- endif -%}
 
-        {%- if form.errors -%}
-          <p class="tlw-form__error">{{ form.errors | default_errors }}</p>
-        {%- endif -%}
+          {%- if form.errors -%}
+            <p class="tlw-form__error">{{ form.errors | default_errors }}</p>
+          {%- endif -%}
 
-        <input type="hidden" name="contact[enquiry_type]" value="Custom Wig Enquiry">
+          <input type="hidden" name="contact[enquiry_type]" value="Custom Wig Enquiry">
 
-        <div class="tlw-custom__field">
-          <label for="{{ form_id }}-name">Full name</label>
-          <input
-            type="text"
-            id="{{ form_id }}-name"
-            name="contact[name]"
-            value="{{ form.name }}"
-            autocomplete="name"
-            required
-          >
-        </div>
-
-        <div class="tlw-custom__field">
-          <label for="{{ form_id }}-email">Email address</label>
-          <input
-            type="email"
-            id="{{ form_id }}-email"
-            name="contact[email]"
-            value="{{ form.email }}"
-            autocomplete="email"
-            required
-          >
-        </div>
-
-        {%- if section.settings.show_phone -%}
           <div class="tlw-custom__field">
-            <label for="{{ form_id }}-phone">Contact number</label>
+            <label for="{{ form_id }}-name">Full name</label>
             <input
-              type="tel"
-              id="{{ form_id }}-phone"
-              name="contact[phone]"
-              value="{{ form.phone }}"
-              autocomplete="tel"
+              type="text"
+              id="{{ form_id }}-name"
+              name="contact[name]"
+              value="{{ form.name }}"
+              placeholder="Your full name"
+              autocomplete="name"
+              required
             >
           </div>
-        {%- endif -%}
 
-        <div class="tlw-custom__field tlw-custom__field--wide">
-          <label for="{{ form_id }}-body">{{ section.settings.message_label }}</label>
-          <textarea
-            id="{{ form_id }}-body"
-            name="contact[body]"
-            rows="5"
-            required
-          >{{ form.body }}</textarea>
-        </div>
+          <div class="tlw-custom__field">
+            <label for="{{ form_id }}-email">Email address</label>
+            <input
+              type="email"
+              id="{{ form_id }}-email"
+              name="contact[email]"
+              value="{{ form.email }}"
+              placeholder="you@email.com"
+              autocomplete="email"
+              required
+            >
+          </div>
 
-        <button type="submit" class="tlw-custom__submit">{{ section.settings.submit_label }}</button>
+          {%- if section.settings.show_phone -%}
+            <div class="tlw-custom__field">
+              <label for="{{ form_id }}-phone">Contact number</label>
+              <input
+                type="tel"
+                id="{{ form_id }}-phone"
+                name="contact[phone]"
+                value="{{ form.phone }}"
+                placeholder="Optional"
+                autocomplete="tel"
+              >
+            </div>
+          {%- endif -%}
 
-      {%- endform -%}
+          <div class="tlw-custom__field tlw-custom__field--wide">
+            <label for="{{ form_id }}-body">{{ section.settings.message_label }}</label>
+            <textarea
+              id="{{ form_id }}-body"
+              name="contact[body]"
+              rows="5"
+              placeholder="Describe the look you have in mind"
+              required
+            >{{ form.body }}</textarea>
+          </div>
+
+          <button type="submit" class="tlw-custom__submit">{{ section.settings.submit_label }}</button>
+
+        {%- endform -%}
+      </div>
     </div>
   </div>
 
@@ -223,10 +233,33 @@
     overflow: hidden;
   }
 
-  #tlw-custom-{{ section.id }} .tlw-custom__form {
-    max-width: 560px;
+  #tlw-custom-{{ section.id }} .tlw-custom__card {
+    max-width: 640px;
     margin: 48px auto 0;
-    padding-inline: var(--tlw-margin);
+    margin-inline: var(--tlw-margin);
+    padding: 32px;
+    border: 1px solid var(--tlw-outline-variant);
+    border-radius: 28px;
+    background: var(--tlw-surface-lowest);
+  }
+
+  @media (min-width: 768px) {
+    #tlw-custom-{{ section.id }} .tlw-custom__card {
+      padding: 48px;
+      margin-inline: auto;
+    }
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__form-eyebrow {
+    margin: 0 0 32px;
+    font-family: var(--tlw-font-body);
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--tlw-accent);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__form {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
@@ -253,12 +286,17 @@
   #tlw-custom-{{ section.id }} .tlw-custom__field input,
   #tlw-custom-{{ section.id }} .tlw-custom__field textarea {
     border: 1px solid var(--tlw-outline-variant);
-    background: var(--tlw-surface-lowest);
+    background: var(--tlw-surface-container-low);
     padding: 14px 16px;
     font-family: var(--tlw-font-body);
     font-size: 15px;
     color: var(--tlw-primary);
     resize: vertical;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__field input::placeholder,
+  #tlw-custom-{{ section.id }} .tlw-custom__field textarea::placeholder {
+    color: var(--tlw-outline);
   }
 
   #tlw-custom-{{ section.id }} .tlw-custom__field input:focus,
@@ -456,6 +494,12 @@
     {
       "type": "header",
       "content": "The form"
+    },
+    {
+      "type": "text",
+      "id": "form_eyebrow",
+      "label": "Small gold label above the form",
+      "default": "Details"
     },
     {
       "type": "checkbox",
