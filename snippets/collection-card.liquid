@@ -1,208 +1,84 @@
-{%- doc -%}
-  This snippet is used to render a collection card.
-  To be used inside a block to inherit the block object settings.
+{% comment %}
+  THELACEDWÁY collection product card
+  Home of Amare Studio
 
-  @param {string} card_image - The image to display in the collection card
-  @param {string} children - The content to render inside the collection card
-  @param {object} collection - The collection to render the card for
-  @param {object} block - The block object
-  @param {object} section - The section object
+  Used by tlw-main-collection.liquid, rendered once per product. Kept as its
+  own snippet so the collection section can loop over the same products
+  twice (real ones, then coming-soon ones last) without duplicating this
+  markup.
 
-  @example
-  {% render 'collection-card',
-    card_image: card_image,
-    children: children,
-    block: block,
-    collection: collection,
-    section: section
-  %}
-{%- enddoc -%}
+  Expects: product, section, collection (all passed in via render).
+{% endcomment %}
 
-{% style %}
-  {% if request.visual_preview_mode %}
-    .collection-card {
-      min-width: 250px;
-    }
-  {% endif %}
-{% endstyle %}
-
-{% liquid
-  assign onboarding = false
-  assign block_settings = block.settings
-
-  if collection == blank
-    assign onboarding = true
+{%- liquid
+  assign coming_soon = false
+  unless product.featured_media
+    assign coming_soon = true
+  endunless
+  assign sold_out = false
+  if product.available == false and coming_soon == false
+    assign sold_out = true
   endif
+-%}
 
-  if block_settings.background_color != blank
-    render 'contrast-override', background_color: block_settings.background_color, section_id: block.id
-  endif
-%}
+<a class="tlw-card" href="{{ product.url }}">
+  <div class="tlw-card__media">
+    {%- if product.featured_media -%}
+      {{ product.featured_media
+        | image_url: width: 900
+        | image_tag:
+          loading: 'lazy',
+          sizes: '(min-width: 900px) 30vw, 45vw',
+          widths: '300, 450, 600, 900',
+          alt: product.title,
+          class: 'tlw-card__img'
+      }}
 
-<div
-  class="
-    collection-card
-    border-style
-    {% if block_settings.placement == 'on_image' %}collection-card--image-bg{% endif %}
-    {% if section.settings.layout_type == 'bento' %}collection-card--image-height-fixed{% endif %}
-    {% if section.settings.layout_type == 'editorial' %}collection-card--flexible-aspect-ratio{% endif %}
-    {% if block_settings.background_color != blank %} color-custom-{{ block.id }}{% endif %}
-  "
-  data-block-id="{{ block.id }}"
-  {% if onboarding %}
-    data-placeholder="true"
-  {% endif %}
-  style="
-    {% render 'border-override', settings: block_settings %}
-    --horizontal-alignment: {{ block_settings.horizontal_alignment }};
-    --vertical-alignment: {{ block_settings.vertical_alignment }};
-    --gap: {{ block_settings.collection_card_gap }}px;
-  "
-  {{- block.shopify_attributes -}}
->
-  <a
-    class="collection-card__link"
-    {% unless onboarding %}
-      href="{{ collection.url }}"
-    {% endunless %}
-  >
-    <span class="visually-hidden">{{ collection.title }}</span>
-  </a>
-  <div class="collection-card__inner">
-    {{ card_image }}
-    <div class="collection-card__content layout-panel-flex--column">
-      {{ children }}
-    </div>
+      {%- if product.media[1] and section.settings.hover_second_image -%}
+        {{ product.media[1]
+          | image_url: width: 900
+          | image_tag:
+            loading: 'lazy',
+            alt: '',
+            class: 'tlw-card__img tlw-card__img--hover'
+        }}
+      {%- endif -%}
+    {%- else -%}
+      <div class="tlw-card__gradient-fallback"></div>
+    {%- endif -%}
+
+    {%- if coming_soon -%}
+      <div class="tlw-card__coming-soon">
+        <span class="tlw-card__coming-soon-badge tlw-label-caps">{{ section.settings.coming_soon_label }}</span>
+      </div>
+    {%- endif -%}
+
+    {%- if collection.handle == 'ready-to-ship' -%}
+      <span class="tlw-card__collection-badge">Ready to Ship</span>
+    {%- endif -%}
   </div>
-</div>
 
-{% stylesheet %}
-  .collection-card {
-    --fixed-card-height: var(--height-small);
+  <div class="tlw-card__body">
+    <div class="tlw-card__row">
+      <h2 class="tlw-card__title tlw-headline-sm">{{ product.title }}</h2>
 
-    width: 100%;
-    position: relative;
-    height: 100%;
-    flex: 1 1 var(--card-width-small);
-  }
+      <p class="tlw-card__price tlw-body-md">
+        {%- if coming_soon -%}
+          {{ section.settings.coming_soon_label }}
+        {%- elsif sold_out -%}
+          <span class="tlw-label-caps">Sold out</span>
+        {%- elsif product.price_varies -%}
+          From {{ product.price_min | money }}
+        {%- else -%}
+          {{ product.price | money }}
+        {%- endif -%}
+      </p>
+    </div>
 
-  .collection-card > svg {
-    height: 100%;
-    width: 100%;
-    aspect-ratio: var(--ratio);
-  }
+    <p class="tlw-card__caption">{{ collection.title }}</p>
 
-  .collection-card--image-bg .collection-card__inner {
-    height: 100%;
-  }
-
-  .collection-card__link {
-    position: absolute;
-    inset: 0;
-
-    /* allows focus outline to have radius in supported browsers */
-    border-radius: var(--border-radius);
-  }
-
-  .collection-card__inner {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    z-index: var(--layer-flat);
-    pointer-events: none;
-    gap: var(--gap);
-
-    a,
-    button {
-      pointer-events: auto;
-    }
-  }
-
-  /* allow all blocks to be selectable in editor preview */
-  .shopify-design-mode .collection-card__content * {
-    pointer-events: auto;
-  }
-
-  .collection-card__content {
-    --flex-wrap: wrap;
-
-    display: flex;
-    position: relative;
-    height: 100%;
-    width: 100%;
-    max-width: 100%;
-    gap: var(--gap);
-  }
-
-  /* Nested image block rules */
-
-  .collection-card.collection-card--image-bg {
-    aspect-ratio: var(--ratio);
-  }
-
-  .collection-card.collection-card--image-bg .collection-card__content {
-    padding: var(--padding-lg);
-  }
-
-  .collection-card--image-height-fixed {
-    height: 100%;
-  }
-
-  /* Bento layout rules */
-  .collection-card--image-height-fixed .collection-card__image {
-    height: var(--fixed-card-height);
-    width: 100%;
-  }
-
-  .collection-card--image-height-fixed.collection-card--image-bg {
-    height: var(--fixed-card-height);
-    aspect-ratio: unset;
-  }
-
-  .collection-card__image .resource-image__image {
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-  }
-
-  .collection-card--image-bg .collection-card__image {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-  }
-
-  .collection-card__image svg {
-    height: 100%;
-    width: 100%;
-  }
-
-  /* Editorial layout */
-  .resource-list:not(.hidden--desktop) .collection-card--flexible-aspect-ratio {
-    .collection-card__image {
-      aspect-ratio: 99;
-      height: 100%;
-    }
-
-    .collection-card__inner {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-
-    .collection-card__content {
-      flex-shrink: 0;
-    }
-
-    &:not(.collection-card--image-bg) .collection-card__content {
-      height: auto;
-    }
-
-    &.collection-card.collection-card--image-bg,
-    &.collection-card .placeholder-svg {
-      aspect-ratio: 99;
-    }
-  }
-{% endstylesheet %}
+    <span class="tlw-card__view">
+      {%- if sold_out -%}Enquire{%- else -%}View{%- endif -%}
+    </span>
+  </div>
+</a>
