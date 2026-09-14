@@ -48,18 +48,22 @@
     <nav class="tlw-header__nav tlw-header__nav--left" aria-label="Main">
       {%- for link in left.links -%}
         <div class="tlw-nav__item{% if link.links.size > 0 %} has-children{% endif %}">
-          <a
-            class="tlw-nav__link"
-            href="{{ link.url }}"
-            {% if link.active %}aria-current="page"{% endif %}
-          >
-            {{ link.title }}
-            {%- if link.links.size > 0 -%}
+          {%- if link.links.size > 0 -%}
+            <button type="button" class="tlw-nav__link" aria-expanded="false" aria-haspopup="true">
+              {{ link.title }}
               <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true">
                 <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/>
               </svg>
-            {%- endif -%}
-          </a>
+            </button>
+          {%- else -%}
+            <a
+              class="tlw-nav__link"
+              href="{{ link.url }}"
+              {% if link.active %}aria-current="page"{% endif %}
+            >
+              {{ link.title }}
+            </a>
+          {%- endif -%}
 
           {%- if link.links.size > 0 -%}
             <div class="tlw-nav__drop">
@@ -96,18 +100,22 @@
     <nav class="tlw-header__nav tlw-header__nav--right" aria-label="Secondary">
       {%- for link in right.links -%}
         <div class="tlw-nav__item{% if link.links.size > 0 %} has-children{% endif %}">
-          <a
-            class="tlw-nav__link"
-            href="{{ link.url }}"
-            {% if link.active %}aria-current="page"{% endif %}
-          >
-            {{ link.title }}
-            {%- if link.links.size > 0 -%}
+          {%- if link.links.size > 0 -%}
+            <button type="button" class="tlw-nav__link" aria-expanded="false" aria-haspopup="true">
+              {{ link.title }}
               <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true">
                 <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/>
               </svg>
-            {%- endif -%}
-          </a>
+            </button>
+          {%- else -%}
+            <a
+              class="tlw-nav__link"
+              href="{{ link.url }}"
+              {% if link.active %}aria-current="page"{% endif %}
+            >
+              {{ link.title }}
+            </a>
+          {%- endif -%}
 
           {%- if link.links.size > 0 -%}
             <div class="tlw-nav__drop">
@@ -315,12 +323,17 @@
     align-items: center;
     gap: 7px;
     padding: 10px 0;
+    font-family: inherit;
     font-size: {{ section.settings.link_size }}px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     font-weight: {{ section.settings.link_weight }};
     color: var(--tlw-primary);
     white-space: nowrap;
+    background: none;
+    border: none;
+    margin: 0;
+    cursor: pointer;
     transition: color 250ms ease;
   }
 
@@ -534,18 +547,22 @@
       if (e.key === 'Escape') shut();
     });
 
-    /* Touch devices have no hover, so tapping a parent opens its dropdown
-       once rather than following the link straight away. */
-    header.querySelectorAll('.tlw-nav__item.has-children > .tlw-nav__link').forEach(function (link) {
-      link.addEventListener('click', function (e) {
-        if (window.matchMedia('(hover: hover)').matches) return;
-        var item = link.parentElement;
-        if (!item.classList.contains('is-open')) {
-          e.preventDefault();
-          header.querySelectorAll('.tlw-nav__item.is-open').forEach(function (o) {
-            o.classList.remove('is-open');
-          });
+    /* Dropdown triggers are buttons now (see markup), so a click never
+       navigates — it only opens/closes the dropdown. Needed on touch
+       devices (no hover), and doesn't hurt on desktop where hover already
+       reveals the dropdown, since a click there just confirms the state. */
+    header.querySelectorAll('.tlw-nav__item.has-children > .tlw-nav__link').forEach(function (trigger) {
+      trigger.addEventListener('click', function () {
+        var item = trigger.parentElement;
+        var isOpen = item.classList.contains('is-open');
+        header.querySelectorAll('.tlw-nav__item.is-open').forEach(function (o) {
+          o.classList.remove('is-open');
+          var t = o.querySelector('.tlw-nav__link');
+          if (t) t.setAttribute('aria-expanded', 'false');
+        });
+        if (!isOpen) {
           item.classList.add('is-open');
+          trigger.setAttribute('aria-expanded', 'true');
         }
       });
     });
