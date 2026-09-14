@@ -1,4 +1,3 @@
-
 {% comment %}
   THELACEDWÁY custom wigs
   Home of Amare Studio
@@ -26,7 +25,7 @@
 -%}
 
 <section class="tlw-custom" id="tlw-custom-{{ section.id }}">
-  <div class="tlw-custom__head">
+  <div class="tlw-custom__head{% unless section.settings.start_open %} tlw-custom__head--center{% endunless %}">
     {%- if section.settings.eyebrow != blank -%}
       <p class="tlw-custom__eyebrow">{{ section.settings.eyebrow }}</p>
     {%- endif -%}
@@ -74,7 +73,7 @@
     data-custom-panel
   >
     <div class="tlw-custom__form-wrap">
-      <div class="tlw-custom__card">
+      <div class="tlw-custom__card{% unless section.settings.start_open %} tlw-custom__card--center{% endunless %}">
         {%- if section.settings.form_eyebrow != blank -%}
           <p class="tlw-custom__form-eyebrow">{{ section.settings.form_eyebrow }}</p>
         {%- endif -%}
@@ -169,6 +168,15 @@
     text-align: left;
   }
 
+  #tlw-custom-{{ section.id }} .tlw-custom__head--center {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__head--center .tlw-custom__rule {
+    margin-inline: auto;
+  }
+
   #tlw-custom-{{ section.id }} .tlw-custom__rule {
     margin: 24px 0 0;
     height: 1px;
@@ -256,6 +264,10 @@
   @media (min-width: 768px) {
     #tlw-custom-{{ section.id }} .tlw-custom__card {
       padding: 48px;
+    }
+
+    #tlw-custom-{{ section.id }} .tlw-custom__card--center {
+      margin-inline: auto;
     }
   }
 
