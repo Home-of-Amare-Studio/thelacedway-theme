@@ -35,7 +35,10 @@
       {% if section.settings.heading_accent != blank -%}
         <em class="tlw-accent-word">{{ section.settings.heading_accent }}</em>
       {%- endif %}
-      {{ section.settings.heading_after }}
+      {%- if section.settings.heading_after != blank -%}
+        <br class="tlw-custom__break">
+        {{ section.settings.heading_after }}
+      {%- endif %}
     </{{ heading_tag }}>
 
     <div class="tlw-custom__rule"></div>
@@ -175,6 +178,29 @@
 
   #tlw-custom-{{ section.id }} .tlw-custom__head--center .tlw-custom__rule {
     margin-inline: auto;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__break {
+    display: block;
+  }
+
+  @media (min-width: 768px) {
+    #tlw-custom-{{ section.id }} .tlw-custom__break {
+      display: none;
+    }
+  }
+
+  /* On mobile, everything centers regardless of homepage vs standalone-page
+     mode \u2014 the left-aligned layout is a desktop-only choice. */
+  @media (max-width: 767px) {
+    #tlw-custom-{{ section.id }} .tlw-custom__head {
+      margin-inline: auto;
+      text-align: center;
+    }
+
+    #tlw-custom-{{ section.id }} .tlw-custom__rule {
+      margin-inline: auto;
+    }
   }
 
   #tlw-custom-{{ section.id }} .tlw-custom__rule {
@@ -554,8 +580,9 @@
     {
       "name": "TLW Custom Wigs — Standalone Page",
       "settings": {
-        "heading_before": "Create Your Custom Wig",
+        "heading_before": "Create Your",
         "heading_accent": "",
+        "heading_after": "Custom Wig",
         "body": "Can't find exactly what you're looking for?",
         "extra_paragraphs": "Our Custom Wig service allows you to create a unit tailored to your individual preferences. Whether you have a specific colour, length, lace size or style in mind, complete the form below and tell us your vision.\nOnce your enquiry has been reviewed, we'll be in touch with a personalised quote.",
         "start_open": true,
