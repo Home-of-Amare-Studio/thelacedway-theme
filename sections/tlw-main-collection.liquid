@@ -359,14 +359,19 @@
 
   #tlw-collection-{{ section.id }} .tlw-card__body {
     padding-top: 14px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
   }
 
   #tlw-collection-{{ section.id }} .tlw-card__title {
-    margin: 0 0 4px;
+    margin: 0;
   }
 
   #tlw-collection-{{ section.id }} .tlw-card__price {
     margin: 0;
+    white-space: nowrap;
     color: var(--tlw-on-surface-variant);
   }
 
