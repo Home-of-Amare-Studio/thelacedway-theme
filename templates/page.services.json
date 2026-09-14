@@ -107,6 +107,7 @@
       ],
       "name": "TLW Services",
       "settings": {
+        "video_desktop": "shopify://files/videos/services.mp4",
         "heading": "Services",
         "hero_intro": "Flawless installs. Seamless melts. Every install is carried out with precision and care to achieve your desired look. Book your appointment today.",
         "hero_cta_label": "Booking policies",
