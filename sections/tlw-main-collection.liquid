@@ -132,73 +132,20 @@
     {%- else -%}
 
       <div class="tlw-collection__grid">
+        {%- comment -%} Real products first, in their normal order {%- endcomment -%}
         {%- for product in collection.products -%}
-          {%- if product.tags contains 'addon' -%}
+          {%- if product.tags contains 'addon' or product.featured_media == nil -%}
             {%- continue -%}
           {%- endif -%}
+          {%- render 'tlw-collection-card', product: product, section: section, collection: collection -%}
+        {%- endfor -%}
 
-          {%- liquid
-            assign coming_soon = false
-            unless product.featured_media
-              assign coming_soon = true
-            endunless
-          -%}
-
-          <a class="tlw-card" href="{{ product.url }}">
-            <div class="tlw-card__media">
-              {%- if product.featured_media -%}
-                {{ product.featured_media
-                  | image_url: width: 900
-                  | image_tag:
-                    loading: 'lazy',
-                    sizes: '(min-width: 900px) 30vw, 45vw',
-                    widths: '300, 450, 600, 900',
-                    alt: product.title,
-                    class: 'tlw-card__img'
-                }}
-
-                {%- if product.media[1] and section.settings.hover_second_image -%}
-                  {{ product.media[1]
-                    | image_url: width: 900
-                    | image_tag:
-                      loading: 'lazy',
-                      alt: '',
-                      class: 'tlw-card__img tlw-card__img--hover'
-                  }}
-                {%- endif -%}
-              {%- else -%}
-                <div class="tlw-card__gradient-fallback"></div>
-              {%- endif -%}
-
-              {%- if coming_soon -%}
-                <div class="tlw-card__coming-soon">
-                  <span class="tlw-card__coming-soon-badge tlw-label-caps">{{ section.settings.coming_soon_label }}</span>
-                </div>
-              {%- endif -%}
-
-              {%- if collection.handle == 'ready-to-ship' -%}
-                <span class="tlw-card__collection-badge">Ready to Ship</span>
-              {%- endif -%}
-
-              {%- unless product.available or coming_soon -%}
-                <span class="tlw-card__badge tlw-label-caps">Sold out</span>
-              {%- endunless -%}
-            </div>
-
-            <div class="tlw-card__body">
-              <h2 class="tlw-card__title tlw-headline-sm">{{ product.title }}</h2>
-
-              <p class="tlw-card__price tlw-body-md">
-                {%- if coming_soon -%}
-                  {{ section.settings.coming_soon_label }}
-                {%- elsif product.price_varies -%}
-                  From {{ product.price_min | money }}
-                {%- else -%}
-                  {{ product.price | money }}
-                {%- endif -%}
-              </p>
-            </div>
-          </a>
+        {%- comment -%} Then coming-soon products (no photo yet), pushed to the end {%- endcomment -%}
+        {%- for product in collection.products -%}
+          {%- if product.tags contains 'addon' or product.featured_media != nil -%}
+            {%- continue -%}
+          {%- endif -%}
+          {%- render 'tlw-collection-card', product: product, section: section, collection: collection -%}
         {%- endfor -%}
       </div>
 
