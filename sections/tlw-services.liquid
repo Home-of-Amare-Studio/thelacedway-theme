@@ -155,7 +155,7 @@
 
     {%- if section.settings.acuity_url != blank -%}
       <div class="tlw-services__book-btn-wrap">
-        <a href="{{ section.settings.acuity_url }}" target="_blank" rel="noopener noreferrer" class="tlw-btn">
+        <a href="{{ section.settings.acuity_url }}" target="_blank" rel="noopener noreferrer" class="tlw-services__book-btn">
           {{ section.settings.booking_cta_label }}
         </a>
       </div>
@@ -438,6 +438,27 @@
     justify-content: center;
   }
 
+  #tlw-services-{{ section.id }} .tlw-services__book-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--tlw-primary);
+    background: transparent;
+    padding: 16px 32px;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--tlw-primary);
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+
+  #tlw-services-{{ section.id }} .tlw-services__book-btn:hover {
+    background: var(--tlw-primary);
+    color: var(--tlw-on-primary);
+  }
+
   #tlw-services-{{ section.id }} .tlw-services__pinned {
     position: fixed;
     bottom: 0;
@@ -451,7 +472,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 999px;
+    border-radius: 0;
     background: rgba(10,10,10,0.9);
     padding: 12px 20px;
     font-family: var(--tlw-font-body);
