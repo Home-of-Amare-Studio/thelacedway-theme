@@ -100,9 +100,9 @@
         "padding-block-end": 48
       }
     },
-    "main": {
-      "type": "main-collection",
-      "disabled": true,
+    "tlw_main_collection_9GFRha": {
+      "type": "tlw-main-collection",
+      "name": "TLW Collection",
       "settings": {
         "show_header": true,
         "show_description": true,
@@ -113,25 +113,7 @@
         "per_page": 16,
         "hover_second_image": true,
         "empty_text": "New pieces are on their way. Check back soon.",
-        "show_cta": true,
-        "contact_page_url": "/pages/contact",
-        "contact_label": "Contact us",
-        "enquire_label": "Enquire"
-      }
-    },
-    "main_collection_3VhAHb": {
-      "type": "main-collection",
-      "name": "TLW Collection",
-      "settings": {
-        "show_header": true,
-        "show_description": true,
-        "show_breadcrumb": true,
-        "show_count": false,
-        "columns": 3,
-        "gap": 88,
-        "per_page": 16,
-        "hover_second_image": true,
-        "empty_text": "New pieces are on their way. Check back soon.",
+        "coming_soon_label": "Coming soon",
         "show_cta": true,
         "contact_page_url": "/pages/contact",
         "contact_label": "Contact us",
@@ -141,7 +123,6 @@
   },
   "order": [
     "section",
-    "main",
-    "main_collection_3VhAHb"
+    "tlw_main_collection_9GFRha"
   ]
 }

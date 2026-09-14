@@ -139,13 +139,9 @@
 
           {%- liquid
             assign coming_soon = false
-            if product.price == 0
+            unless product.featured_media
               assign coming_soon = true
-            endif
-            assign hero_img_class = 'tlw-card__img'
-            if coming_soon
-              assign hero_img_class = 'tlw-card__img tlw-card__img--blur'
-            endif
+            endunless
           -%}
 
           <a class="tlw-card" href="{{ product.url }}">
@@ -158,10 +154,10 @@
                     sizes: '(min-width: 900px) 30vw, 45vw',
                     widths: '300, 450, 600, 900',
                     alt: product.title,
-                    class: hero_img_class
+                    class: 'tlw-card__img'
                 }}
 
-                {%- if product.media[1] and section.settings.hover_second_image and coming_soon == false -%}
+                {%- if product.media[1] and section.settings.hover_second_image -%}
                   {{ product.media[1]
                     | image_url: width: 900
                     | image_tag:
@@ -170,12 +166,8 @@
                       class: 'tlw-card__img tlw-card__img--hover'
                   }}
                 {%- endif -%}
-              {%- elsif coming_soon -%}
-                <div class="tlw-card__gradient-fallback"></div>
               {%- else -%}
-                <div class="tlw-card__placeholder">
-                  <span class="tlw-label-caps">{{ product.title }}</span>
-                </div>
+                <div class="tlw-card__gradient-fallback"></div>
               {%- endif -%}
 
               {%- if coming_soon -%}
@@ -373,17 +365,6 @@
     }
   }
 
-  #tlw-collection-{{ section.id }} .tlw-card__placeholder {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 16px;
-    color: var(--tlw-outline);
-  }
-
   #tlw-collection-{{ section.id }} .tlw-card__collection-badge {
     position: absolute;
     top: 12px;
@@ -395,11 +376,6 @@
     font-size: 10px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-  }
-
-  #tlw-collection-{{ section.id }} .tlw-card__img--blur {
-    filter: blur(20px) saturate(0.6);
-    transform: scale(1.1);
   }
 
   #tlw-collection-{{ section.id }} .tlw-card__gradient-fallback {
@@ -589,7 +565,7 @@
     },
     {
       "type": "paragraph",
-      "content": "A piece is treated as \u2018coming soon\u2019 automatically when its price is \u00a30.00 in Shopify \u2014 no tag or setting needed."
+      "content": "A piece shows the 'coming soon' treatment automatically whenever it has no photo uploaded in Shopify \u2014 no tag or setting needed."
     },
     {
       "type": "text",
