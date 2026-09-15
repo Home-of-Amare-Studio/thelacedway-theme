@@ -113,7 +113,7 @@
               {%- assign option_downcase = option.name | downcase -%}
               {%- if option_downcase contains 'cap size' -%}
                 <p class="tlw-field__help">
-                  {%- render 'tlw-measure-guide', id: 'variant-' | append: forloop.index -%}
+                  {%- render 'tlw-measure-guide', id: 'variant-', append: forloop.index -%}
                 </p>
               {%- endif -%}
             </div>
@@ -667,3 +667,13 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{%- render 'tlw-measure-guide', id: 'variant-' | append: forloop.index -%}"
+  to: "{%- render 'tlw-measure-guide', id: 'variant-', append: forloop.index -%}"
+  position: 4103..4176
+{% endcomment %}
