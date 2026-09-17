@@ -868,18 +868,13 @@
   }
 
   #tlw-product-{{ section.id }} .tlw-accordion__panel {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 450ms ease;
-  }
-
-  #tlw-product-{{ section.id }} .tlw-accordion.is-open .tlw-accordion__panel {
-    grid-template-rows: 1fr;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 450ms ease;
   }
 
   #tlw-product-{{ section.id }} .tlw-accordion__panel > div {
     overflow: hidden;
-    min-height: 0;
   }
 
   #tlw-product-{{ section.id }} .tlw-accordion__inner {
@@ -1206,11 +1201,20 @@
 
     refresh();
 
-    /* ---- accordions ---- */
+    /* ---- accordions ----
+       Measuring the real pixel height and animating max-height to that,
+       rather than a CSS fraction trick, since that proved unreliable in
+       some environments. This is the older but bulletproof pattern. */
     root.querySelectorAll('[data-accordion]').forEach(function (acc) {
       var trigger = acc.querySelector('[data-accordion-trigger]');
+      var panel = acc.querySelector('[data-accordion-panel]');
       trigger.addEventListener('click', function () {
         var isOpen = acc.classList.contains('is-open');
+        if (isOpen) {
+          panel.style.maxHeight = '0px';
+        } else {
+          panel.style.maxHeight = panel.scrollHeight + 'px';
+        }
         acc.classList.toggle('is-open', !isOpen);
         trigger.setAttribute('aria-expanded', String(!isOpen));
       });
