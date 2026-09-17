@@ -305,7 +305,7 @@
         </button>
         <div class="tlw-accordion__panel" data-accordion-panel>
           <div class="tlw-accordion__inner">
-            <div class="tlw-product__specs">
+            <ul class="tlw-product__specs">
               {%- for chunk in chunks -%}
                 {%- assign clean_chunk = chunk | strip -%}
                 {%- if clean_chunk == blank -%}
@@ -331,15 +331,12 @@
                     {%- assign lifespan_value = value_candidate -%}
                   {%- endif -%}
 
-                  <div class="tlw-product__spec-row">
-                    <span class="tlw-label-caps tlw-product__spec-label">{{ title_label }}</span>
-                    <span class="tlw-product__spec-value">{{ value_candidate }}</span>
-                  </div>
+                  <li class="tlw-product__spec-item tlw-body-md">{{ title_label }}: {{ value_candidate }}</li>
                 {%- else -%}
-                  <p class="tlw-product__spec-note tlw-body-md">{{ clean_chunk }}</p>
+                  <li class="tlw-product__spec-item tlw-body-md">{{ clean_chunk }}</li>
                 {%- endif -%}
               {%- endfor -%}
-            </div>
+            </ul>
           </div>
         </div>
       </div>
@@ -765,30 +762,19 @@
     font-size: 14px;
   }
 
-  #tlw-product-{{ section.id }} .tlw-product__spec-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--tlw-outline-variant);
+  #tlw-product-{{ section.id }} .tlw-product__specs {
+    margin: 0;
+    padding-left: 22px;
+    list-style: disc;
   }
 
-  #tlw-product-{{ section.id }} .tlw-product__spec-row:first-child {
-    padding-top: 0;
-  }
-
-  #tlw-product-{{ section.id }} .tlw-product__spec-label {
-    color: var(--tlw-on-surface-variant);
-  }
-
-  #tlw-product-{{ section.id }} .tlw-product__spec-value {
+  #tlw-product-{{ section.id }} .tlw-product__spec-item {
+    margin-bottom: 12px;
     color: var(--tlw-primary);
-    text-align: right;
   }
 
-  #tlw-product-{{ section.id }} .tlw-product__spec-note {
-    margin: 16px 0 0;
-    color: var(--tlw-on-surface-variant);
+  #tlw-product-{{ section.id }} .tlw-product__spec-item:last-child {
+    margin-bottom: 0;
   }
 
   #tlw-product-{{ section.id }} .tlw-product__list {
