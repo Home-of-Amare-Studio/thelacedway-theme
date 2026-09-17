@@ -162,14 +162,35 @@
 
         {% comment %}
           ---------- SERVICE OPTIONS ----------
-          Each block is one dropdown. If the chosen value matches the block's
-          trigger value AND the block has an add-on product set, that add-on
-          is added to the cart as its own line at its own price.
+          Each block is one dropdown. Up to 3 of its choices can each carry
+          their own add-on product and price — most options only use the
+          first slot, but a few (like Layers) need two or three different
+          prices for different choices.
         {% endcomment %}
         {%- for block in section.blocks -%}
           {%- if block.type == 'service_option' -%}
             {%- assign values = block.settings.values | split: ',' -%}
-            {%- assign addon = block.settings.addon_product -%}
+
+            {%- comment %} Build the list of paid choices for this option, skipping any slot that's incomplete. {%- endcomment %}
+            {%- assign addon_pairs = '' -%}
+
+            {%- assign addon_1 = block.settings.addon_product -%}
+            {%- if block.settings.trigger_value != blank and addon_1 != blank -%}
+              {%- assign pair = block.settings.trigger_value | strip | append: '::' | append: addon_1.selected_or_first_available_variant.id | append: '::' | append: addon_1.price -%}
+              {%- assign addon_pairs = addon_pairs | append: pair | append: '||' -%}
+            {%- endif -%}
+
+            {%- assign addon_2 = block.settings.addon_product_2 -%}
+            {%- if block.settings.trigger_value_2 != blank and addon_2 != blank -%}
+              {%- assign pair = block.settings.trigger_value_2 | strip | append: '::' | append: addon_2.selected_or_first_available_variant.id | append: '::' | append: addon_2.price -%}
+              {%- assign addon_pairs = addon_pairs | append: pair | append: '||' -%}
+            {%- endif -%}
+
+            {%- assign addon_3 = block.settings.addon_product_3 -%}
+            {%- if block.settings.trigger_value_3 != blank and addon_3 != blank -%}
+              {%- assign pair = block.settings.trigger_value_3 | strip | append: '::' | append: addon_3.selected_or_first_available_variant.id | append: '::' | append: addon_3.price -%}
+              {%- assign addon_pairs = addon_pairs | append: pair | append: '||' -%}
+            {%- endif -%}
 
             <div class="tlw-field" {{ block.shopify_attributes }}>
               <label class="tlw-label-caps tlw-field__label" id="tlw-svc-label-{{ block.id }}">
@@ -180,11 +201,6 @@
                     {%- render 'tlw-hairline-guide', id: block.id -%}
                   {%- endif -%}
                 </span>
-                {%- if addon != blank and block.settings.trigger_value != blank -%}
-                  <span class="tlw-field__price">
-                    +{{ addon.price | money }} if {{ block.settings.trigger_value | strip }}
-                  </span>
-                {%- endif -%}
               </label>
 
               <div class="tlw-dropdown" data-dropdown data-dropdown-id="svc-{{ block.id }}">
@@ -193,21 +209,17 @@
                   id="tlw-svc-{{ block.id }}"
                   data-service-option
                   data-property-name="{{ block.settings.label | escape }}"
-                  data-trigger-value="{{ block.settings.trigger_value | strip | escape }}"
+                  data-addon-pairs="{{ addon_pairs | escape }}"
                   data-dropdown-store
                   tabindex="-1"
                   aria-hidden="true"
-                  {% if addon != blank %}
-                    data-addon-variant-id="{{ addon.selected_or_first_available_variant.id }}"
-                    data-addon-price="{{ addon.price }}"
-                    data-addon-title="{{ addon.title | escape }}"
-                  {% endif %}
                 >
                   {%- for value in values -%}
                     {%- assign clean = value | strip -%}
                     <option value="{{ clean | escape }}">{{ clean }}</option>
                   {%- endfor -%}
                 </select>
+
 
                 <button
                   type="button"
@@ -227,9 +239,20 @@
                 <ul class="tlw-dropdown__panel" data-dropdown-panel role="listbox" aria-label="{{ block.settings.label }}" hidden>
                   {%- for value in values -%}
                     {%- assign clean = value | strip -%}
+                    {%- assign option_price = blank -%}
+                    {%- if clean == block.settings.trigger_value and addon_1 != blank -%}
+                      {%- assign option_price = addon_1.price -%}
+                    {%- elsif clean == block.settings.trigger_value_2 and addon_2 != blank -%}
+                      {%- assign option_price = addon_2.price -%}
+                    {%- elsif clean == block.settings.trigger_value_3 and addon_3 != blank -%}
+                      {%- assign option_price = addon_3.price -%}
+                    {%- endif -%}
                     <li role="option" data-dropdown-option data-value="{{ clean | escape }}"{% if forloop.first %} class="is-selected"{% endif %}>
                       <button type="button" class="tlw-dropdown__option">
-                        <span>{{ clean }}</span>
+                        <span>
+                          {{ clean }}
+                          {%- if option_price != blank %} (+{{ option_price | money }}){% endif -%}
+                        </span>
                       </button>
                     </li>
                   {%- endfor -%}
@@ -1078,15 +1101,33 @@
       }) || null;
     }
 
+    /* ---- read a service option's data-addon-pairs into a plain array ----
+       Format: "value::variantId::price||value::variantId::price" — kept as
+       a simple delimited string rather than JSON so it drops straight into
+       an HTML attribute with no escaping headaches. */
+    function addonPairsFor(select) {
+      var raw = select.dataset.addonPairs;
+      if (!raw) return [];
+      return raw.split('||').filter(Boolean).map(function (pair) {
+        var parts = pair.split('::');
+        return { value: parts[0], variantId: parseInt(parts[1], 10), price: parseInt(parts[2], 10) };
+      });
+    }
+
+    function matchedAddon(select) {
+      var pairs = addonPairsFor(select);
+      for (var i = 0; i < pairs.length; i++) {
+        if (pairs[i].value === select.value) return pairs[i];
+      }
+      return null;
+    }
+
     /* ---- add up base variant plus any triggered add-ons ---- */
     function runningTotal(variant) {
       var total = variant ? variant.price : 0;
       root.querySelectorAll('[data-service-option]').forEach(function (s) {
-        var trigger = s.dataset.triggerValue;
-        var price = s.dataset.addonPrice;
-        if (trigger && price && s.value === trigger) {
-          total += parseInt(price, 10);
-        }
+        var match = matchedAddon(s);
+        if (match) total += match.price;
       });
       return total;
     }
@@ -1143,11 +1184,10 @@
            shows exactly what was picked, paid or not */
         properties[s.dataset.propertyName] = s.value;
 
-        var trigger = s.dataset.triggerValue;
-        var addonId = s.dataset.addonVariantId;
-        if (trigger && addonId && s.value === trigger) {
+        var match = matchedAddon(s);
+        if (match) {
           addons.push({
-            id: parseInt(addonId, 10),
+            id: match.variantId,
             quantity: 1,
             properties: { 'Add-on for': productTitle }
           });
@@ -1392,14 +1432,43 @@
         {
           "type": "text",
           "id": "trigger_value",
-          "label": "Charge when the customer picks",
+          "label": "Charge when the customer picks (1)",
           "info": "Must match one of the choices exactly. Leave empty for a free option."
         },
         {
           "type": "product",
           "id": "addon_product",
-          "label": "Add-on product to charge for",
-          "info": "The hidden product holding the price. Leave empty for a free option."
+          "label": "Add-on product to charge for (1)",
+          "info": "The hidden product holding the price."
+        },
+        {
+          "type": "header",
+          "content": "A second paid choice (optional)"
+        },
+        {
+          "type": "text",
+          "id": "trigger_value_2",
+          "label": "Charge when the customer picks (2)",
+          "info": "Leave both (2) fields empty if this option only has one paid choice."
+        },
+        {
+          "type": "product",
+          "id": "addon_product_2",
+          "label": "Add-on product to charge for (2)"
+        },
+        {
+          "type": "header",
+          "content": "A third paid choice (optional)"
+        },
+        {
+          "type": "text",
+          "id": "trigger_value_3",
+          "label": "Charge when the customer picks (3)"
+        },
+        {
+          "type": "product",
+          "id": "addon_product_3",
+          "label": "Add-on product to charge for (3)"
         },
         {
           "type": "text",
@@ -1448,7 +1517,54 @@
     {
       "name": "TLW Product",
       "blocks": [
-        { "type": "service_option" },
+        {
+          "type": "service_option",
+          "settings": {
+            "label": "Customisation",
+            "values": "No, Yes",
+            "trigger_value": "Yes"
+          }
+        },
+        {
+          "type": "service_option",
+          "settings": {
+            "label": "Jet Black",
+            "values": "No, Yes",
+            "trigger_value": "Yes"
+          }
+        },
+        {
+          "type": "service_option",
+          "settings": {
+            "label": "Parting Preference",
+            "values": "Left side part, Middle part, Right side part",
+            "help_text": "Please note: If you select a side part for a 5x5, 6x6 or 7x7 closure, the closure itself will be constructed and positioned towards your preferred side rather than in the centre."
+          }
+        },
+        {
+          "type": "service_option",
+          "settings": {
+            "label": "Hairline",
+            "values": "Natural Hairline, Light Lagos Hairline"
+          }
+        },
+        {
+          "type": "service_option",
+          "settings": {
+            "label": "Styled",
+            "values": "Straight, Curled, Curled (Pin Intact)",
+            "trigger_value": "Curled (Pin Intact)"
+          }
+        },
+        {
+          "type": "service_option",
+          "settings": {
+            "label": "Layers",
+            "values": "No, Face framing, Heavy Layers (Curls Only), Blunt Cut",
+            "trigger_value": "Face framing",
+            "trigger_value_2": "Heavy Layers (Curls Only)"
+          }
+        },
         {
           "type": "client",
           "settings": {
