@@ -73,7 +73,7 @@
         <p class="tlw-body-md tlw-product__detail">{{ section.settings.detail_line }}</p>
       {%- endif -%}
 
-      <p class="tlw-headline-sm tlw-product__price" data-price>
+      <p class="tlw-product__price" data-price>
         {{ current_variant.price | money }}
       </p>
 
@@ -587,7 +587,11 @@
   }
 
   #tlw-product-{{ section.id }} .tlw-product__price {
-    margin-bottom: 32px;
+    margin: 0 0 32px;
+    font-family: var(--tlw-font-body);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--tlw-on-surface-variant);
   }
 
   #tlw-product-{{ section.id }} .tlw-field {
@@ -742,13 +746,7 @@
   }
 
   #tlw-product-{{ section.id }} .tlw-product__total {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 20px 0;
-    margin-top: 12px;
-    border-top: 1px solid var(--tlw-outline-variant);
-    border-bottom: 1px solid var(--tlw-outline-variant);
+    display: none;
   }
 
   #tlw-product-{{ section.id }} .tlw-product__submit {
