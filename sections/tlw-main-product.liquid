@@ -112,8 +112,9 @@
               </select>
               {%- assign option_downcase = option.name | downcase -%}
               {%- if option_downcase contains 'cap size' -%}
+                {%- assign measure_guide_id = 'variant-' | append: forloop.index -%}
                 <p class="tlw-field__help">
-                  {%- render 'tlw-measure-guide', id: 'variant-', append: forloop.index -%}
+                  {%- render 'tlw-measure-guide', id: measure_guide_id -%}
                 </p>
               {%- endif -%}
             </div>
@@ -210,45 +211,228 @@
         <p class="tlw-product__error" data-cart-error hidden></p>
       </form>
 
-      {%- if product.description != blank -%}
-        {%- liquid
-          assign raw = product.description | strip_html | strip_newlines
-          assign raw = raw | replace: '<br>', '|||' | replace: '<br />', '|||' | replace: '<br/>', '|||'
-          assign raw = raw | replace: '•', '|||' | replace: '·', '|||' | replace: '‣', '|||' | replace: '▪', '|||'
-          assign chunks = raw | split: '|||'
-        -%}
-
-        <div class="tlw-product__specs">
-          <p class="tlw-label-caps tlw-product__specs-heading">Product Details</p>
-          {%- for chunk in chunks -%}
-            {%- assign clean_chunk = chunk | strip -%}
-            {%- if clean_chunk == blank -%}
-              {%- continue -%}
-            {%- endif -%}
-
-            {%- assign parts = clean_chunk | split: ':' -%}
-            {%- assign label_candidate = parts[0] | strip -%}
-            {%- assign value_candidate = clean_chunk | remove_first: label_candidate | remove_first: ':' | strip -%}
-
-            {%- if parts.size > 1 and label_candidate.size <= 25 and value_candidate != blank -%}
-              {%- assign words = label_candidate | downcase | split: ' ' -%}
-              {%- assign title_label = '' -%}
-              {%- for word in words -%}
-                {%- assign title_label = title_label | append: word | capitalize | append: ' ' -%}
-              {%- endfor -%}
-              <div class="tlw-product__spec-row">
-                <span class="tlw-label-caps tlw-product__spec-label">{{ title_label | strip }}</span>
-                <span class="tlw-product__spec-value">{{ value_candidate }}</span>
-              </div>
-            {%- else -%}
-              <p class="tlw-product__spec-note tlw-body-md">{{ clean_chunk }}</p>
-            {%- endif -%}
-          {%- endfor -%}
-        </div>
-      {%- endif -%}
-
     </div>
   </div>
+
+  {% comment %} ---------- ACCORDIONS ---------- {% endcomment %}
+  <div class="tlw-product__accordions">
+
+    {%- liquid
+      assign hair_type_value = ''
+      assign lifespan_value = ''
+    -%}
+
+    {%- if product.description != blank -%}
+      {%- liquid
+        assign raw = product.description | strip_html | strip_newlines
+        assign raw = raw | replace: '<br>', '|||' | replace: '<br />', '|||' | replace: '<br/>', '|||'
+        assign raw = raw | replace: '•', '|||' | replace: '·', '|||' | replace: '‣', '|||' | replace: '▪', '|||'
+        assign chunks = raw | split: '|||'
+      -%}
+
+      <div class="tlw-accordion" data-accordion>
+        <button type="button" class="tlw-accordion__trigger" data-accordion-trigger aria-expanded="false">
+          <span class="tlw-label-caps">Product Details</span>
+          <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+        <div class="tlw-accordion__panel" data-accordion-panel>
+          <div class="tlw-accordion__inner">
+            <div class="tlw-product__specs">
+              {%- for chunk in chunks -%}
+                {%- assign clean_chunk = chunk | strip -%}
+                {%- if clean_chunk == blank -%}
+                  {%- continue -%}
+                {%- endif -%}
+
+                {%- assign parts = clean_chunk | split: ':' -%}
+                {%- assign label_candidate = parts[0] | strip -%}
+                {%- assign value_candidate = clean_chunk | remove_first: label_candidate | remove_first: ':' | strip -%}
+
+                {%- if parts.size > 1 and label_candidate.size <= 25 and value_candidate != blank -%}
+                  {%- assign words = label_candidate | downcase | split: ' ' -%}
+                  {%- assign title_label = '' -%}
+                  {%- for word in words -%}
+                    {%- assign title_label = title_label | append: word | capitalize | append: ' ' -%}
+                  {%- endfor -%}
+                  {%- assign title_label = title_label | strip -%}
+
+                  {%- if title_label == 'Hair Type' -%}
+                    {%- assign hair_type_value = value_candidate -%}
+                  {%- endif -%}
+                  {%- if title_label contains 'Lifespan' -%}
+                    {%- assign lifespan_value = value_candidate -%}
+                  {%- endif -%}
+
+                  <div class="tlw-product__spec-row">
+                    <span class="tlw-label-caps tlw-product__spec-label">{{ title_label }}</span>
+                    <span class="tlw-product__spec-value">{{ value_candidate }}</span>
+                  </div>
+                {%- else -%}
+                  <p class="tlw-product__spec-note tlw-body-md">{{ clean_chunk }}</p>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- unless product.type contains 'Accessor' -%}
+      <div class="tlw-accordion" data-accordion>
+        <button type="button" class="tlw-accordion__trigger" data-accordion-trigger aria-expanded="false">
+          <span class="tlw-label-caps">Hair Care</span>
+          <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+        <div class="tlw-accordion__panel" data-accordion-panel>
+          <div class="tlw-accordion__inner">
+            <p class="tlw-body-md">
+              Our {% if hair_type_value contains 'Raw' %}Raw{% else %}Virgin{% endif %} Hair can be washed and conditioned just like your natural hair. For the best results, we recommend using sulphate-free or organic hair care products to maintain the softness and longevity of the hair.
+            </p>
+            <p class="tlw-body-md">
+              For best results, we recommend air drying your hair after washing. This helps retain moisture, reduces unnecessary heat exposure, and prolongs the life and quality of your hair.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tlw-accordion" data-accordion>
+        <button type="button" class="tlw-accordion__trigger" data-accordion-trigger aria-expanded="false">
+          <span class="tlw-label-caps">Longevity</span>
+          <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+        <div class="tlw-accordion__panel" data-accordion-panel>
+          <div class="tlw-accordion__inner">
+            <p class="tlw-body-md">
+              With the correct maintenance and aftercare, our hair can last
+              {% if lifespan_value != blank %}{{ lifespan_value }}{% else %}1 to 3 years{% endif %},
+              making it a worthwhile investment.
+            </p>
+          </div>
+        </div>
+      </div>
+    {%- endunless -%}
+
+    <div class="tlw-accordion" data-accordion>
+      <button type="button" class="tlw-accordion__trigger" data-accordion-trigger aria-expanded="false">
+        <span class="tlw-label-caps">Shipping and Returns</span>
+        <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+      </button>
+      <div class="tlw-accordion__panel" data-accordion-panel>
+        <div class="tlw-accordion__inner">
+          <p class="tlw-body-md">
+            Once your order has been placed, you have 24 hours to contact us if you wish to make any amendments. After this period, your order will be processed and no further changes can be made.
+          </p>
+          {%- if collection.handle == 'ready-to-ship' -%}
+            <p class="tlw-body-md">This unit is Ready to Ship. It is already finished and dispatched within 1 to 2 working days of your order.</p>
+          {%- else -%}
+            <p class="tlw-body-md">Each unit is custom made to order. Please allow 7-15 working days for your unit to be made before dispatch.</p>
+          {%- endif -%}
+          <p class="tlw-body-md">Once your order has been shipped, delivery typically takes:</p>
+          <ul class="tlw-product__list">
+            <li>Royal Mail Tracked 24 (Tracked and Signed)</li>
+            <li>Royal Mail Special Delivery (Covers parcel if lost): Next working day before 1pm.</li>
+          </ul>
+          <p class="tlw-body-md">For full details, please refer to our <a href="/pages/shipping-returns" class="tlw-product__link">Shipping &amp; Returns Policy</a>.</p>
+        </div>
+      </div>
+    </div>
+
+    {%- unless product.type contains 'Accessor' -%}
+      <div class="tlw-accordion" data-accordion>
+        <button type="button" class="tlw-accordion__trigger" data-accordion-trigger aria-expanded="false">
+          <span class="tlw-label-caps">How to Measure Your Head</span>
+          <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+        <div class="tlw-accordion__panel" data-accordion-panel>
+          <div class="tlw-accordion__inner">
+            <p class="tlw-body-md">To ensure the best fit, we recommend measuring your head before selecting your wig size.</p>
+            <p class="tlw-body-md">Using a soft measuring tape, start at the centre of your hairline and wrap the tape around your head, passing just above your ears and around the nape of your neck before bringing it back to the starting point.</p>
+            <p class="tlw-body-md">This measurement is your head circumference and will help you choose the correct cap size for the most secure and comfortable fit.</p>
+            <p class="tlw-body-md">Please note: We strongly recommend measuring your head accurately before placing your order. As all units are custom-made, we cannot accept responsibility for incorrect measurements provided by the customer and cap sizes cannot be changed once production has begun.</p>
+          </div>
+        </div>
+      </div>
+    {%- endunless -%}
+
+    <div class="tlw-accordion" data-accordion>
+      <button type="button" class="tlw-accordion__trigger" data-accordion-trigger aria-expanded="false">
+        <span class="tlw-label-caps">International Orders</span>
+        <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+      </button>
+      <div class="tlw-accordion__panel" data-accordion-panel>
+        <div class="tlw-accordion__inner">
+          <p class="tlw-body-md">{{ section.settings.international_orders_text }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tlw-accordion" data-accordion>
+      <button type="button" class="tlw-accordion__trigger" data-accordion-trigger aria-expanded="false">
+        <span class="tlw-label-caps">Disclaimer (Please Read)</span>
+        <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+      </button>
+      <div class="tlw-accordion__panel" data-accordion-panel>
+        <div class="tlw-accordion__inner">
+          <div class="tlw-product__disclaimer-block">
+            <p class="tlw-label-caps tlw-product__disclaimer-heading">Colour Disclaimer</p>
+            <p class="tlw-body-md">Every unit is unique. Slight variations in colour may occur. Please note that colours may appear differently depending on your device screen and lighting.</p>
+          </div>
+          <div class="tlw-product__disclaimer-block">
+            <p class="tlw-label-caps tlw-product__disclaimer-heading">Hair Length Disclaimer</p>
+            <p class="tlw-body-md">When selecting your desired hair length, please keep in mind that the final appearance will vary depending on how the hair is styled.</p>
+            <p class="tlw-body-md">Curls may reduce the visible length by approximately 2-4 inches.</p>
+            <p class="tlw-body-md">For example: If you would like your curled hair to appear approximately 22 inches long, we recommend selecting a straight hair length of 24-26 inches.</p>
+            <p class="tlw-body-md">Please note that all hair lengths are measured when the hair is straight and fully stretched.</p>
+          </div>
+          <div class="tlw-product__disclaimer-block">
+            <p class="tlw-label-caps tlw-product__disclaimer-heading">Texture Disclaimer</p>
+            <p class="tlw-body-md">Please note that any unit displayed with a curled, loose wave or similar styled appearance has been heat styled. These looks are achieved by curling our straight hair and are intended to showcase the hair's versatility. This style is temporary and will gradually loosen over time, particularly after brushing or washing.</p>
+            <p class="tlw-body-md">Once washed, the hair will return to its natural texture. The hair can be restyled using heat whenever desired.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  {% comment %} ---------- FITTED ON REAL CLIENTS ---------- {% endcomment %}
+  {%- if section.blocks.size > 0 -%}
+    {%- assign client_blocks = section.blocks | where: 'type', 'client' -%}
+    {%- if client_blocks.size > 0 -%}
+      <div class="tlw-product__clients">
+        <div class="tlw-product__clients-head">
+          <span class="tlw-label-caps tlw-product__clients-eyebrow">Before You Take Our Word For It.</span>
+          <h2 class="tlw-headline-md">Fitted On Real Clients.</h2>
+        </div>
+        <div class="tlw-product__clients-grid">
+          {%- for block in client_blocks -%}
+            <div class="tlw-product__client" {{ block.shopify_attributes }}>
+              <div class="tlw-product__client-media">
+                {%- if block.settings.image != blank -%}
+                  {{ block.settings.image | image_url: width: 700 | image_tag: loading: 'lazy', alt: block.settings.name }}
+                {%- endif -%}
+                <div class="tlw-product__client-overlay">
+                  <p class="tlw-product__client-quote">&ldquo;{{ block.settings.quote }}&rdquo;</p>
+                  <p class="tlw-label-caps tlw-product__client-caption">{{ block.settings.name }} / {{ block.settings.length }} / {{ block.settings.lace_size }} lace</p>
+                </div>
+              </div>
+              <p class="tlw-label-caps tlw-product__client-caption tlw-product__client-caption--mobile">{{ block.settings.name }} / {{ block.settings.length }} / {{ block.settings.lace_size }} lace</p>
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+
+  {% comment %} ---------- EXPLORE ---------- {% endcomment %}
+  {%- if product.collections.size > 0 -%}
+    {%- assign explore_collection = product.collections.first -%}
+    <div class="tlw-product__explore">
+      <h2 class="tlw-headline-md">Explore the rest of {{ explore_collection.title }}</h2>
+      <p class="tlw-body-md">Every piece is hand-tied and finished to your measurements. See the full collection.</p>
+      <a href="{{ explore_collection.url }}" class="tlw-product__explore-btn">Back to {{ explore_collection.title }}</a>
+    </div>
+  {%- endif -%}
 
   {% comment %}
     Variant data for the price and availability updates. Written as JSON so the
@@ -409,17 +593,6 @@
     font-size: 14px;
   }
 
-  #tlw-product-{{ section.id }} .tlw-product__specs {
-    margin-top: 40px;
-    padding-top: 32px;
-    border-top: 1px solid var(--tlw-outline-variant);
-  }
-
-  #tlw-product-{{ section.id }} .tlw-product__specs-heading {
-    color: var(--tlw-accent);
-    margin: 0 0 20px;
-  }
-
   #tlw-product-{{ section.id }} .tlw-product__spec-row {
     display: flex;
     justify-content: space-between;
@@ -445,11 +618,280 @@
     margin: 16px 0 0;
     color: var(--tlw-on-surface-variant);
   }
+
+  #tlw-product-{{ section.id }} .tlw-product__list {
+    margin: 8px 0;
+    padding-left: 20px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__list li {
+    margin-bottom: 6px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__link {
+    color: var(--tlw-primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__disclaimer-block {
+    margin-bottom: 32px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__disclaimer-block:last-child {
+    margin-bottom: 0;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__disclaimer-heading {
+    color: var(--tlw-accent);
+    margin: 0 0 12px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__disclaimer-block .tlw-body-md {
+    margin: 0 0 12px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__disclaimer-block .tlw-body-md:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ---------- Accordions ---------- */
+  #tlw-product-{{ section.id }} .tlw-product__accordions {
+    max-width: 760px;
+    margin: 64px auto 0;
+    padding-inline: var(--tlw-margin);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion {
+    border-top: 1px solid var(--tlw-outline-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion:last-child {
+    border-bottom: 1px solid var(--tlw-outline-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 22px 0;
+    border: none;
+    background: none;
+    text-align: left;
+    color: var(--tlw-primary);
+    cursor: pointer;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion__trigger svg {
+    flex-shrink: 0;
+    color: var(--tlw-on-surface-variant);
+    transition: transform 400ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion.is-open .tlw-accordion__trigger svg {
+    transform: rotate(180deg);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 450ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion.is-open .tlw-accordion__panel {
+    grid-template-rows: 1fr;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion__panel > div {
+    overflow: hidden;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion__inner {
+    padding-bottom: 28px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion__inner .tlw-body-md {
+    color: var(--tlw-on-surface-variant);
+    margin: 0 0 12px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion__inner .tlw-body-md:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ---------- Fitted on real clients ---------- */
+  #tlw-product-{{ section.id }} .tlw-product__clients {
+    max-width: 1400px;
+    margin: 80px auto 0;
+    padding-inline: var(--tlw-margin);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__clients-head {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__clients-eyebrow {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--tlw-accent);
+  }
+
+  @media (min-width: 768px) {
+    #tlw-product-{{ section.id }} .tlw-product__clients-head {
+      margin-bottom: 64px;
+    }
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__clients-grid {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+  }
+
+  @media (min-width: 768px) {
+    #tlw-product-{{ section.id }} .tlw-product__clients-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      overflow: visible;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    #tlw-product-{{ section.id }} .tlw-product__clients-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__client {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
+  }
+
+  @media (min-width: 768px) {
+    #tlw-product-{{ section.id }} .tlw-product__client {
+      flex: initial;
+    }
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__client-media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--tlw-surface-container);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__client-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1);
+    transition: filter 1000ms ease, transform 1000ms ease;
+  }
+
+  @media (hover: hover) {
+    #tlw-product-{{ section.id }} .tlw-product__client:hover .tlw-product__client-media img {
+      filter: grayscale(0);
+      transform: scale(1.05);
+    }
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__client-overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 24px;
+    background: rgba(10, 10, 10, 0.8);
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 700ms ease;
+  }
+
+  @media (min-width: 768px) {
+    #tlw-product-{{ section.id }} .tlw-product__client-overlay {
+      display: flex;
+    }
+    #tlw-product-{{ section.id }} .tlw-product__client:hover .tlw-product__client-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__client-quote {
+    font-family: var(--tlw-font-display);
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__client-caption {
+    margin-top: 12px;
+    opacity: 0.7;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__client-caption--mobile {
+    margin-top: 12px;
+    opacity: 1;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  @media (min-width: 768px) {
+    #tlw-product-{{ section.id }} .tlw-product__client-caption--mobile {
+      display: none;
+    }
+  }
+
+  /* ---------- Explore ---------- */
+  #tlw-product-{{ section.id }} .tlw-product__explore {
+    max-width: 640px;
+    margin: 80px auto 0;
+    padding-inline: var(--tlw-margin);
+    text-align: center;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__explore h2 {
+    color: var(--tlw-primary);
+    margin: 0 0 16px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__explore p {
+    color: var(--tlw-on-surface-variant);
+    margin: 0 0 32px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__explore-btn {
+    display: inline-block;
+    border: 1px solid var(--tlw-accent);
+    padding: 16px 40px;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tlw-primary);
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__explore-btn:hover {
+    background: var(--tlw-accent);
+    color: var(--tlw-on-primary);
+  }
 </style>
 
 <script>
   (function () {
     var root = document.getElementById('tlw-product-{{ section.id }}');
+
     if (!root) return;
 
     var form = root.querySelector('[data-product-form]');
@@ -590,6 +1032,16 @@
     });
 
     refresh();
+
+    /* ---- accordions ---- */
+    root.querySelectorAll('[data-accordion]').forEach(function (acc) {
+      var trigger = acc.querySelector('[data-accordion-trigger]');
+      trigger.addEventListener('click', function () {
+        var isOpen = acc.classList.contains('is-open');
+        acc.classList.toggle('is-open', !isOpen);
+        trigger.setAttribute('aria-expanded', String(!isOpen));
+      });
+    });
   })();
 </script>
 
@@ -616,6 +1068,16 @@
       "id": "show_collection_label",
       "label": "Show collection name above the title",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "Accordion copy"
+    },
+    {
+      "type": "textarea",
+      "id": "international_orders_text",
+      "label": "International Orders text",
+      "default": "For orders shipped outside of the United Kingdom, import duties, taxes and customs fees may apply once your parcel reaches its destination country. These charges are determined by your local customs authorities and are the responsibility of the customer."
     }
   ],
   "blocks": [
@@ -655,25 +1117,85 @@
           "info": "Optional line under the dropdown"
         }
       ]
+    },
+    {
+      "type": "client",
+      "name": "Client photo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Photo"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Client first name"
+        },
+        {
+          "type": "text",
+          "id": "length",
+          "label": "Length",
+          "info": "e.g. 18\u2033"
+        },
+        {
+          "type": "text",
+          "id": "lace_size",
+          "label": "Lace size",
+          "info": "e.g. 5x5"
+        },
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "info": "Shown on hover (desktop). Don't include quotation marks, they're added automatically."
+        }
+      ]
     }
   ],
   "presets": [
     {
       "name": "TLW Product",
       "blocks": [
-        { "type": "service_option" }
+        { "type": "service_option" },
+        {
+          "type": "client",
+          "settings": {
+            "name": "Maria",
+            "length": "18\u2033",
+            "lace_size": "5x5",
+            "quote": "The lace melted so seamlessly I forgot it was a unit."
+          }
+        },
+        {
+          "type": "client",
+          "settings": {
+            "name": "Ava",
+            "length": "14\u2033",
+            "lace_size": "13x6",
+            "quote": "Finally a wig that feels like it was made just for me."
+          }
+        },
+        {
+          "type": "client",
+          "settings": {
+            "name": "Beverley",
+            "length": "22\u2033",
+            "lace_size": "7x7",
+            "quote": "The density, the movement, the fit \u2014 everything is perfect."
+          }
+        },
+        {
+          "type": "client",
+          "settings": {
+            "name": "India",
+            "length": "20\u2033",
+            "lace_size": "6x6",
+            "quote": "I wear it every day and nobody believes it is not my hair."
+          }
+        }
       ]
     }
   ]
 }
 {% endschema %}
-{% comment %}
-
-This file has been rewritten to preserve the original behavior.
-
----
-Changes:
-- from: "{%- render 'tlw-measure-guide', id: 'variant-' | append: forloop.index -%}"
-  to: "{%- render 'tlw-measure-guide', id: 'variant-', append: forloop.index -%}"
-  position: 4103..4176
-{% endcomment %}
