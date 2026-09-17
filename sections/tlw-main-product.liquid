@@ -89,27 +89,66 @@
         {%- unless product.has_only_default_variant -%}
           {%- for option in product.options_with_values -%}
             <div class="tlw-field">
-              <label
-                class="tlw-label-caps tlw-field__label"
-                for="tlw-opt-{{ section.id }}-{{ forloop.index }}"
-              >
+              <label class="tlw-label-caps tlw-field__label" id="tlw-opt-label-{{ section.id }}-{{ forloop.index }}">
                 {{ option.name }}
               </label>
-              <select
-                class="tlw-select"
-                id="tlw-opt-{{ section.id }}-{{ forloop.index }}"
-                data-option-index="{{ forloop.index0 }}"
-                data-variant-option
+
+              <div
+                class="tlw-dropdown"
+                data-dropdown
+                data-dropdown-id="variant-{{ forloop.index }}"
               >
-                {%- for value in option.values -%}
-                  <option
-                    value="{{ value | escape }}"
-                    {% if option.selected_value == value %}selected{% endif %}
-                  >
-                    {{ value }}
-                  </option>
-                {%- endfor -%}
-              </select>
+                <select
+                  class="tlw-select tlw-visually-hidden"
+                  id="tlw-opt-{{ section.id }}-{{ forloop.index }}"
+                  data-option-index="{{ forloop.index0 }}"
+                  data-variant-option
+                  data-dropdown-store
+                  tabindex="-1"
+                  aria-hidden="true"
+                >
+                  {%- for value in option.values -%}
+                    <option
+                      value="{{ value | escape }}"
+                      {% if option.selected_value == value %}selected{% endif %}
+                    >
+                      {{ value }}
+                    </option>
+                  {%- endfor -%}
+                </select>
+
+                <button
+                  type="button"
+                  class="tlw-dropdown__trigger"
+                  data-dropdown-trigger
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-labelledby="tlw-opt-label-{{ section.id }}-{{ forloop.index }} tlw-opt-{{ section.id }}-{{ forloop.index }}-value"
+                >
+                  {%- if option.selected_value != blank -%}
+                    <span data-dropdown-value id="tlw-opt-{{ section.id }}-{{ forloop.index }}-value">{{ option.selected_value }}</span>
+                  {%- else -%}
+                    <span data-dropdown-value id="tlw-opt-{{ section.id }}-{{ forloop.index }}-value" class="tlw-dropdown__placeholder">
+                      Select {{ option.name | downcase }}...
+                    </span>
+                  {%- endif -%}
+                  <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" class="tlw-dropdown__chevron">
+                    <path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+
+                <ul class="tlw-dropdown__panel" data-dropdown-panel role="listbox" aria-label="{{ option.name }}" hidden>
+                  {%- for value in option.values -%}
+                    <li role="option" data-dropdown-option data-value="{{ value | escape }}"{% if option.selected_value == value %} class="is-selected"{% endif %}>
+                      <button type="button" class="tlw-dropdown__option">
+                        <span>{{ value }}</span>
+                        <span class="tlw-dropdown__option-note" data-sold-out-label hidden>(Sold out)</span>
+                      </button>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </div>
+
               {%- assign option_downcase = option.name | downcase -%}
               {%- if option_downcase contains 'cap size' -%}
                 {%- assign measure_guide_id = 'variant-' | append: forloop.index -%}
@@ -133,10 +172,7 @@
             {%- assign addon = block.settings.addon_product -%}
 
             <div class="tlw-field" {{ block.shopify_attributes }}>
-              <label
-                class="tlw-label-caps tlw-field__label"
-                for="tlw-svc-{{ block.id }}"
-              >
+              <label class="tlw-label-caps tlw-field__label" id="tlw-svc-label-{{ block.id }}">
                 <span>
                   {{ block.settings.label }}
                   {%- assign label_downcase = block.settings.label | downcase -%}
@@ -151,23 +187,54 @@
                 {%- endif -%}
               </label>
 
-              <select
-                class="tlw-select"
-                id="tlw-svc-{{ block.id }}"
-                data-service-option
-                data-property-name="{{ block.settings.label | escape }}"
-                data-trigger-value="{{ block.settings.trigger_value | strip | escape }}"
-                {% if addon != blank %}
-                  data-addon-variant-id="{{ addon.selected_or_first_available_variant.id }}"
-                  data-addon-price="{{ addon.price }}"
-                  data-addon-title="{{ addon.title | escape }}"
-                {% endif %}
-              >
-                {%- for value in values -%}
-                  {%- assign clean = value | strip -%}
-                  <option value="{{ clean | escape }}">{{ clean }}</option>
-                {%- endfor -%}
-              </select>
+              <div class="tlw-dropdown" data-dropdown data-dropdown-id="svc-{{ block.id }}">
+                <select
+                  class="tlw-select tlw-visually-hidden"
+                  id="tlw-svc-{{ block.id }}"
+                  data-service-option
+                  data-property-name="{{ block.settings.label | escape }}"
+                  data-trigger-value="{{ block.settings.trigger_value | strip | escape }}"
+                  data-dropdown-store
+                  tabindex="-1"
+                  aria-hidden="true"
+                  {% if addon != blank %}
+                    data-addon-variant-id="{{ addon.selected_or_first_available_variant.id }}"
+                    data-addon-price="{{ addon.price }}"
+                    data-addon-title="{{ addon.title | escape }}"
+                  {% endif %}
+                >
+                  {%- for value in values -%}
+                    {%- assign clean = value | strip -%}
+                    <option value="{{ clean | escape }}">{{ clean }}</option>
+                  {%- endfor -%}
+                </select>
+
+                <button
+                  type="button"
+                  class="tlw-dropdown__trigger"
+                  data-dropdown-trigger
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-labelledby="tlw-svc-label-{{ block.id }} tlw-svc-{{ block.id }}-value"
+                >
+                  {%- assign first_value = values.first | strip -%}
+                  <span data-dropdown-value id="tlw-svc-{{ block.id }}-value">{{ first_value }}</span>
+                  <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" class="tlw-dropdown__chevron">
+                    <path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+
+                <ul class="tlw-dropdown__panel" data-dropdown-panel role="listbox" aria-label="{{ block.settings.label }}" hidden>
+                  {%- for value in values -%}
+                    {%- assign clean = value | strip -%}
+                    <li role="option" data-dropdown-option data-value="{{ clean | escape }}"{% if forloop.first %} class="is-selected"{% endif %}>
+                      <button type="button" class="tlw-dropdown__option">
+                        <span>{{ clean }}</span>
+                      </button>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </div>
 
               {%- if block.settings.help_text != blank -%}
                 <p class="tlw-field__help">{{ block.settings.help_text }}</p>
@@ -224,8 +291,9 @@
 
     {%- if product.description != blank -%}
       {%- liquid
-        assign raw = product.description | strip_html | strip_newlines
-        assign raw = raw | replace: '<br>', '|||' | replace: '<br />', '|||' | replace: '<br/>', '|||'
+        assign raw = product.description
+        assign raw = raw | replace: '</p>', '|||' | replace: '<br>', '|||' | replace: '<br />', '|||' | replace: '<br/>', '|||' | replace: '</li>', '|||'
+        assign raw = raw | strip_html | strip_newlines
         assign raw = raw | replace: '•', '|||' | replace: '·', '|||' | replace: '‣', '|||' | replace: '▪', '|||'
         assign chunks = raw | split: '|||'
       -%}
@@ -557,19 +625,123 @@
     color: var(--tlw-outline);
   }
 
-  #tlw-product-{{ section.id }} .tlw-select {
+  #tlw-product-{{ section.id }} .tlw-visually-hidden {
+    display: none;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown {
+    position: relative;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__trigger {
+    display: flex;
     width: 100%;
-    padding: 14px 16px;
-    border: 1px solid var(--tlw-outline-variant);
-    border-radius: var(--tlw-radius);
-    background: var(--tlw-surface-lowest);
-    color: var(--tlw-primary);
+    align-items: center;
+    justify-content: space-between;
+    border: none;
+    border-bottom: 1px solid var(--tlw-outline);
+    background: transparent;
+    padding: 12px 0;
     font-family: var(--tlw-font-body);
     font-size: 15px;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23241b15' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
+    color: var(--tlw-primary);
+    cursor: pointer;
+    transition: border-color 200ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__trigger:hover {
+    border-color: rgba(181, 143, 45, 0.7);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown.is-open .tlw-dropdown__trigger {
+    border-color: var(--tlw-accent);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown.is-invalid .tlw-dropdown__trigger {
+    border-color: #c0392b;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__placeholder {
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__chevron {
+    flex-shrink: 0;
+    color: var(--tlw-on-surface-variant);
+    transition: transform 300ms ease, color 300ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown.is-open .tlw-dropdown__chevron {
+    color: var(--tlw-accent);
+    transform: rotate(180deg);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 40;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    width: 100%;
+    max-height: 280px;
+    overflow-y: auto;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.96);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(181, 143, 45, 0.35);
+    box-shadow: 0 18px 50px rgba(10, 10, 10, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    border: none;
+    border-left: 3px solid transparent;
+    background: transparent;
+    padding: 14px 24px;
+    text-align: left;
+    font-family: var(--tlw-font-display);
+    font-size: 15px;
+    color: var(--tlw-primary);
+    cursor: pointer;
+    transition: border-color 150ms ease, background-color 150ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__option:hover,
+  #tlw-product-{{ section.id }} [data-dropdown-option].is-active .tlw-dropdown__option {
+    border-left-color: var(--tlw-accent);
+    background: rgba(181, 143, 45, 0.1);
+  }
+
+  #tlw-product-{{ section.id }} [data-dropdown-option].is-selected .tlw-dropdown__option {
+    border-left-color: var(--tlw-accent);
+    background: rgba(181, 143, 45, 0.08);
+  }
+
+  #tlw-product-{{ section.id }} [data-dropdown-option].is-disabled .tlw-dropdown__option {
+    cursor: not-allowed;
+    opacity: 0.45;
+    border-left-color: transparent;
+    background: transparent;
+  }
+
+  #tlw-product-{{ section.id }} [data-dropdown-option].is-disabled .tlw-dropdown__option span:first-child {
+    text-decoration: line-through;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__option-note {
+    flex-shrink: 0;
+    font-family: var(--tlw-font-body);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
   }
 
   #tlw-product-{{ section.id }} .tlw-product__total {
@@ -1042,6 +1214,137 @@
         trigger.setAttribute('aria-expanded', String(!isOpen));
       });
     });
+
+    /* ---- custom dropdowns ----
+       Each wraps a real (but hidden) <select> that stays the single source
+       of truth: clicking a custom option updates the hidden select's value
+       and dispatches a real 'change' event, so all the cart/price logic
+       above keeps working exactly as it did against a native select. */
+    var allDropdowns = Array.prototype.slice.call(root.querySelectorAll('[data-dropdown]'));
+
+    function closeDropdown(dd) {
+      dd.classList.remove('is-open');
+      var trigger = dd.querySelector('[data-dropdown-trigger]');
+      var panel = dd.querySelector('[data-dropdown-panel]');
+      trigger.setAttribute('aria-expanded', 'false');
+      panel.hidden = true;
+    }
+
+    function openDropdown(dd) {
+      allDropdowns.forEach(function (other) {
+        if (other !== dd) closeDropdown(other);
+      });
+      dd.classList.add('is-open');
+      var trigger = dd.querySelector('[data-dropdown-trigger]');
+      var panel = dd.querySelector('[data-dropdown-panel]');
+      trigger.setAttribute('aria-expanded', 'true');
+      panel.hidden = false;
+    }
+
+    function selectOption(dd, li) {
+      if (li.classList.contains('is-disabled')) return;
+      var value = li.dataset.value;
+      var select = dd.querySelector('[data-dropdown-store]');
+      var valueEl = dd.querySelector('[data-dropdown-value]');
+
+      select.value = value;
+      valueEl.textContent = value;
+      valueEl.classList.remove('tlw-dropdown__placeholder');
+
+      dd.querySelectorAll('[data-dropdown-option]').forEach(function (opt) {
+        opt.classList.toggle('is-selected', opt === li);
+      });
+
+      dd.classList.remove('is-invalid');
+      closeDropdown(dd);
+
+      var event = document.createEvent('HTMLEvents');
+      event.initEvent('change', true, true);
+      select.dispatchEvent(event);
+    }
+
+    allDropdowns.forEach(function (dd) {
+      var trigger = dd.querySelector('[data-dropdown-trigger]');
+      var panel = dd.querySelector('[data-dropdown-panel]');
+      var options = Array.prototype.slice.call(dd.querySelectorAll('[data-dropdown-option]'));
+
+      trigger.addEventListener('click', function () {
+        if (dd.classList.contains('is-open')) closeDropdown(dd);
+        else openDropdown(dd);
+      });
+
+      options.forEach(function (li) {
+        li.querySelector('.tlw-dropdown__option').addEventListener('click', function () {
+          selectOption(dd, li);
+        });
+      });
+
+      trigger.addEventListener('keydown', function (e) {
+        var activeIndex = options.findIndex(function (o) { return o.classList.contains('is-active'); });
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (!dd.classList.contains('is-open')) {
+            openDropdown(dd);
+            return;
+          }
+          var dir = e.key === 'ArrowDown' ? 1 : -1;
+          var next = Math.min(options.length - 1, Math.max(0, activeIndex + dir));
+          options.forEach(function (o, i) { o.classList.toggle('is-active', i === next); });
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (!dd.classList.contains('is-open')) {
+            openDropdown(dd);
+          } else if (activeIndex > -1) {
+            selectOption(dd, options[activeIndex]);
+          }
+        } else if (e.key === 'Escape') {
+          closeDropdown(dd);
+        }
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      allDropdowns.forEach(function (dd) {
+        if (!dd.contains(e.target)) closeDropdown(dd);
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') allDropdowns.forEach(closeDropdown);
+    });
+
+    /* ---- keep variant dropdown options in sync with what's actually
+       selected, and grey out combinations with no matching variant ---- */
+    function syncVariantDropdowns() {
+      var variantSelects = Array.prototype.slice.call(root.querySelectorAll('[data-variant-option]'));
+      if (!variantSelects.length) return;
+
+      var chosen = variantSelects.map(function (s) { return s.value; });
+
+      variantSelects.forEach(function (select) {
+        var index = parseInt(select.dataset.optionIndex, 10);
+        var dd = select.closest('[data-dropdown]');
+
+        dd.querySelectorAll('[data-dropdown-option]').forEach(function (li) {
+          var testValues = chosen.slice();
+          testValues[index] = li.dataset.value;
+
+          var available = variants.some(function (v) {
+            return testValues.every(function (val, i) { return v.options[i] === val; }) && v.available;
+          });
+
+          li.classList.toggle('is-disabled', !available);
+          var note = li.querySelector('[data-sold-out-label]');
+          if (note) note.hidden = available;
+        });
+      });
+    }
+
+    root.addEventListener('change', function (e) {
+      if (e.target.matches('[data-variant-option]')) syncVariantDropdowns();
+    });
+
+    syncVariantDropdowns();
   })();
 </script>
 
