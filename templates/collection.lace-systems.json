@@ -130,11 +130,23 @@
         "contact_label": "Contact us",
         "enquire_label": "Enquire"
       }
+    },
+    "tlw_collection_cta_BNChjG": {
+      "type": "tlw-collection-cta",
+      "name": "CTA: Lace Systems",
+      "settings": {
+        "heading": "Not sure which lace?",
+        "body": "Tell us how you part and style your hair and we'll point you to the right lace system.",
+        "button_label": "Contact us",
+        "button_link": "",
+        "show_line": true
+      }
     }
   },
   "order": [
     "section",
     "collection_header_G8Bm9d",
-    "tlw_main_collection_9GFRha"
+    "tlw_main_collection_9GFRha",
+    "tlw_collection_cta_BNChjG"
   ]
 }
