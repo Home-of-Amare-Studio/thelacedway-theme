@@ -489,42 +489,7 @@
             "trigger_value_4": "",
             "addon_product_4": "",
             "help_text": "",
-            "reveal_on_customisation": false
-          }
-        },
-        "service_option_N3dymU": {
-          "type": "service_option",
-          "name": "Service option - Customisation",
-          "settings": {
-            "label": "Customisation",
-            "values": "No, Yes",
-            "trigger_value": "Yes",
-            "addon_product": "",
-            "trigger_value_2": "",
-            "addon_product_2": "",
-            "trigger_value_3": "",
-            "addon_product_3": "",
-            "trigger_value_4": "",
-            "addon_product_4": "",
-            "help_text": "",
-            "reveal_on_customisation": false
-          }
-        },
-        "service_option_qBMEFa": {
-          "type": "service_option",
-          "name": "Service option - Parting Preference",
-          "settings": {
-            "label": "Parting Preference",
-            "values": "Left side part, Middle part, Right side part",
-            "trigger_value": "",
-            "addon_product": "",
-            "trigger_value_2": "",
-            "addon_product_2": "",
-            "trigger_value_3": "",
-            "addon_product_3": "",
-            "trigger_value_4": "",
-            "addon_product_4": "",
-            "help_text": "Please note: If you select a side part for a 5x5, 6x6 or 7x7 closure, the closure itself will be constructed and positioned towards your preferred side rather than in the centre.",
+            "tooltip": "",
             "reveal_on_customisation": false
           }
         },
@@ -543,6 +508,45 @@
             "trigger_value_4": "",
             "addon_product_4": "",
             "help_text": "",
+            "tooltip": "",
+            "reveal_on_customisation": false
+          }
+        },
+        "service_option_N3dymU": {
+          "type": "service_option",
+          "name": "Service option - Customisation",
+          "settings": {
+            "label": "Customisation",
+            "values": "No, Yes",
+            "trigger_value": "Yes",
+            "addon_product": "",
+            "trigger_value_2": "",
+            "addon_product_2": "",
+            "trigger_value_3": "",
+            "addon_product_3": "",
+            "trigger_value_4": "",
+            "addon_product_4": "",
+            "help_text": "",
+            "tooltip": "",
+            "reveal_on_customisation": false
+          }
+        },
+        "service_option_qBMEFa": {
+          "type": "service_option",
+          "name": "Service option - Parting Preference",
+          "settings": {
+            "label": "Parting Preference",
+            "values": "Left side part, Middle part, Right side part",
+            "trigger_value": "",
+            "addon_product": "",
+            "trigger_value_2": "",
+            "addon_product_2": "",
+            "trigger_value_3": "",
+            "addon_product_3": "",
+            "trigger_value_4": "",
+            "addon_product_4": "",
+            "help_text": "Please note: If you select a side part for a 5x5, 6x6 or 7x7 closure, the closure itself will be constructed and positioned towards your preferred side rather than in the centre.",
+            "tooltip": "",
             "reveal_on_customisation": false
           }
         },
@@ -561,6 +565,7 @@
             "trigger_value_4": "",
             "addon_product_4": "",
             "help_text": "",
+            "tooltip": "",
             "reveal_on_customisation": false
           }
         },
@@ -579,6 +584,7 @@
             "trigger_value_4": "",
             "addon_product_4": "",
             "help_text": "",
+            "tooltip": "",
             "reveal_on_customisation": false
           }
         },
@@ -597,6 +603,7 @@
             "trigger_value_4": "",
             "addon_product_4": "",
             "help_text": "",
+            "tooltip": "",
             "reveal_on_customisation": false
           }
         },
@@ -678,9 +685,9 @@
       },
       "block_order": [
         "service_option_PjxzrE",
+        "service_option_ba4LbX",
         "service_option_N3dymU",
         "service_option_qBMEFa",
-        "service_option_ba4LbX",
         "service_option_PT8dYy",
         "service_option_F4UWyk",
         "service_option_em8dfU",
