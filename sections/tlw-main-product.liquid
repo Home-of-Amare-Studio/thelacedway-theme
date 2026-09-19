@@ -1903,6 +1903,86 @@
     display: none !important;
   }
 
+  /* Judge.me's Write a review form: tidy, and comfortable on a phone */
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form-wrapper,
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form {
+    font-family: var(--tlw-font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--tlw-primary);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form-wrapper label,
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form label {
+    display: block;
+    margin: 0 0 8px;
+    font-size: 15px;
+    line-height: 1.5 !important;
+  }
+
+  /* "Display name (displayed publicly like John Smith)" stays one flowing line, not stacked pieces */
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form-wrapper label > span:not([class*="star"]),
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form-wrapper label > a,
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form label > span:not([class*="star"]),
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form label > a {
+    display: inline !important;
+    line-height: inherit !important;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form-wrapper input[type="text"],
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form-wrapper input[type="email"],
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form-wrapper textarea,
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form input[type="text"],
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form input[type="email"],
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form textarea {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--tlw-outline-variant);
+    border-radius: 0;
+    background: #fff;
+    font-family: var(--tlw-font-body);
+    font-size: 16px;
+    color: var(--tlw-primary);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form-wrapper p,
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form p {
+    margin: 16px 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form-wrapper .jdgm-btn,
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form .jdgm-btn {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0 0 12px !important;
+    padding: 16px 24px !important;
+    text-align: center;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form-wrapper .jdgm-btn--border,
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form-wrapper [class*="cancel"],
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form .jdgm-btn--border,
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form [class*="cancel"] {
+    border: 1px solid var(--tlw-primary) !important;
+    background: transparent !important;
+    color: var(--tlw-primary) !important;
+  }
+
+  @media (min-width: 601px) {
+    #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form-wrapper .jdgm-btn,
+    #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-form .jdgm-btn {
+      display: inline-block;
+      width: auto;
+      margin: 0 12px 0 0 !important;
+    }
+  }
+
   /* keep Write a review on the left, not centred */
   #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-rev-widg__summary {
     display: flex !important;
