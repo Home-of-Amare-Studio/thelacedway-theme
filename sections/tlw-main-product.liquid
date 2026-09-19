@@ -872,12 +872,17 @@
   {%- endif -%}
 
   {% comment %} ---------- EXPLORE ---------- {% endcomment %}
-  {%- if product.collections.size > 0 -%}
+  {%- if section.settings.show_explore and product.collections.size > 0 -%}
     {%- assign explore_collection = product.collections.first -%}
+    {%- assign explore_heading = section.settings.explore_heading | default: 'Explore the rest of {collection}' | replace: '{collection}', explore_collection.title -%}
+    {%- assign explore_body = section.settings.explore_body | default: 'Every piece is hand-tied and finished to your measurements. See the full collection.' -%}
+    {%- assign explore_button = section.settings.explore_button | default: 'Back to {collection}' | replace: '{collection}', explore_collection.title -%}
     <div class="tlw-product__explore">
-      <h2 class="tlw-headline-md">Explore the rest of {{ explore_collection.title }}</h2>
-      <p class="tlw-body-md">Every piece is hand-tied and finished to your measurements. See the full collection.</p>
-      <a href="{{ explore_collection.url }}" class="tlw-product__explore-btn">Back to {{ explore_collection.title }}</a>
+      <h2 class="tlw-headline-md">{{ explore_heading | escape }}</h2>
+      {%- if explore_body != blank -%}
+        <p class="tlw-body-md">{{ explore_body | escape }}</p>
+      {%- endif -%}
+      <a href="{{ explore_collection.url }}" class="tlw-product__explore-btn">{{ explore_button | escape }}</a>
     </div>
   {%- endif -%}
 
@@ -2381,6 +2386,36 @@
       "label": "Show the Judge.me reviews and Write a review button",
       "info": "Turn off only if you add Judge.me's own block instead, to avoid showing reviews twice.",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "Explore box (always last)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_explore",
+      "label": "Show the Explore box at the bottom",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "explore_heading",
+      "label": "Heading",
+      "info": "Type {collection} to include the collection's name.",
+      "default": "Explore the rest of {collection}"
+    },
+    {
+      "type": "textarea",
+      "id": "explore_body",
+      "label": "Paragraph",
+      "default": "Every piece is hand-tied and finished to your measurements. See the full collection."
+    },
+    {
+      "type": "text",
+      "id": "explore_button",
+      "label": "Button text",
+      "info": "Type {collection} to include the collection's name.",
+      "default": "Back to {collection}"
     }
   ],
   "blocks": [
