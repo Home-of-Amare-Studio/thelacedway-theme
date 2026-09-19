@@ -641,6 +641,7 @@
         "client_PXhQyG": {
           "type": "client",
           "settings": {
+            "image": "shopify://shop_images/coll-bespoq.jpg",
             "name": "Ava",
             "length": "14″",
             "lace_size": "13x6",
@@ -654,15 +655,6 @@
             "length": "22″",
             "lace_size": "7x7",
             "quote": "The density, the movement, the fit — everything is perfect."
-          }
-        },
-        "client_Ghk4Wr": {
-          "type": "client",
-          "settings": {
-            "name": "India",
-            "length": "20″",
-            "lace_size": "6x6",
-            "quote": "I wear it every day and nobody believes it is not my hair."
           }
         }
       },
@@ -682,8 +674,7 @@
         "accordion_xbW3TM",
         "accordion_XqcewM",
         "client_PXhQyG",
-        "client_n4bTGX",
-        "client_Ghk4Wr"
+        "client_n4bTGX"
       ],
       "name": "TLW Product",
       "settings": {
