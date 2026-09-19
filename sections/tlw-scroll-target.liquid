@@ -2,8 +2,8 @@
   THELACEDWÁY scroll target
   Home of Amare Studio
 
-  An invisible marker. Place it directly above the collections section on the
-  homepage. Clicking a link with the matching text (default "Shop all collections")
+  An invisible marker. Place it above the collections section on the
+  homepage (it also finds that section by its heading). Clicking a link with the matching text (default "Shop all collections")
   then glides down to this spot instead of opening another page. A link whose
   address is #tlw-collections does the same. Several phrases can be listed, separated by commas.
 {% endcomment %}
@@ -13,6 +13,7 @@
   id="tlw-collections"
   data-tlw-scroll-target
   data-label="{{ section.settings.link_text | escape }}"
+  data-heading="{{ section.settings.heading_text | escape }}"
   data-offset="{{ section.settings.top_space }}"
   aria-hidden="true"
 ></div>
@@ -44,16 +45,28 @@
       .map(norm)
       .filter(Boolean);
     var offset = parseInt(target.getAttribute('data-offset'), 10) || 0;
+    var headingText = norm(target.getAttribute('data-heading'));
+
+    /* The section to land on: the one whose heading matches (wherever this marker sits),
+       otherwise the marker itself. Headings inside the header, footer or menus are ignored. */
+    function findDestination() {
+      if (headingText) {
+        var nodes = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, div');
+        for (var i = 0; i < nodes.length; i++) {
+          var node = nodes[i];
+          if (norm(node.textContent) !== headingText) continue;
+          if (node.closest('header, footer, nav, [role="navigation"], a, button')) continue;
+          return node.closest('.shopify-section') || node;
+        }
+      }
+      return target;
+    }
 
     function scrollToTarget() {
-      var top = target.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop) - offset;
-      top = Math.max(0, top);
+      var destination = findDestination();
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if ('scrollBehavior' in document.documentElement.style && !reduce) {
-        window.scrollTo({ top: top, behavior: 'smooth' });
-      } else {
-        window.scrollTo(0, top);
-      }
+      destination.style.scrollMarginTop = offset + 'px';
+      destination.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
     }
 
     function onClick(e) {
@@ -89,7 +102,9 @@
   "name": "TLW Scroll target",
   "tag": "div",
   "enabled_on": {
-    "templates": ["index"]
+    "templates": [
+      "index"
+    ]
   },
   "settings": [
     {
@@ -98,6 +113,13 @@
       "label": "Scroll here when a link with this text is clicked",
       "info": "Any link whose text contains this glides to this spot instead of opening a page. Separate several phrases with commas.",
       "default": "Shop all collections, Shop the collections"
+    },
+    {
+      "type": "text",
+      "id": "heading_text",
+      "label": "Glide down to the section headed",
+      "info": "The heading of the collections section. It is found by this wording wherever this marker sits. Leave empty to glide to this marker instead.",
+      "default": "The Collections"
     },
     {
       "type": "range",
