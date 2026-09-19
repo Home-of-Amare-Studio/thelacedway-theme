@@ -22,35 +22,95 @@
 >
   <div class="tlw-product__grid">
 
-    {% comment %} ---------- GALLERY ---------- {% endcomment %}
+    {% comment %}
+      ---------- GALLERY ----------
+      Thumbnails (photos and videos from the product's media in Shopify admin)
+      sit in a column to the left of the main display on desktop, and in a row
+      underneath on mobile. The active thumbnail has a gold underline; videos
+      carry a gold play button.
+    {% endcomment %}
     <div class="tlw-product__media">
       {%- if product.media.size > 0 -%}
-        <div class="tlw-product__main-image" data-main-image>
-          {{ product.featured_media
-            | image_url: width: 1400
-            | image_tag:
-              loading: 'eager',
-              sizes: '(min-width: 900px) 50vw, 100vw',
-              widths: '400, 600, 900, 1200, 1400',
-              alt: product.title
-          }}
-        </div>
+        {%- assign first_main = '' -%}
+        {%- assign thumbs_html = '' -%}
+        {%- assign templates_html = '' -%}
+
+        {%- for media in product.media -%}
+          {%- assign media_alt = media.alt | default: product.title -%}
+          {%- assign is_video = false -%}
+          {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
+            {%- assign is_video = true -%}
+          {%- endif -%}
+
+          {%- capture main_one -%}
+            {%- if media.media_type == 'video' -%}
+              <video class="tlw-product__video" autoplay muted loop playsinline poster="{{ media.preview_image | image_url: width: 1400 }}">
+                {%- for source in media.sources -%}
+                  <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                {%- endfor -%}
+              </video>
+            {%- elsif media.media_type == 'external_video' -%}
+              <div class="tlw-product__embed">{{ media | external_video_tag }}</div>
+            {%- elsif forloop.first -%}
+              {{ media.preview_image
+                | image_url: width: 1400
+                | image_tag:
+                  loading: 'eager',
+                  fetchpriority: 'high',
+                  sizes: '(min-width: 900px) 55vw, 100vw',
+                  widths: '600, 900, 1200, 1400',
+                  alt: media_alt
+              }}
+            {%- else -%}
+              {{ media.preview_image
+                | image_url: width: 1400
+                | image_tag:
+                  loading: 'lazy',
+                  sizes: '(min-width: 900px) 55vw, 100vw',
+                  widths: '600, 900, 1200, 1400',
+                  alt: media_alt
+              }}
+            {%- endif -%}
+          {%- endcapture -%}
+
+          {%- if forloop.first -%}
+            {%- assign first_main = main_one -%}
+          {%- endif -%}
+
+          {%- capture template_one -%}
+            <template data-media-template="{{ media.id }}">{{ main_one }}</template>
+          {%- endcapture -%}
+          {%- assign templates_html = templates_html | append: template_one -%}
+
+          {%- capture thumb_one -%}
+            <button
+              type="button"
+              class="tlw-product__thumb{% if forloop.first %} is-active{% endif %}"
+              data-thumb
+              data-media-id="{{ media.id }}"
+              aria-label="{% if is_video %}Play video{% else %}View image {{ forloop.index }}{% endif %} of {{ product.title | escape }}"
+              aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+            >
+              {{ media.preview_image | image_url: width: 240 | image_tag: loading: 'lazy', widths: '120, 240', sizes: '72px', alt: '' }}
+              {%- if is_video -%}
+                <span class="tlw-product__play" aria-hidden="true">
+                  <span class="tlw-product__play-btn">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 4.5l13 7.5-13 7.5z"/></svg>
+                  </span>
+                </span>
+              {%- endif -%}
+            </button>
+          {%- endcapture -%}
+          {%- assign thumbs_html = thumbs_html | append: thumb_one -%}
+        {%- endfor -%}
+
+        <div class="tlw-product__main" data-main-media>{{ first_main }}</div>
 
         {%- if product.media.size > 1 -%}
-          <div class="tlw-product__thumbs">
-            {%- for media in product.media -%}
-              <button
-                type="button"
-                class="tlw-product__thumb{% if forloop.first %} is-active{% endif %}"
-                data-thumb
-                data-full="{{ media | image_url: width: 1400 }}"
-                aria-label="View image {{ forloop.index }}"
-              >
-                {{ media | image_url: width: 200 | image_tag: loading: 'lazy', alt: '' }}
-              </button>
-            {%- endfor -%}
-          </div>
+          <div class="tlw-product__thumbs" role="group" aria-label="Product photos and videos">{{ thumbs_html }}</div>
         {%- endif -%}
+
+        {{ templates_html }}
       {%- else -%}
         <div class="tlw-product__placeholder">
           <span class="tlw-label-caps">Image coming soon</span>
@@ -73,8 +133,15 @@
         <p class="tlw-body-md tlw-product__detail">{{ section.settings.detail_line }}</p>
       {%- endif -%}
 
-      <p class="tlw-product__price" data-price>
-        {{ current_variant.price | money }}
+      {%- assign has_compare = false -%}
+      {%- if current_variant.compare_at_price -%}
+        {%- if current_variant.compare_at_price > current_variant.price -%}
+          {%- assign has_compare = true -%}
+        {%- endif -%}
+      {%- endif -%}
+      <p class="tlw-product__price">
+        <span data-price>{{ current_variant.price | money }}</span>
+        <span class="tlw-product__compare" data-compare-price{% unless has_compare %} hidden{% endunless %}>{% if has_compare %}{{ current_variant.compare_at_price | money }}{% endif %}</span>
       </p>
 
       <form
@@ -635,7 +702,7 @@
       padding-block: 80px;
     }
     #tlw-product-{{ section.id }} .tlw-product__grid {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 7fr 5fr;
       gap: 64px;
       align-items: start;
     }
@@ -645,14 +712,49 @@
     }
   }
 
-  #tlw-product-{{ section.id }} .tlw-product__main-image img {
+  #tlw-product-{{ section.id }} .tlw-product__media {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__main {
+    order: 1;
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: var(--tlw-surface-container);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__main img,
+  #tlw-product-{{ section.id }} .tlw-product__main video,
+  #tlw-product-{{ section.id }} .tlw-product__main .tlw-product__embed {
+    display: block;
     width: 100%;
-    aspect-ratio: 4 / 5;
+    height: 100%;
     object-fit: cover;
+    object-position: 50% 18%;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__main iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  @media (hover: hover) {
+    #tlw-product-{{ section.id }} .tlw-product__main img {
+      transition: transform 1000ms ease-in-out;
+    }
+    #tlw-product-{{ section.id }} .tlw-product__main:hover img {
+      transform: scale(1.05);
+    }
   }
 
   #tlw-product-{{ section.id }} .tlw-product__placeholder {
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 3 / 4;
     background: var(--tlw-surface-container);
     display: flex;
     align-items: center;
@@ -661,27 +763,84 @@
   }
 
   #tlw-product-{{ section.id }} .tlw-product__thumbs {
+    order: 2;
     display: flex;
-    gap: 8px;
-    margin-top: 8px;
+    flex-direction: row;
+    gap: 16px;
     overflow-x: auto;
   }
 
   #tlw-product-{{ section.id }} .tlw-product__thumb {
+    position: relative;
     flex: 0 0 72px;
-    padding: 0;
-    border: 1px solid transparent;
+    width: 72px;
+    padding: 0 0 8px;
+    border: none;
+    border-bottom: 1px solid transparent;
     background: none;
+    cursor: pointer;
+    opacity: 0.55;
+    transition: opacity 300ms ease, border-color 300ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__thumb:hover {
+    opacity: 0.85;
   }
 
   #tlw-product-{{ section.id }} .tlw-product__thumb.is-active {
-    border-color: var(--tlw-primary);
+    border-bottom-color: var(--tlw-accent);
+    opacity: 1;
   }
 
   #tlw-product-{{ section.id }} .tlw-product__thumb img {
+    display: block;
     width: 100%;
     aspect-ratio: 4 / 5;
     object-fit: cover;
+    object-position: 50% 18%;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__play {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 8px;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__play-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: rgba(166, 139, 63, 0.92);
+    border-radius: var(--tlw-radius, 0);
+    color: #fff;
+  }
+
+  @media (min-width: 900px) {
+    #tlw-product-{{ section.id }} .tlw-product__media {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 40px;
+    }
+    #tlw-product-{{ section.id }} .tlw-product__thumbs {
+      order: 1;
+      flex-direction: column;
+      flex: 0 0 72px;
+      width: 72px;
+      overflow: visible;
+    }
+    #tlw-product-{{ section.id }} .tlw-product__main {
+      order: 2;
+      flex: 1;
+      min-width: 0;
+    }
   }
 
   #tlw-product-{{ section.id }} .tlw-product__eyebrow {
@@ -699,11 +858,19 @@
   }
 
   #tlw-product-{{ section.id }} .tlw-product__price {
-    margin: 0 0 32px;
+    margin: 0 0 48px;
     font-family: var(--tlw-font-body);
-    font-size: 20px;
-    font-weight: 400;
+    font-size: 15px;
+    font-weight: 300;
+    letter-spacing: 0.025em;
     color: var(--tlw-on-surface-variant);
+    color: color-mix(in srgb, var(--tlw-on-surface-variant) 80%, transparent);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__compare {
+    margin-left: 12px;
+    text-decoration: line-through;
+    opacity: 0.6;
   }
 
   #tlw-product-{{ section.id }} .tlw-field {
@@ -1323,6 +1490,7 @@
     var variantInput = root.querySelector('[data-variant-id]');
     var priceEl = root.querySelector('[data-price]');
     var totalEl = root.querySelector('[data-running-total]');
+    var compareEl = root.querySelector('[data-compare-price]');
     var button = root.querySelector('[data-add-to-cart]');
     var buttonText = root.querySelector('[data-button-text]');
     var errorEl = root.querySelector('[data-cart-error]');
@@ -1397,8 +1565,19 @@
       }
 
       variantInput.value = variant.id;
-      priceEl.textContent = formatMoney(runningTotal(variant));
-      totalEl.textContent = formatMoney(runningTotal(variant));
+      var total = runningTotal(variant);
+      priceEl.textContent = formatMoney(total);
+      totalEl.textContent = formatMoney(total);
+
+      /* the "was" price follows the same variant, plus any add-ons */
+      if (compareEl) {
+        if (variant.compare_at_price && variant.compare_at_price > variant.price) {
+          compareEl.textContent = formatMoney(total + (variant.compare_at_price - variant.price));
+          compareEl.hidden = false;
+        } else {
+          compareEl.hidden = true;
+        }
+      }
 
       button.disabled = !variant.available;
       buttonText.textContent = variant.available
@@ -1410,15 +1589,30 @@
       if (e.target.matches('[data-variant-option], [data-service-option]')) refresh();
     });
 
-    /* ---- gallery ---- */
-    var mainImg = root.querySelector('[data-main-image] img');
-    root.querySelectorAll('[data-thumb]').forEach(function (thumb) {
+    /* ---- gallery: clicking a thumbnail swaps the main display ---- */
+    var mainEl = root.querySelector('[data-main-media]');
+    var thumbEls = root.querySelectorAll('[data-thumb]');
+    thumbEls.forEach(function (thumb) {
       thumb.addEventListener('click', function () {
-        if (mainImg) mainImg.src = thumb.dataset.full;
-        root.querySelectorAll('[data-thumb]').forEach(function (t) {
+        if (!mainEl) return;
+        var tpl = root.querySelector('template[data-media-template="' + thumb.getAttribute('data-media-id') + '"]');
+        if (!tpl) return;
+
+        mainEl.innerHTML = '';
+        mainEl.appendChild(tpl.content.cloneNode(true));
+
+        var vid = mainEl.querySelector('video');
+        if (vid) {
+          var started = vid.play();
+          if (started && started.catch) started.catch(function () {});
+        }
+
+        thumbEls.forEach(function (t) {
           t.classList.remove('is-active');
+          t.setAttribute('aria-current', 'false');
         });
         thumb.classList.add('is-active');
+        thumb.setAttribute('aria-current', 'true');
       });
     });
 
