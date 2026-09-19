@@ -1,0 +1,115 @@
+{% comment %}
+  THELACEDWÁY scroll target
+  Home of Amare Studio
+
+  An invisible marker. Place it directly above the collections section on the
+  homepage. Clicking a link with the matching text (default "Shop all collections")
+  then glides down to this spot instead of opening another page. A link whose
+  address is #tlw-collections does the same.
+{% endcomment %}
+
+<div
+  class="tlw-scroll-target"
+  id="tlw-collections"
+  data-tlw-scroll-target
+  data-label="{{ section.settings.link_text | escape }}"
+  data-offset="{{ section.settings.top_space }}"
+  aria-hidden="true"
+></div>
+
+<style>
+  .tlw-scroll-target {
+    display: block;
+    height: 0;
+    margin: 0;
+    padding: 0;
+  }
+</style>
+
+<script>
+  (function () {
+    /* the theme editor re-runs this script when the section is edited: remove the old listener first */
+    if (window.tlwScrollTarget && window.tlwScrollTarget.destroy) window.tlwScrollTarget.destroy();
+
+    var target = document.querySelector('[data-tlw-scroll-target]');
+    if (!target) return;
+
+    function norm(text) {
+      return String(text || '').replace(/\s+/g, ' ').trim().toLowerCase();
+    }
+
+    var label = norm(target.getAttribute('data-label'));
+    var offset = parseInt(target.getAttribute('data-offset'), 10) || 0;
+
+    function scrollToTarget() {
+      var top = target.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop) - offset;
+      top = Math.max(0, top);
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if ('scrollBehavior' in document.documentElement.style && !reduce) {
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      } else {
+        window.scrollTo(0, top);
+      }
+    }
+
+    function onClick(e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var link = e.target.closest ? e.target.closest('a[href]') : null;
+      if (!link || link.hasAttribute('data-tlw-no-scroll')) return;
+
+      var href = link.getAttribute('href') || '';
+      var text = norm(link.textContent);
+      var isAnchor = href === '#tlw-collections' || href === '#collections';
+      var isLabel = label && text.length < 80 && text.indexOf(label) !== -1;
+      if (!isAnchor && !isLabel) return;
+
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      scrollToTarget();
+    }
+
+    document.addEventListener('click', onClick, true);
+
+    window.tlwScrollTarget = {
+      scroll: scrollToTarget,
+      destroy: function () {
+        document.removeEventListener('click', onClick, true);
+        window.tlwScrollTarget = null;
+      }
+    };
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "TLW Scroll target",
+  "tag": "div",
+  "enabled_on": {
+    "templates": ["index"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "Scroll here when this link text is clicked",
+      "info": "Any link whose text contains this will glide to this spot instead of opening a page.",
+      "default": "Shop all collections"
+    },
+    {
+      "type": "range",
+      "id": "top_space",
+      "label": "Space kept above (for the sticky header)",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 90
+    }
+  ],
+  "presets": [
+    {
+      "name": "TLW Scroll target"
+    }
+  ]
+}
+{% endschema %}
