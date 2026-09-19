@@ -679,6 +679,17 @@
     {%- endunless -%}
   {%- endunless -%}
 
+  {%- if use_meta -%}
+    {%- unless request.design_mode -%}
+      {%- assign visible_total = 0 -%}
+      {%- for m in meta_photos limit: 8 -%}
+        {%- if m.preview_image or m.image or m.src or m.media_type == 'image' -%}
+          {%- assign visible_total = visible_total | plus: 1 -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endunless -%}
+  {%- endif -%}
+
   {%- if visible_total > 0 -%}
     {%- assign cols_d = visible_total | at_most: 4 -%}
     {%- assign cols_t = visible_total | at_most: 2 -%}
@@ -717,7 +728,16 @@
 
           {%- if use_meta -%}
             {%- assign c_media = meta_photos[idx] -%}
-            {%- assign c_image = c_media.preview_image | default: c_media -%}
+            {%- comment %} A file in the box can arrive as a media object (with preview_image) or as an image object. Test for what is really there instead of asking whether it is "blank". {%- endcomment %}
+            {%- if c_media.preview_image -%}
+              {%- assign c_image = c_media.preview_image -%}
+            {%- elsif c_media.image -%}
+              {%- assign c_image = c_media.image -%}
+            {%- elsif c_media.src -%}
+              {%- assign c_image = c_media -%}
+            {%- elsif c_media.media_type == 'image' -%}
+              {%- assign c_image = c_media -%}
+            {%- endif -%}
             {%- assign c_alt = c_media.alt -%}
             {%- assign c_line = detail_lines[idx] | strip -%}
             {%- assign c_parts = c_line | split: '|' -%}
@@ -735,9 +755,11 @@
             {%- assign c_attrs = block.shopify_attributes -%}
           {%- endif -%}
 
-          {%- if c_image == blank and request.design_mode == false -%}
-            {%- continue -%}
-          {%- endif -%}
+          {%- unless c_image -%}
+            {%- unless request.design_mode -%}
+              {%- continue -%}
+            {%- endunless -%}
+          {%- endunless -%}
 
           {%- assign c_caption = c_name -%}
           {%- if c_length != blank -%}
@@ -756,7 +778,7 @@
 
           <div class="tlw-product__client" {{ c_attrs }}>
             <div class="tlw-product__client-media">
-              {%- if c_image != blank -%}
+              {%- if c_image -%}
                 {{ c_image
                   | image_url: width: 900
                   | image_tag:
@@ -768,7 +790,7 @@
               {%- elsif request.design_mode -%}
                 <span class="tlw-product__client-empty">
                   {%- if use_meta -%}
-                    Photo {{ i }} in this product's Client photos box could not be read
+                    Photo {{ i }} in this product's Client photos box could not be read (file type: {{ c_media.media_type | default: 'nothing found' }}). Make sure it is an image and shows as ready in Content &gt; Files
                   {%- else -%}
                     Add a photo to this Client photo block
                   {%- endif -%}
