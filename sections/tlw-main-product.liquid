@@ -85,6 +85,64 @@
         data-product-title="{{ product.title | escape }}"
       >
 
+        {%- liquid
+          assign hair_type_value = ''
+          assign lifespan_value = ''
+          assign chunks = ''
+          if product.description != blank
+            assign raw = product.description
+            assign raw = raw | replace: '</p>', '|||' | replace: '<br>', '|||' | replace: '<br />', '|||' | replace: '<br/>', '|||' | replace: '</li>', '|||'
+            assign raw = raw | strip_html | strip_newlines
+            assign raw = raw | replace: '•', '|||' | replace: '·', '|||' | replace: '‣', '|||' | replace: '▪', '|||'
+            assign chunks = raw | split: '|||'
+          endif
+        -%}
+
+        {%- if section.settings.unit_details_mode -%}
+
+          {% comment %}
+            ---------- READY TO SHIP: fixed unit details card ----------
+            No selectable options at all — the unit is already made. Just
+            the parsed spec list shown as plain read-only lines.
+          {% endcomment %}
+          {%- if chunks != '' -%}
+            <div class="tlw-product__unit-card">
+              <p class="tlw-label-caps tlw-product__unit-heading">Unit Details</p>
+              {%- for chunk in chunks -%}
+                {%- assign clean_chunk = chunk | strip -%}
+                {%- if clean_chunk == blank -%}
+                  {%- continue -%}
+                {%- endif -%}
+
+                {%- assign parts = clean_chunk | split: ':' -%}
+                {%- assign label_candidate = parts[0] | strip -%}
+                {%- assign value_candidate = clean_chunk | remove_first: label_candidate | remove_first: ':' | strip -%}
+
+                {%- if parts.size > 1 and label_candidate.size <= 25 and value_candidate != blank -%}
+                  {%- assign words = label_candidate | downcase | split: ' ' -%}
+                  {%- assign title_label = '' -%}
+                  {%- for word in words -%}
+                    {%- assign title_label = title_label | append: word | capitalize | append: ' ' -%}
+                  {%- endfor -%}
+                  {%- assign title_label = title_label | strip -%}
+
+                  {%- if title_label == 'Hair Type' -%}
+                    {%- assign hair_type_value = value_candidate -%}
+                  {%- endif -%}
+                  {%- if title_label contains 'Lifespan' -%}
+                    {%- assign lifespan_value = value_candidate -%}
+                  {%- endif -%}
+
+                  <p class="tlw-body-md tlw-product__unit-line">{{ title_label }}: {{ value_candidate }}</p>
+                {%- else -%}
+                  <p class="tlw-body-md tlw-product__unit-line">{{ clean_chunk }}</p>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+        {%- else -%}
+
         {% comment %} ---------- REAL VARIANTS ---------- {% endcomment %}
         {%- unless product.has_only_default_variant -%}
           {%- for option in product.options_with_values -%}
@@ -246,8 +304,9 @@
                   aria-expanded="false"
                   aria-labelledby="tlw-svc-label-{{ block.id }} tlw-svc-{{ block.id }}-value"
                 >
-                  {%- assign first_value = values.first | strip -%}
-                  <span data-dropdown-value id="tlw-svc-{{ block.id }}-value">{{ first_value }}</span>
+                  <span data-dropdown-value id="tlw-svc-{{ block.id }}-value" class="tlw-dropdown__placeholder">
+                    Select {{ block.settings.label | downcase }}...
+                  </span>
                   <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" class="tlw-dropdown__chevron">
                     <path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
@@ -266,7 +325,7 @@
                     {%- elsif clean == block.settings.trigger_value_4 and addon_4 != blank -%}
                       {%- assign option_price = addon_4.price -%}
                     {%- endif -%}
-                    <li role="option" data-dropdown-option data-value="{{ clean | escape }}"{% if forloop.first %} class="is-selected"{% endif %}>
+                    <li role="option" data-dropdown-option data-value="{{ clean | escape }}">
                       <button type="button" class="tlw-dropdown__option">
                         <span>
                           {{ clean }}
@@ -291,6 +350,8 @@
             </div>
           {%- endif -%}
         {%- endfor -%}
+
+        {%- endif -%}
 
         {% comment %} ---------- TOTAL (kept for the add-on pricing script, hidden by CSS) ---------- {% endcomment %}
         <div class="tlw-product__total">
@@ -352,14 +413,7 @@
       assign lifespan_value = ''
     -%}
 
-    {%- if product.description != blank -%}
-      {%- liquid
-        assign raw = product.description
-        assign raw = raw | replace: '</p>', '|||' | replace: '<br>', '|||' | replace: '<br />', '|||' | replace: '<br/>', '|||' | replace: '</li>', '|||'
-        assign raw = raw | strip_html | strip_newlines
-        assign raw = raw | replace: '•', '|||' | replace: '·', '|||' | replace: '‣', '|||' | replace: '▪', '|||'
-        assign chunks = raw | split: '|||'
-      -%}
+    {%- unless chunks == '' -%}
 
       <div class="tlw-accordion" data-accordion>
         <button type="button" class="tlw-accordion__trigger" data-accordion-trigger aria-expanded="false">
@@ -403,7 +457,7 @@
           </div>
         </div>
       </div>
-    {%- endif -%}
+    {%- endunless -%}
 
     {%- unless product.type contains 'Accessor' -%}
       <div class="tlw-accordion" data-accordion>
@@ -806,6 +860,27 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     text-decoration: none;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__unit-card {
+    border: 1px solid var(--tlw-outline-variant);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__unit-heading {
+    color: var(--tlw-accent);
+    margin: 0 0 16px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__unit-line {
+    margin: 0 0 10px;
+    color: var(--tlw-primary);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__unit-line:last-child {
+    margin-bottom: 0;
   }
 
   #tlw-product-{{ section.id }} .tlw-product__total {
@@ -1548,6 +1623,13 @@
       "id": "show_collection_label",
       "label": "Show collection name above the title",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "unit_details_mode",
+      "label": "Ready to Ship: show fixed Unit Details card",
+      "info": "Use on Ready to Ship templates \u2014 the unit is already made, so there's nothing to customise. Turns off every dropdown and just lists the specs from the description.",
+      "default": false
     },
     {
       "type": "header",
