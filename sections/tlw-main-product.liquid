@@ -192,6 +192,12 @@
               {%- assign addon_pairs = addon_pairs | append: pair | append: '||' -%}
             {%- endif -%}
 
+            {%- assign addon_4 = block.settings.addon_product_4 -%}
+            {%- if block.settings.trigger_value_4 != blank and addon_4 != blank -%}
+              {%- assign pair = block.settings.trigger_value_4 | strip | append: '::' | append: addon_4.selected_or_first_available_variant.id | append: '::' | append: addon_4.price -%}
+              {%- assign addon_pairs = addon_pairs | append: pair | append: '||' -%}
+            {%- endif -%}
+
             {%- assign block_label_downcase = block.settings.label | downcase -%}
             {%- assign is_reveal_child = false -%}
             {%- if block_label_downcase == 'hairline' or block_label_downcase == 'styled' or block_label_downcase == 'layers' -%}
@@ -257,6 +263,8 @@
                       {%- assign option_price = addon_2.price -%}
                     {%- elsif clean == block.settings.trigger_value_3 and addon_3 != blank -%}
                       {%- assign option_price = addon_3.price -%}
+                    {%- elsif clean == block.settings.trigger_value_4 and addon_4 != blank -%}
+                      {%- assign option_price = addon_4.price -%}
                     {%- endif -%}
                     <li role="option" data-dropdown-option data-value="{{ clean | escape }}"{% if forloop.first %} class="is-selected"{% endif %}>
                       <button type="button" class="tlw-dropdown__option">
@@ -1610,6 +1618,20 @@
           "type": "product",
           "id": "addon_product_3",
           "label": "Add-on product to charge for (3)"
+        },
+        {
+          "type": "header",
+          "content": "A fourth paid choice (optional)"
+        },
+        {
+          "type": "text",
+          "id": "trigger_value_4",
+          "label": "Charge when the customer picks (4)"
+        },
+        {
+          "type": "product",
+          "id": "addon_product_4",
+          "label": "Add-on product to charge for (4)"
         },
         {
           "type": "text",
