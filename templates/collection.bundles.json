@@ -151,12 +151,24 @@
         "contact_label": "Contact us",
         "enquire_label": "Enquire"
       }
+    },
+    "tlw_collection_cta_ULWhCW": {
+      "type": "tlw-collection-cta",
+      "name": "CTA: Bundles",
+      "settings": {
+        "heading": "Not sure how many bundles?",
+        "body": "Tell us the length and fullness you have in mind and we'll advise on the right quantity.",
+        "button_label": "Enquire",
+        "button_link": "",
+        "show_line": true
+      }
     }
   },
   "order": [
     "section",
     "tlw_main_collection_9GFRha",
     "collection_header_gRA4B4",
-    "tlw_main_collection_nN84A7"
+    "tlw_main_collection_nN84A7",
+    "tlw_collection_cta_ULWhCW"
   ]
 }
