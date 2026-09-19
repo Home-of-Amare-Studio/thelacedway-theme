@@ -192,7 +192,18 @@
               {%- assign addon_pairs = addon_pairs | append: pair | append: '||' -%}
             {%- endif -%}
 
-            <div class="tlw-field" {{ block.shopify_attributes }}>
+            {%- assign block_label_downcase = block.settings.label | downcase -%}
+            {%- assign is_reveal_child = false -%}
+            {%- if block_label_downcase == 'hairline' or block_label_downcase == 'styled' or block_label_downcase == 'layers' -%}
+              {%- assign is_reveal_child = true -%}
+            {%- endif -%}
+
+            <div
+              class="tlw-field{% if is_reveal_child %} tlw-field--reveal{% endif %}"
+              {{ block.shopify_attributes }}
+              data-field-label="{{ block_label_downcase }}"
+              {% if is_reveal_child %}data-customisation-reveal hidden{% endif %}
+            >
               <label class="tlw-label-caps tlw-field__label" id="tlw-svc-label-{{ block.id }}">
                 <span>
                   {{ block.settings.label }}
@@ -273,13 +284,34 @@
           {%- endif -%}
         {%- endfor -%}
 
-        {% comment %} ---------- TOTAL ---------- {% endcomment %}
+        {% comment %} ---------- TOTAL (kept for the add-on pricing script, hidden by CSS) ---------- {% endcomment %}
         <div class="tlw-product__total">
           <span class="tlw-label-caps">Total</span>
           <span class="tlw-headline-sm" data-running-total>
             {{ current_variant.price | money }}
           </span>
         </div>
+
+        {% comment %}
+          ---------- CUSTOMS ACKNOWLEDGEMENT ----------
+          Fixed, always on every product using this section — not a block,
+          so there's nothing to accidentally remove. Required: the form
+          won't submit until this is checked.
+        {% endcomment %}
+        <label class="tlw-product__ack" data-customs-ack>
+          <input type="checkbox" data-customs-checkbox>
+          <span class="tlw-product__ack-box">
+            <svg viewBox="0 0 12 10" width="10" height="8" aria-hidden="true">
+              <path d="M1 5l3.2 3.2L11 1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="tlw-product__ack-text">
+            I understand I may be responsible for any customs duties, taxes, or import fees on international orders.
+          </span>
+        </label>
+        <p class="tlw-product__ack-error" data-customs-error hidden>
+          Please confirm you understand the customs note above before adding to bag.
+        </p>
 
         <input type="hidden" name="id" data-variant-id value="{{ current_variant.id }}">
 
@@ -772,6 +804,71 @@
     display: none;
   }
 
+  #tlw-product-{{ section.id }} .tlw-product__ack {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 16px 0 4px;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 200ms ease, box-shadow 200ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__ack.is-error {
+    background: rgba(181, 143, 45, 0.05);
+    box-shadow: 0 0 0 1px var(--tlw-accent);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__ack input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__ack-box {
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    border: 1px solid var(--tlw-outline);
+    border-radius: 2px;
+    color: var(--tlw-on-primary);
+    transition: background-color 200ms ease, border-color 200ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__ack-box svg {
+    opacity: 0;
+    transition: opacity 150ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__ack input:checked ~ .tlw-product__ack-box {
+    background: var(--tlw-primary);
+    border-color: var(--tlw-primary);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__ack input:checked ~ .tlw-product__ack-box svg {
+    opacity: 1;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__ack-text {
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__ack-error {
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: #a33;
+  }
+
   #tlw-product-{{ section.id }} .tlw-product__submit {
     width: 100%;
     margin-top: 24px;
@@ -1142,7 +1239,7 @@
       }
 
       variantInput.value = variant.id;
-      priceEl.textContent = formatMoney(variant.price);
+      priceEl.textContent = formatMoney(runningTotal(variant));
       totalEl.textContent = formatMoney(runningTotal(variant));
 
       button.disabled = !variant.available;
@@ -1167,10 +1264,31 @@
       });
     });
 
+    /* ---- customs acknowledgement: required before adding to cart ---- */
+    var customsAck = root.querySelector('[data-customs-ack]');
+    var customsCheckbox = root.querySelector('[data-customs-checkbox]');
+    var customsError = root.querySelector('[data-customs-error]');
+
+    if (customsCheckbox) {
+      customsCheckbox.addEventListener('change', function () {
+        if (customsCheckbox.checked) {
+          customsAck.classList.remove('is-error');
+          customsError.hidden = true;
+        }
+      });
+    }
+
     /* ---- add to cart ---- */
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       errorEl.hidden = true;
+
+      if (customsCheckbox && !customsCheckbox.checked) {
+        customsAck.classList.add('is-error');
+        customsError.hidden = false;
+        customsAck.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
 
       var variant = currentVariant();
       if (!variant) return;
@@ -1374,6 +1492,29 @@
     });
 
     syncVariantDropdowns();
+
+    /* ---- Customisation reveal: Hairline, Styled and Layers only show
+       once Customisation is set to "Yes". Matched by field label, same
+       pattern as the Hairline "?" icon and Cap Size measure-guide link. */
+    var customisationField = root.querySelector('[data-field-label="customisation"]');
+    var revealFields = Array.prototype.slice.call(root.querySelectorAll('[data-customisation-reveal]'));
+
+    function syncCustomisationReveal() {
+      if (!customisationField || !revealFields.length) return;
+      var select = customisationField.querySelector('[data-service-option]');
+      var show = !!select && select.value.trim().toLowerCase() === 'yes';
+      revealFields.forEach(function (field) {
+        field.hidden = !show;
+      });
+    }
+
+    if (customisationField) {
+      var customisationSelect = customisationField.querySelector('[data-service-option]');
+      if (customisationSelect) {
+        customisationSelect.addEventListener('change', syncCustomisationReveal);
+      }
+      syncCustomisationReveal();
+    }
   })();
 </script>
 
@@ -1475,6 +1616,17 @@
           "id": "help_text",
           "label": "Helper text",
           "info": "Optional line under the dropdown"
+        },
+        {
+          "type": "header",
+          "content": "Visibility"
+        },
+        {
+          "type": "checkbox",
+          "id": "reveal_on_customisation",
+          "label": "Only show once Customisation is set to Yes",
+          "info": "Turn this on for options that should stay hidden until the customer opts into customisation \u2014 e.g. Hairline, Styled, Layers. Needs a field labelled \u2018Customisation\u2019 elsewhere on this product.",
+          "default": false
         }
       ]
     },
@@ -1528,17 +1680,17 @@
         {
           "type": "service_option",
           "settings": {
-            "label": "Jet Black",
-            "values": "No, Yes",
-            "trigger_value": "Yes"
+            "label": "Parting Preference",
+            "values": "Left side part, Middle part, Right side part",
+            "help_text": "Please note: If you select a side part for a 5x5, 6x6 or 7x7 closure, the closure itself will be constructed and positioned towards your preferred side rather than in the centre."
           }
         },
         {
           "type": "service_option",
           "settings": {
-            "label": "Parting Preference",
-            "values": "Left side part, Middle part, Right side part",
-            "help_text": "Please note: If you select a side part for a 5x5, 6x6 or 7x7 closure, the closure itself will be constructed and positioned towards your preferred side rather than in the centre."
+            "label": "Jet Black",
+            "values": "No, Yes",
+            "trigger_value": "Yes"
           }
         },
         {

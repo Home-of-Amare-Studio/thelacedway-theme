@@ -22,15 +22,6 @@
             "help_text": ""
           }
         },
-        "client_jAzpxw": {
-          "type": "client",
-          "settings": {
-            "name": "",
-            "length": "",
-            "lace_size": "",
-            "quote": ""
-          }
-        },
         "service_option_rVeVxG": {
           "type": "service_option",
           "settings": {
@@ -50,13 +41,23 @@
             "addon_product": "jet-black",
             "help_text": ""
           }
+        },
+        "client_jAzpxw": {
+          "type": "client",
+          "settings": {
+            "image": "shopify://shop_images/A01E501E-9CBD-4D06-9BA1-4F0BA73E4C74.jpg",
+            "name": "",
+            "length": "",
+            "lace_size": "",
+            "quote": ""
+          }
         }
       },
       "block_order": [
         "service_option_rMRHqj",
-        "client_jAzpxw",
         "service_option_rVeVxG",
-        "service_option_VPQUyc"
+        "service_option_VPQUyc",
+        "client_jAzpxw"
       ],
       "name": "TLW Product",
       "settings": {
