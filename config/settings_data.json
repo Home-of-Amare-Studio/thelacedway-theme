@@ -103,6 +103,10 @@
     "variant_button_radius": 14,
     "variant_button_width": "equal-width-buttons",
     "tlw_measure_image": "shopify://shop_images/cap-size-measurement.png",
+    "tlw_hairline_1_name": "Natural Hairline",
+    "tlw_hairline_1_image": "shopify://shop_images/Screenshot_2026-09-19_at_19.28.44.png",
+    "tlw_hairline_2_name": "Lagos Hairline",
+    "tlw_hairline_2_image": "shopify://shop_images/Screenshot_2026-09-19_at_19.27.43.png",
     "content_for_index": [],
     "blocks": {
       "14060646107696862457": {
