@@ -12,13 +12,13 @@
     "tlw_main_product_fAykxh": {
       "type": "tlw-main-product",
       "blocks": {
-        "service_option_rVeVxG": {
+        "service_option_VPQUyc": {
           "type": "service_option",
           "settings": {
-            "label": "Customisation",
+            "label": "Jet Black",
             "values": "No, Yes",
             "trigger_value": "Yes",
-            "addon_product": "customisation",
+            "addon_product": "jet-black",
             "trigger_value_2": "",
             "addon_product_2": "",
             "trigger_value_3": "",
@@ -27,13 +27,13 @@
             "reveal_on_customisation": false
           }
         },
-        "service_option_VPQUyc": {
+        "service_option_rVeVxG": {
           "type": "service_option",
           "settings": {
-            "label": "Jet Black",
+            "label": "Customisation",
             "values": "No, Yes",
             "trigger_value": "Yes",
-            "addon_product": "jet-black",
+            "addon_product": "customisation",
             "trigger_value_2": "",
             "addon_product_2": "",
             "trigger_value_3": "",
@@ -118,8 +118,8 @@
         }
       },
       "block_order": [
-        "service_option_rVeVxG",
         "service_option_VPQUyc",
+        "service_option_rVeVxG",
         "service_option_WezG9F",
         "service_option_rcXMHQ",
         "service_option_C8CXCk",
