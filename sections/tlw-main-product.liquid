@@ -837,7 +837,18 @@
   {%- if section.settings.show_reviews -%}
     {%- assign rv_obj = product.metafields.reviews.rating.value -%}
     {%- assign rv_count = product.metafields.reviews.rating_count.value | default: 0 -%}
-    {%- assign rv_heading = section.settings.reviews_heading | default: 'What clients say' | replace: '{product}', product.title -%}
+    {%- comment %} Product names are stored in capitals (MONROE). "Neat capitals" turns that into Monroe for the heading. {%- endcomment %}
+    {%- assign rv_name = product.title -%}
+    {%- unless section.settings.reviews_name_style == 'asis' -%}
+      {%- assign rv_name = '' -%}
+      {%- assign rv_words = product.title | downcase | split: ' ' -%}
+      {%- for rv_word in rv_words -%}
+        {%- assign rv_cap = rv_word | capitalize -%}
+        {%- assign rv_name = rv_name | append: rv_cap | append: ' ' -%}
+      {%- endfor -%}
+      {%- assign rv_name = rv_name | strip -%}
+    {%- endunless -%}
+    {%- assign rv_heading = section.settings.reviews_heading | default: 'What clients say about {product}' | replace: '{product}', rv_name -%}
 
     <div class="tlw-product__reviews" id="tlw-reviews">
       <div class="tlw-product__reviews-inner">
@@ -2379,8 +2390,24 @@
       "type": "text",
       "id": "reviews_heading",
       "label": "Heading",
-      "info": "Type {product} to include the product's name.",
-      "default": "What clients say about our wigs"
+      "info": "{product} is replaced by the wig's name, e.g. Monroe.",
+      "default": "What clients say about {product}"
+    },
+    {
+      "type": "select",
+      "id": "reviews_name_style",
+      "label": "How to write the wig's name",
+      "options": [
+        {
+          "value": "neat",
+          "label": "Neat capitals (Monroe)"
+        },
+        {
+          "value": "asis",
+          "label": "Exactly as written (MONROE)"
+        }
+      ],
+      "default": "neat"
     },
     {
       "type": "checkbox",
