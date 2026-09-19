@@ -129,6 +129,17 @@
 
       <h1 class="tlw-display-lg tlw-product__title">{{ product.title }}</h1>
 
+      {%- if section.settings.show_rating -%}
+        {%- assign rating_obj = product.metafields.reviews.rating.value -%}
+        {%- assign review_count = product.metafields.reviews.rating_count.value | default: 0 -%}
+        {%- if rating_obj != blank and review_count > 0 -%}
+          <a class="tlw-product__rating" href="#tlw-reviews">
+            {%- render 'tlw-stars', rating: rating_obj.rating, max: rating_obj.scale_max, size: 22 -%}
+            <span class="tlw-product__rating-text">{{ rating_obj.rating | times: 1.0 | round: 1 }} &middot; {{ review_count }} {% if review_count == 1 %}review{% else %}reviews{% endif %}</span>
+          </a>
+        {%- endif -%}
+      {%- endif -%}
+
       {%- if section.settings.detail_line != blank -%}
         <p class="tlw-body-md tlw-product__detail">{{ section.settings.detail_line }}</p>
       {%- endif -%}
@@ -1001,6 +1012,26 @@
     margin-bottom: 8px;
   }
 
+  #tlw-product-{{ section.id }} .tlw-product__rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    margin: 20px 0 8px;
+    text-decoration: none;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__rating-text {
+    font-family: var(--tlw-font-body);
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__rating:hover .tlw-product__rating-text {
+    color: var(--tlw-primary);
+  }
+
   #tlw-product-{{ section.id }} .tlw-product__detail {
     color: var(--tlw-on-surface-variant);
     margin-bottom: 16px;
@@ -1472,25 +1503,6 @@
   #tlw-product-{{ section.id }} .tlw-product__clients-head {
     text-align: center;
     margin-bottom: 40px;
-  }
-
-  #tlw-product-{{ section.id }} .tlw-product__clients-note {
-    max-width: 620px;
-    margin: 16px auto 0;
-    padding: 10px 14px;
-    border: 1px dashed var(--tlw-outline);
-    font-family: var(--tlw-font-body);
-    font-size: 12px;
-    line-height: 1.5;
-    text-align: left;
-    color: var(--tlw-on-surface-variant);
-  }
-
-  #tlw-product-{{ section.id }} .tlw-product__clients-note code {
-    display: block;
-    margin-top: 6px;
-    font-size: 11px;
-    word-break: break-all;
   }
 
   #tlw-product-{{ section.id }} .tlw-product__clients-eyebrow {
@@ -2105,6 +2117,13 @@
       "type": "checkbox",
       "id": "show_collection_label",
       "label": "Show collection name above the title",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show the star rating under the title",
+      "info": "Links down to the reviews. Only shows for products that have reviews.",
       "default": true
     },
     {
