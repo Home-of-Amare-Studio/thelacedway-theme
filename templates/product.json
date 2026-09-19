@@ -12,6 +12,25 @@
     "tlw_main_product_fAykxh": {
       "type": "tlw-main-product",
       "blocks": {
+        "service_option_rMRHqj": {
+          "type": "service_option",
+          "settings": {
+            "label": "",
+            "values": "No, Yes",
+            "trigger_value": "",
+            "addon_product": "",
+            "help_text": ""
+          }
+        },
+        "client_jAzpxw": {
+          "type": "client",
+          "settings": {
+            "name": "",
+            "length": "",
+            "lace_size": "",
+            "quote": ""
+          }
+        },
         "service_option_rVeVxG": {
           "type": "service_option",
           "settings": {
@@ -34,6 +53,8 @@
         }
       },
       "block_order": [
+        "service_option_rMRHqj",
+        "client_jAzpxw",
         "service_option_rVeVxG",
         "service_option_VPQUyc"
       ],
