@@ -876,6 +876,785 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     text-decoration: none;
+{% comment %}
+  THELACEDWÁY main product section
+  Home of Amare Studio
+
+  Handles two kinds of purchase:
+  1. Real Shopify variants (Lace Size, Length, Lace type) which carry the price.
+  2. Service options, which are either free line item properties, or paid
+     add-ons that get added to the cart as their own separate line.
+
+  Paid add-ons MUST be separate cart lines. Line item properties are display
+  only and carry no price.
+{% endcomment %}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+-%}
+
+<section
+  class="tlw-product tlw-container"
+  id="tlw-product-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="tlw-product__grid">
+
+    {% comment %} ---------- GALLERY ---------- {% endcomment %}
+    <div class="tlw-product__media">
+      {%- if product.media.size > 0 -%}
+        <div class="tlw-product__main-image" data-main-image>
+          {{ product.featured_media
+            | image_url: width: 1400
+            | image_tag:
+              loading: 'eager',
+              sizes: '(min-width: 900px) 50vw, 100vw',
+              widths: '400, 600, 900, 1200, 1400',
+              alt: product.title
+          }}
+        </div>
+
+        {%- if product.media.size > 1 -%}
+          <div class="tlw-product__thumbs">
+            {%- for media in product.media -%}
+              <button
+                type="button"
+                class="tlw-product__thumb{% if forloop.first %} is-active{% endif %}"
+                data-thumb
+                data-full="{{ media | image_url: width: 1400 }}"
+                aria-label="View image {{ forloop.index }}"
+              >
+                {{ media | image_url: width: 200 | image_tag: loading: 'lazy', alt: '' }}
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      {%- else -%}
+        <div class="tlw-product__placeholder">
+          <span class="tlw-label-caps">Image coming soon</span>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {% comment %} ---------- DETAILS ---------- {% endcomment %}
+    <div class="tlw-product__info">
+
+      {%- if section.settings.show_collection_label and product.collections.size > 0 -%}
+        <p class="tlw-label-caps tlw-product__eyebrow">
+          {{ product.collections.first.title }}
+        </p>
+      {%- endif -%}
+
+      <h1 class="tlw-display-lg tlw-product__title">{{ product.title }}</h1>
+
+      {%- if section.settings.detail_line != blank -%}
+        <p class="tlw-body-md tlw-product__detail">{{ section.settings.detail_line }}</p>
+      {%- endif -%}
+
+      <p class="tlw-product__price" data-price>
+        {{ current_variant.price | money }}
+      </p>
+
+      <form
+        method="post"
+        action="{{ routes.cart_add_url }}"
+        id="tlw-form-{{ section.id }}"
+        data-product-form
+        data-product-title="{{ product.title | escape }}"
+      >
+
+        {%- liquid
+          assign hair_type_value = ''
+          assign lifespan_value = ''
+          assign chunks = ''
+          if product.description != blank
+            assign raw = product.description
+            assign raw = raw | replace: '​', '' | replace: '‌', '' | replace: '‍', '' | replace: '⁠', '' | replace: '﻿', '' | replace: '­', '' | replace: '᠎', '' | replace: '⁡', '' | replace: '⁢', '' | replace: '⁣', '' | replace: '⁤', '' | replace: ' ', ' '
+            assign raw = raw | replace: '</p>', '|||' | replace: '<br>', '|||' | replace: '<br />', '|||' | replace: '<br/>', '|||' | replace: '</li>', '|||'
+            assign raw = raw | strip_html | strip_newlines
+            assign raw = raw | replace: '•', '|||' | replace: '·', '|||' | replace: '‣', '|||' | replace: '▪', '|||'
+            assign raw = raw | replace: '：', ':' | replace: '﹕', ':' | replace: '︰', ':'
+            assign chunks = raw | split: '|||'
+          endif
+        -%}
+
+        {%- if section.settings.unit_details_mode -%}
+
+          {% comment %}
+            ---------- READY TO SHIP: fixed unit details card ----------
+            No selectable options at all — the unit is already made. Just
+            the parsed spec list shown as plain read-only lines.
+          {% endcomment %}
+          {%- if chunks != '' -%}
+            <div class="tlw-product__unit-card">
+              <p class="tlw-label-caps tlw-product__unit-heading">Unit Details</p>
+              {%- for chunk in chunks -%}
+                {%- assign clean_chunk = chunk | strip -%}
+                {%- if clean_chunk == blank -%}
+                  {%- continue -%}
+                {%- endif -%}
+
+                {%- assign parts = clean_chunk | split: ':' -%}
+                {%- assign label_candidate = parts[0] | strip -%}
+                {%- assign value_candidate = clean_chunk | remove_first: label_candidate | remove_first: ':' | strip -%}
+
+                {%- if parts.size > 1 and label_candidate.size <= 25 and value_candidate != blank -%}
+                  {%- assign words = label_candidate | downcase | split: ' ' -%}
+                  {%- assign title_label = '' -%}
+                  {%- for word in words -%}
+                    {%- assign capped_word = word | capitalize -%}
+                    {%- assign title_label = title_label | append: capped_word | append: ' ' -%}
+                  {%- endfor -%}
+                  {%- assign title_label = title_label | strip -%}
+
+                  {%- if title_label == 'Hair Type' -%}
+                    {%- assign hair_type_value = value_candidate -%}
+                  {%- endif -%}
+                  {%- if title_label contains 'Lifespan' -%}
+                    {%- assign lifespan_value = value_candidate -%}
+                  {%- endif -%}
+
+                  <p class="tlw-body-md tlw-product__unit-line">{{ title_label }}: {{ value_candidate }}</p>
+                {%- else -%}
+                  <p class="tlw-body-md tlw-product__unit-line">{{ clean_chunk }}</p>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+        {%- else -%}
+
+        {% comment %} ---------- REAL VARIANTS ---------- {% endcomment %}
+        {%- unless product.has_only_default_variant -%}
+          {%- for option in product.options_with_values -%}
+            <div class="tlw-field">
+              <label class="tlw-label-caps tlw-field__label" id="tlw-opt-label-{{ section.id }}-{{ forloop.index }}">
+                {{ option.name }}
+              </label>
+
+              <div
+                class="tlw-dropdown"
+                data-dropdown
+                data-dropdown-id="variant-{{ forloop.index }}"
+              >
+                <select
+                  class="tlw-select tlw-visually-hidden"
+                  id="tlw-opt-{{ section.id }}-{{ forloop.index }}"
+                  data-option-index="{{ forloop.index0 }}"
+                  data-variant-option
+                  data-dropdown-store
+                  tabindex="-1"
+                  aria-hidden="true"
+                >
+                  {%- for value in option.values -%}
+                    <option
+                      value="{{ value | escape }}"
+                      {% if option.selected_value == value %}selected{% endif %}
+                    >
+                      {{ value }}
+                    </option>
+                  {%- endfor -%}
+                </select>
+
+                <button
+                  type="button"
+                  class="tlw-dropdown__trigger"
+                  data-dropdown-trigger
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-labelledby="tlw-opt-label-{{ section.id }}-{{ forloop.index }} tlw-opt-{{ section.id }}-{{ forloop.index }}-value"
+                >
+                  <span data-dropdown-value id="tlw-opt-{{ section.id }}-{{ forloop.index }}-value" class="tlw-dropdown__placeholder">
+                    Select {{ option.name | downcase }}...
+                  </span>
+                  <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" class="tlw-dropdown__chevron">
+                    <path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+
+                <ul class="tlw-dropdown__panel" data-dropdown-panel role="listbox" aria-label="{{ option.name }}" hidden>
+                  {%- for value in option.values -%}
+                    <li role="option" data-dropdown-option data-value="{{ value | escape }}">
+                      <button type="button" class="tlw-dropdown__option">
+                        <span>{{ value }}</span>
+                        <span class="tlw-dropdown__option-note" data-sold-out-label hidden>(Sold out)</span>
+                      </button>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </div>
+
+              {%- assign option_downcase = option.name | downcase -%}
+              {%- if option_downcase contains 'cap size' -%}
+                {%- assign measure_guide_id = 'variant-' | append: forloop.index -%}
+                <p class="tlw-field__help">
+                  {%- render 'tlw-measure-guide', id: measure_guide_id -%}
+                </p>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        {%- endunless -%}
+
+        {% comment %}
+          ---------- SERVICE OPTIONS ----------
+          Each block is one dropdown. Up to 3 of its choices can each carry
+          their own add-on product and price — most options only use the
+          first slot, but a few (like Layers) need two or three different
+          prices for different choices.
+        {% endcomment %}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'service_option' -%}
+            {%- assign values = block.settings.values | split: ',' -%}
+
+            {%- comment %} Build the list of paid choices for this option, skipping any slot that's incomplete. {%- endcomment %}
+            {%- assign addon_pairs = '' -%}
+
+            {%- assign addon_1 = block.settings.addon_product -%}
+            {%- if block.settings.trigger_value != blank and addon_1 != blank -%}
+              {%- assign pair = block.settings.trigger_value | strip | append: '::' | append: addon_1.selected_or_first_available_variant.id | append: '::' | append: addon_1.price -%}
+              {%- assign addon_pairs = addon_pairs | append: pair | append: '||' -%}
+            {%- endif -%}
+
+            {%- assign addon_2 = block.settings.addon_product_2 -%}
+            {%- if block.settings.trigger_value_2 != blank and addon_2 != blank -%}
+              {%- assign pair = block.settings.trigger_value_2 | strip | append: '::' | append: addon_2.selected_or_first_available_variant.id | append: '::' | append: addon_2.price -%}
+              {%- assign addon_pairs = addon_pairs | append: pair | append: '||' -%}
+            {%- endif -%}
+
+            {%- assign addon_3 = block.settings.addon_product_3 -%}
+            {%- if block.settings.trigger_value_3 != blank and addon_3 != blank -%}
+              {%- assign pair = block.settings.trigger_value_3 | strip | append: '::' | append: addon_3.selected_or_first_available_variant.id | append: '::' | append: addon_3.price -%}
+              {%- assign addon_pairs = addon_pairs | append: pair | append: '||' -%}
+            {%- endif -%}
+
+            {%- assign addon_4 = block.settings.addon_product_4 -%}
+            {%- if block.settings.trigger_value_4 != blank and addon_4 != blank -%}
+              {%- assign pair = block.settings.trigger_value_4 | strip | append: '::' | append: addon_4.selected_or_first_available_variant.id | append: '::' | append: addon_4.price -%}
+              {%- assign addon_pairs = addon_pairs | append: pair | append: '||' -%}
+            {%- endif -%}
+
+            {%- assign block_label_downcase = block.settings.label | downcase -%}
+            {%- assign is_reveal_child = false -%}
+            {%- if block_label_downcase == 'hairline' or block_label_downcase == 'styled' or block_label_downcase == 'layers' -%}
+              {%- assign is_reveal_child = true -%}
+            {%- endif -%}
+
+            <div
+              class="tlw-field{% if is_reveal_child %} tlw-field--reveal{% endif %}"
+              {{ block.shopify_attributes }}
+              data-field-label="{{ block_label_downcase }}"
+              {% if is_reveal_child %}data-customisation-reveal hidden{% endif %}
+            >
+              <label class="tlw-label-caps tlw-field__label" id="tlw-svc-label-{{ block.id }}">
+                <span>
+                  {{ block.settings.label }}
+                  {%- assign label_downcase = block.settings.label | downcase -%}
+                  {%- if label_downcase contains 'hairline' -%}
+                    {%- render 'tlw-hairline-guide', id: block.id -%}
+                  {%- endif -%}
+                </span>
+              </label>
+
+              <div class="tlw-dropdown" data-dropdown data-dropdown-id="svc-{{ block.id }}">
+                <select
+                  class="tlw-select tlw-visually-hidden"
+                  id="tlw-svc-{{ block.id }}"
+                  data-service-option
+                  data-property-name="{{ block.settings.label | escape }}"
+                  data-addon-pairs="{{ addon_pairs | escape }}"
+                  data-dropdown-store
+                  tabindex="-1"
+                  aria-hidden="true"
+                >
+                  {%- for value in values -%}
+                    {%- assign clean = value | strip -%}
+                    <option value="{{ clean | escape }}">{{ clean }}</option>
+                  {%- endfor -%}
+                </select>
+
+
+                <button
+                  type="button"
+                  class="tlw-dropdown__trigger"
+                  data-dropdown-trigger
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-labelledby="tlw-svc-label-{{ block.id }} tlw-svc-{{ block.id }}-value"
+                >
+                  <span data-dropdown-value id="tlw-svc-{{ block.id }}-value" class="tlw-dropdown__placeholder">
+                    Select {{ block.settings.label | downcase }}...
+                  </span>
+                  <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" class="tlw-dropdown__chevron">
+                    <path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+
+                <ul class="tlw-dropdown__panel" data-dropdown-panel role="listbox" aria-label="{{ block.settings.label }}" hidden>
+                  {%- for value in values -%}
+                    {%- assign clean = value | strip -%}
+                    {%- assign option_price = blank -%}
+                    {%- if clean == block.settings.trigger_value and addon_1 != blank -%}
+                      {%- assign option_price = addon_1.price -%}
+                    {%- elsif clean == block.settings.trigger_value_2 and addon_2 != blank -%}
+                      {%- assign option_price = addon_2.price -%}
+                    {%- elsif clean == block.settings.trigger_value_3 and addon_3 != blank -%}
+                      {%- assign option_price = addon_3.price -%}
+                    {%- elsif clean == block.settings.trigger_value_4 and addon_4 != blank -%}
+                      {%- assign option_price = addon_4.price -%}
+                    {%- endif -%}
+                    <li role="option" data-dropdown-option data-value="{{ clean | escape }}">
+                      <button type="button" class="tlw-dropdown__option">
+                        <span>
+                          {{ clean }}
+                          {%- if option_price != blank %} (+{{ option_price | money }}){% endif -%}
+                        </span>
+                      </button>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </div>
+
+              {%- if block.settings.help_text != blank -%}
+                <p class="tlw-field__help">{{ block.settings.help_text }}</p>
+              {%- endif -%}
+
+              {%- assign block_label_downcase = block.settings.label | downcase -%}
+              {%- if block_label_downcase contains 'cap size' -%}
+                <p class="tlw-field__help">
+                  {%- render 'tlw-measure-guide', id: block.id -%}
+                </p>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- endif -%}
+
+        {% comment %} ---------- TOTAL (kept for the add-on pricing script, hidden by CSS) ---------- {% endcomment %}
+        <div class="tlw-product__total">
+          <span class="tlw-label-caps">Total</span>
+          <span class="tlw-headline-sm" data-running-total>
+            {{ current_variant.price | money }}
+          </span>
+        </div>
+
+        {% comment %}
+          ---------- CUSTOMS ACKNOWLEDGEMENT ----------
+          Fixed, always on every product using this section — not a block,
+          so there's nothing to accidentally remove. Required: the form
+          won't submit until this is checked.
+        {% endcomment %}
+        <label class="tlw-product__ack" data-customs-ack>
+          <input type="checkbox" data-customs-checkbox>
+          <span class="tlw-product__ack-box">
+            <svg viewBox="0 0 12 10" width="10" height="8" aria-hidden="true">
+              <path d="M1 5l3.2 3.2L11 1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="tlw-product__ack-text">
+            I understand I may be responsible for any customs duties, taxes, or import fees on international orders.
+          </span>
+        </label>
+        <p class="tlw-product__ack-error" data-customs-error hidden>
+          Please confirm you understand the customs note above before adding to bag.
+        </p>
+
+        <input type="hidden" name="id" data-variant-id value="{{ current_variant.id }}">
+
+        <button
+          type="submit"
+          class="tlw-btn tlw-product__submit"
+          data-add-to-cart
+          {% unless current_variant.available %}disabled{% endunless %}
+        >
+          <span data-button-text>
+            {%- if current_variant.available -%}
+              {{ section.settings.button_label | default: 'Add to bag' }}
+            {%- else -%}
+              Sold out
+            {%- endif -%}
+          </span>
+        </button>
+
+        <p class="tlw-product__error" data-cart-error hidden></p>
+      </form>
+
+    </div>
+  </div>
+
+  {% comment %}
+    ---------- ACCORDIONS ----------
+    Every accordion is an "Accordion" block, editable in the theme editor.
+    Placeholders inside the text are swapped in automatically:
+      {hair_type}        -> Raw or Virgin (from the description's Hair Type line)
+      {lifespan}         -> from the description's Lifespan line, else "1 to 3 years"
+      {product_details}  -> the bulleted spec list built from the description
+  {% endcomment %}
+  {%- assign accordion_blocks = section.blocks | where: 'type', 'accordion' -%}
+  {%- if accordion_blocks.size > 0 -%}
+  <div class="tlw-product__accordions">
+
+    {%- liquid
+      assign hair_type_value = ''
+      assign lifespan_value = ''
+    -%}
+
+    {%- capture specs_html -%}
+      {%- unless chunks == '' -%}
+        <ul class="tlw-product__specs">
+          {%- for chunk in chunks -%}
+            {%- assign clean_chunk = chunk | strip -%}
+            {%- if clean_chunk == blank -%}
+              {%- continue -%}
+            {%- endif -%}
+
+            {%- assign parts = clean_chunk | split: ':' -%}
+            {%- assign label_candidate = parts[0] | strip -%}
+            {%- assign value_candidate = clean_chunk | remove_first: label_candidate | remove_first: ':' | strip -%}
+
+            {%- if parts.size > 1 and label_candidate.size <= 25 and value_candidate != blank -%}
+              {%- assign words = label_candidate | downcase | split: ' ' -%}
+              {%- assign title_label = '' -%}
+              {%- for word in words -%}
+                {%- assign capped_word = word | capitalize -%}
+                {%- assign title_label = title_label | append: capped_word | append: ' ' -%}
+              {%- endfor -%}
+              {%- assign title_label = title_label | strip -%}
+
+              {%- if title_label == 'Hair Type' -%}
+                {%- assign hair_type_value = value_candidate -%}
+              {%- endif -%}
+              {%- if title_label contains 'Lifespan' -%}
+                {%- assign lifespan_value = value_candidate -%}
+              {%- endif -%}
+
+              <li class="tlw-product__spec-item tlw-body-md">{{ title_label }}: {{ value_candidate }}</li>
+            {%- else -%}
+              <li class="tlw-product__spec-item tlw-body-md">{{ clean_chunk }}</li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endunless -%}
+    {%- endcapture -%}
+
+    {%- assign hair_word = 'Virgin' -%}
+    {%- if hair_type_value contains 'Raw' -%}
+      {%- assign hair_word = 'Raw' -%}
+    {%- endif -%}
+    {%- assign lifespan_word = '1 to 3 years' -%}
+    {%- if lifespan_value != blank -%}
+      {%- assign lifespan_word = lifespan_value -%}
+    {%- endif -%}
+
+    {%- for block in accordion_blocks -%}
+      {%- assign body = block.settings.content -%}
+
+      {%- comment %} A Product Details accordion is skipped when the product has no description. {%- endcomment %}
+      {%- if body contains '{product_details}' and specs_html == blank -%}
+        {%- continue -%}
+      {%- endif -%}
+
+      {%- assign body = body | replace: '<p>{product_details}</p>', specs_html | replace: '{product_details}', specs_html | replace: '{hair_type}', hair_word | replace: '{lifespan}', lifespan_word -%}
+
+      <div class="tlw-accordion" data-accordion {{ block.shopify_attributes }}>
+        <button type="button" class="tlw-accordion__trigger" data-accordion-trigger aria-expanded="false">
+          <span class="tlw-label-caps">{{ block.settings.title | default: 'Accordion' }}</span>
+          <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+        <div class="tlw-accordion__panel" data-accordion-panel>
+          <div class="tlw-accordion__inner tlw-body-md">
+            {{ body }}
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+
+  </div>
+  {%- endif -%}
+
+  {% comment %} ---------- FITTED ON REAL CLIENTS ---------- {% endcomment %}
+  {%- if section.blocks.size > 0 -%}
+    {%- assign client_blocks = section.blocks | where: 'type', 'client' -%}
+    {%- if client_blocks.size > 0 -%}
+      <div class="tlw-product__clients">
+        <div class="tlw-product__clients-head">
+          <span class="tlw-label-caps tlw-product__clients-eyebrow">Before You Take Our Word For It.</span>
+          <h2 class="tlw-headline-md">Fitted On Real Clients.</h2>
+        </div>
+        <div class="tlw-product__clients-grid">
+          {%- for block in client_blocks -%}
+            <div class="tlw-product__client" {{ block.shopify_attributes }}>
+              <div class="tlw-product__client-media">
+                {%- if block.settings.image != blank -%}
+                  {{ block.settings.image | image_url: width: 700 | image_tag: loading: 'lazy', alt: block.settings.name }}
+                {%- endif -%}
+                <div class="tlw-product__client-overlay">
+                  <p class="tlw-product__client-quote">&ldquo;{{ block.settings.quote }}&rdquo;</p>
+                  <p class="tlw-label-caps tlw-product__client-caption">{{ block.settings.name }} / {{ block.settings.length }} / {{ block.settings.lace_size }} lace</p>
+                </div>
+              </div>
+              <p class="tlw-label-caps tlw-product__client-caption tlw-product__client-caption--mobile">{{ block.settings.name }} / {{ block.settings.length }} / {{ block.settings.lace_size }} lace</p>
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+
+  {% comment %} ---------- EXPLORE ---------- {% endcomment %}
+  {%- if product.collections.size > 0 -%}
+    {%- assign explore_collection = product.collections.first -%}
+    <div class="tlw-product__explore">
+      <h2 class="tlw-headline-md">Explore the rest of {{ explore_collection.title }}</h2>
+      <p class="tlw-body-md">Every piece is hand-tied and finished to your measurements. See the full collection.</p>
+      <a href="{{ explore_collection.url }}" class="tlw-product__explore-btn">Back to {{ explore_collection.title }}</a>
+    </div>
+  {%- endif -%}
+
+  {% comment %}
+    Variant data for the price and availability updates. Written as JSON so the
+    script never has to guess which variant a set of options maps to.
+  {% endcomment %}
+  <script type="application/json" data-variant-json>
+    {{ product.variants | json }}
+  </script>
+</section>
+
+<style>
+  #tlw-product-{{ section.id }} {
+    padding-block: 48px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__grid {
+    display: grid;
+    gap: 40px;
+  }
+
+  @media (min-width: 900px) {
+    #tlw-product-{{ section.id }} {
+      padding-block: 80px;
+    }
+    #tlw-product-{{ section.id }} .tlw-product__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    #tlw-product-{{ section.id }} .tlw-product__info {
+      position: sticky;
+      top: calc(var(--tlw-nav-h) + 24px);
+    }
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__main-image img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__placeholder {
+    aspect-ratio: 4 / 5;
+    background: var(--tlw-surface-container);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tlw-outline);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__thumbs {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    overflow-x: auto;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__thumb {
+    flex: 0 0 72px;
+    padding: 0;
+    border: 1px solid transparent;
+    background: none;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__thumb.is-active {
+    border-color: var(--tlw-primary);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__thumb img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__eyebrow {
+    color: var(--tlw-outline);
+    margin: 0 0 12px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__title {
+    margin-bottom: 8px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__detail {
+    color: var(--tlw-on-surface-variant);
+    margin-bottom: 16px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__price {
+    margin: 0 0 32px;
+    font-family: var(--tlw-font-body);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-field {
+    margin-bottom: 32px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-field__label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-field__label > span:first-child {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-field__price {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 12px;
+    color: var(--tlw-outline);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-field__help {
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--tlw-outline);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-visually-hidden {
+    display: none;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown {
+    position: relative;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__trigger {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    border: none;
+    border-bottom: 1px solid var(--tlw-outline);
+    background: transparent;
+    padding: 12px 0;
+    font-family: var(--tlw-font-body);
+    font-size: 15px;
+    color: var(--tlw-primary);
+    cursor: pointer;
+    transition: border-color 200ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__trigger:hover {
+    border-color: rgba(181, 143, 45, 0.7);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown.is-open .tlw-dropdown__trigger {
+    border-color: var(--tlw-accent);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown.is-invalid .tlw-dropdown__trigger {
+    border-color: #c0392b;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__placeholder {
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__chevron {
+    flex-shrink: 0;
+    color: var(--tlw-on-surface-variant);
+    transition: transform 300ms ease, color 300ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown.is-open .tlw-dropdown__chevron {
+    color: var(--tlw-accent);
+    transform: rotate(180deg);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 40;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    width: 100%;
+    max-height: 280px;
+    overflow-y: auto;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.96);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(181, 143, 45, 0.35);
+    box-shadow: 0 18px 50px rgba(10, 10, 10, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    border: none;
+    border-left: 3px solid transparent;
+    background: transparent;
+    padding: 14px 24px;
+    text-align: left;
+    font-family: var(--tlw-font-display);
+    font-size: 15px;
+    color: var(--tlw-primary);
+    cursor: pointer;
+    transition: border-color 150ms ease, background-color 150ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__option:hover,
+  #tlw-product-{{ section.id }} [data-dropdown-option].is-active .tlw-dropdown__option {
+    border-left-color: var(--tlw-accent);
+    background: rgba(181, 143, 45, 0.1);
+  }
+
+  #tlw-product-{{ section.id }} [data-dropdown-option].is-selected .tlw-dropdown__option {
+    border-left-color: var(--tlw-accent);
+    background: rgba(181, 143, 45, 0.08);
+  }
+
+  #tlw-product-{{ section.id }} [data-dropdown-option].is-disabled .tlw-dropdown__option {
+    cursor: not-allowed;
+    opacity: 0.45;
+    border-left-color: transparent;
+    background: transparent;
+  }
+
+  #tlw-product-{{ section.id }} [data-dropdown-option].is-disabled .tlw-dropdown__option span:first-child {
+    text-decoration: line-through;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-dropdown__option-note {
+    flex-shrink: 0;
+    font-family: var(--tlw-font-body);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
   }
 
   #tlw-product-{{ section.id }} .tlw-product__unit-card {
@@ -1091,6 +1870,48 @@
 
   #tlw-product-{{ section.id }} .tlw-accordion__inner .tlw-body-md:last-child {
     margin-bottom: 0;
+  }
+
+  /* Rich text inside accordion blocks */
+  #tlw-product-{{ section.id }} .tlw-accordion__inner p {
+    margin: 0 0 12px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion__inner p:last-child {
+    margin-bottom: 0;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion__inner ul:not(.tlw-product__specs) {
+    margin: 8px 0;
+    padding-left: 20px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion__inner li:not(.tlw-product__spec-item) {
+    margin-bottom: 6px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion__inner a {
+    color: var(--tlw-primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  /* A line that is only bold text becomes a gold small-caps sub-heading */
+  #tlw-product-{{ section.id }} .tlw-accordion__inner p > strong:only-child {
+    display: block;
+    margin-top: 20px;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tlw-accent);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-accordion__inner > p:first-child > strong:only-child {
+    margin-top: 0;
   }
 
   /* ---------- Fitted on real clients ---------- */
@@ -1652,23 +2473,6 @@
       "label": "Ready to Ship: show fixed Unit Details card",
       "info": "Use on Ready to Ship templates \u2014 the unit is already made, so there's nothing to customise. Turns off every dropdown and just lists the specs from the description.",
       "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "show_closure_notice",
-      "label": "Show Closure Placement Notice accordion",
-      "info": "Tick on wig templates only.",
-      "default": false
-    },
-    {
-      "type": "header",
-      "content": "Accordion copy"
-    },
-    {
-      "type": "textarea",
-      "id": "international_orders_text",
-      "label": "International Orders text",
-      "default": "For orders shipped outside of the United Kingdom, import duties, taxes and customs fees may apply once your parcel reaches its destination country. These charges are determined by your local customs authorities and are the responsibility of the customer."
     }
   ],
   "blocks": [
@@ -1764,6 +2568,25 @@
       ]
     },
     {
+      "type": "accordion",
+      "name": "Accordion",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "New accordion"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content",
+          "info": "Placeholders filled in automatically: {hair_type}, {lifespan}, {product_details}. Bold a line on its own to make it a gold heading.",
+          "default": "<p>Add your text here.</p>"
+        }
+      ]
+    },
+    {
       "type": "client",
       "name": "Client photo",
       "settings": [
@@ -1848,6 +2671,62 @@
             "values": "No, Face framing, Heavy Layers (Curls Only), Blunt Cut",
             "trigger_value": "Face framing",
             "trigger_value_2": "Heavy Layers (Curls Only)"
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Product Details",
+            "content": "<p>{product_details}</p>"
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Hair Care",
+            "content": "<p>Our {hair_type} Hair can be washed and conditioned just like your natural hair. For the best results, we recommend using sulphate-free or organic hair care products to maintain the softness and longevity of the hair.</p><p>For best results, we recommend air drying your hair after washing. This helps retain moisture, reduces unnecessary heat exposure, and prolongs the life and quality of your hair.</p>"
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Longevity",
+            "content": "<p>With the correct maintenance and aftercare, our hair can last {lifespan}, making it a worthwhile investment.</p>"
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Closure Placement Notice",
+            "content": "<p>Please note that if you select Side Part for a 5x5, 6x6, or 7x7 closure unit the closure itself will be constructed and positioned on the side rather than in the centre. Please ensure you are happy with this before placing your order.</p><p>If you would like your closure to remain positioned in the centre but simply styled with a side part, please select Middle Part and at checkout leave a note requesting a side part. This will allow the closure to be installed centrally while still achieving your desired look.</p><p>Please note that 9x6 closure units are always constructed with the closure positioned in the centre due to the larger closure size.</p>"
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Shipping and Returns",
+            "content": "<p>Once your order has been placed, you have 24 hours to contact us if you wish to make any amendments. After this period, your order will be processed and no further changes can be made.</p><p>Each unit is custom made to order. Please allow 7-15 working days for your unit to be made before dispatch.</p><p>Once your order has been shipped, delivery typically takes:</p><ul><li>Royal Mail Tracked 24 (Tracked and Signed)</li><li>Royal Mail Special Delivery (Covers parcel if lost): Next working day before 1pm.</li></ul><p>For full details, please refer to our <a href=\"/pages/shipping-returns\">Shipping &amp; Returns Policy</a>.</p>"
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "How to Measure Your Head",
+            "content": "<p>To ensure the best fit, we recommend measuring your head before selecting your wig size.</p><p>Using a soft measuring tape, start at the centre of your hairline and wrap the tape around your head, passing just above your ears and around the nape of your neck before bringing it back to the starting point.</p><p>This measurement is your head circumference and will help you choose the correct cap size for the most secure and comfortable fit.</p><p>Please note: We strongly recommend measuring your head accurately before placing your order. As all units are custom-made, we cannot accept responsibility for incorrect measurements provided by the customer and cap sizes cannot be changed once production has begun.</p>"
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "International Orders",
+            "content": "<p>For orders shipped outside of the United Kingdom, import duties, taxes and customs fees may apply once your parcel reaches its destination country. These charges are determined by your local customs authorities and are the responsibility of the customer.</p>"
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Disclaimer (Please Read)",
+            "content": "<p><strong>Colour Disclaimer</strong></p><p>Every unit is unique. Slight variations in colour may occur. Please note that colours may appear differently depending on your device screen and lighting.</p><p><strong>Hair Length Disclaimer</strong></p><p>When selecting your desired hair length, please keep in mind that the final appearance will vary depending on how the hair is styled.</p><p>Curls may reduce the visible length by approximately 2-4 inches.</p><p>For example: If you would like your curled hair to appear approximately 22 inches long, we recommend selecting a straight hair length of 24-26 inches.</p><p>Please note that all hair lengths are measured when the hair is straight and fully stretched.</p><p><strong>Texture Disclaimer</strong></p><p>Please note that any unit displayed with a curled, loose wave or similar styled appearance has been heat styled. These looks are achieved by curling our straight hair and are intended to showcase the hair's versatility. This style is temporary and will gradually loosen over time, particularly after brushing or washing.</p><p>Once washed, the hair will return to its natural texture. The hair can be restyled using heat whenever desired.</p>"
           }
         },
         {
