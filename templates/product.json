@@ -474,6 +474,16 @@
     "tlw_main_product_DEyKL3": {
       "type": "tlw-main-product",
       "blocks": {
+        "client_TkLCBj": {
+          "type": "client",
+          "settings": {
+            "image": "shopify://shop_images/Screenshot_2026-09-19_at_20.00.44.png",
+            "name": "Sarah",
+            "length": "18\"",
+            "lace_size": "5x5",
+            "quote": "I love it"
+          }
+        },
         "service_option_PjxzrE": {
           "type": "service_option",
           "name": "Service option - Cap Size",
@@ -662,28 +672,10 @@
             "title": "Disclaimer (Please Read)",
             "content": "<p><strong>Colour Disclaimer</strong></p><p>Every unit is unique. Slight variations in colour may occur. Please note that colours may appear differently depending on your device screen and lighting.</p><p><strong>Hair Length Disclaimer</strong></p><p>When selecting your desired hair length, please keep in mind that the final appearance will vary depending on how the hair is styled.</p><p>Curls may reduce the visible length by approximately 2-4 inches.</p><p>For example: If you would like your curled hair to appear approximately 22 inches long, we recommend selecting a straight hair length of 24-26 inches.</p><p>Please note that all hair lengths are measured when the hair is straight and fully stretched.</p><p><strong>Texture Disclaimer</strong></p><p>Please note that any unit displayed with a curled, loose wave or similar styled appearance has been heat styled. These looks are achieved by curling our straight hair and are intended to showcase the hair's versatility. This style is temporary and will gradually loosen over time, particularly after brushing or washing.</p><p>Once washed, the hair will return to its natural texture. The hair can be restyled using heat whenever desired.</p>"
           }
-        },
-        "client_PXhQyG": {
-          "type": "client",
-          "settings": {
-            "image": "shopify://shop_images/coll-bespoq.jpg",
-            "name": "Ava",
-            "length": "14″",
-            "lace_size": "13x6",
-            "quote": "Finally a wig that feels like it was made just for me."
-          }
-        },
-        "client_n4bTGX": {
-          "type": "client",
-          "settings": {
-            "name": "Beverley",
-            "length": "22″",
-            "lace_size": "7x7",
-            "quote": "The density, the movement, the fit — everything is perfect."
-          }
         }
       },
       "block_order": [
+        "client_TkLCBj",
         "service_option_PjxzrE",
         "service_option_ba4LbX",
         "service_option_N3dymU",
@@ -698,16 +690,17 @@
         "accordion_QMBdfx",
         "accordion_brGykQ",
         "accordion_xbW3TM",
-        "accordion_XqcewM",
-        "client_PXhQyG",
-        "client_n4bTGX"
+        "accordion_XqcewM"
       ],
       "name": "TLW Product",
       "settings": {
         "detail_line": "",
         "button_label": "Add to bag",
         "show_collection_label": true,
-        "unit_details_mode": false
+        "unit_details_mode": false,
+        "clients_eyebrow": "Before You Take Our Word For It.",
+        "clients_heading": "Fitted On Real Clients.",
+        "clients_size": "large"
       }
     }
   },
