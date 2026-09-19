@@ -474,6 +474,24 @@
     "tlw_main_product_DEyKL3": {
       "type": "tlw-main-product",
       "blocks": {
+        "service_option_PjxzrE": {
+          "type": "service_option",
+          "name": "Service option - Cap Size",
+          "settings": {
+            "label": "Cap Size",
+            "values": "Small, Medium, Large",
+            "trigger_value": "",
+            "addon_product": "",
+            "trigger_value_2": "",
+            "addon_product_2": "",
+            "trigger_value_3": "",
+            "addon_product_3": "",
+            "trigger_value_4": "",
+            "addon_product_4": "",
+            "help_text": "",
+            "reveal_on_customisation": false
+          }
+        },
         "service_option_N3dymU": {
           "type": "service_option",
           "name": "Service option - Customisation",
@@ -659,6 +677,7 @@
         }
       },
       "block_order": [
+        "service_option_PjxzrE",
         "service_option_N3dymU",
         "service_option_qBMEFa",
         "service_option_ba4LbX",
