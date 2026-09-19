@@ -102,6 +102,7 @@
     "variant_button_border_width": 1,
     "variant_button_radius": 14,
     "variant_button_width": "equal-width-buttons",
+    "tlw_measure_image": "shopify://shop_images/cap-size-measurement.png",
     "content_for_index": [],
     "blocks": {
       "14060646107696862457": {
