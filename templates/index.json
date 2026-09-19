@@ -20,7 +20,7 @@
         "logo_top": 0,
         "logo_on_mobile": false,
         "button_label": "Shop the collections",
-        "button_link": "shopify://collections/frontpage",
+        "button_link": "",
         "cta_top": 50,
         "cta_align": "flex-start",
         "scroll_label": "Welcome",
@@ -111,6 +111,14 @@
         "reflection_opacity": 75,
         "padding-block-start": 100,
         "padding-block-end": 72
+      }
+    },
+    "tlw_scroll_target_tLTLdF": {
+      "type": "tlw-scroll-target",
+      "name": "TLW Scroll target",
+      "settings": {
+        "link_text": "Shop all collections",
+        "top_space": 90
       }
     },
     "tlw_collections_showcase_rCTPQj": {
@@ -522,14 +530,6 @@
         "message_label": "Tell us what you have in mind",
         "submit_label": "Send enquiry",
         "success_text": "Thank you. Your enquiry is with us and we will be in touch within two working days."
-      }
-    },
-    "tlw_scroll_target_tLTLdF": {
-      "type": "tlw-scroll-target",
-      "name": "TLW Scroll target",
-      "settings": {
-        "link_text": "Shop all collections",
-        "top_space": 90
       }
     }
   },
