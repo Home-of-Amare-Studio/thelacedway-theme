@@ -850,20 +850,32 @@
     {%- endunless -%}
     {%- assign rv_heading = section.settings.reviews_heading | default: 'What clients say about {product}' | replace: '{product}', rv_name -%}
 
-    <div class="tlw-product__reviews" id="tlw-reviews" data-tlw-reviews data-clean="{{ section.settings.reviews_clean }}" data-view-more="{{ section.settings.reviews_view_more }}" data-more-label="{{ section.settings.reviews_more_label | default: 'View more' | escape }}" data-less-label="{{ section.settings.reviews_less_label | default: 'View less' | escape }}" style="--tlw-review-lines: {{ section.settings.reviews_lines | default: 5 }};">
+    <div class="tlw-product__reviews{% unless rv_count > 0 %} tlw-product__reviews--empty{% endunless %}" id="tlw-reviews" data-tlw-reviews data-clean="{{ section.settings.reviews_clean }}" data-view-more="{{ section.settings.reviews_view_more }}" data-more-label="{{ section.settings.reviews_more_label | default: 'View more' | escape }}" data-less-label="{{ section.settings.reviews_less_label | default: 'View less' | escape }}" style="--tlw-review-lines: {{ section.settings.reviews_lines | default: 5 }};">
       <div class="tlw-product__reviews-inner">
-        {%- if section.settings.reviews_eyebrow != blank -%}
-          <p class="tlw-product__reviews-eyebrow">{{ section.settings.reviews_eyebrow | escape }}</p>
-        {%- endif -%}
+        <div class="tlw-product__reviews-head">
+          {%- if section.settings.reviews_eyebrow != blank -%}
+            <p class="tlw-product__reviews-eyebrow">{{ section.settings.reviews_eyebrow | escape }}</p>
+          {%- endif -%}
 
-        <h2 class="tlw-product__reviews-title">{{ rv_heading | escape }}</h2>
+          <h2 class="tlw-product__reviews-title">{{ rv_heading | escape }}</h2>
 
-        {%- if section.settings.reviews_summary and rv_obj != blank and rv_count > 0 -%}
-          <p class="tlw-product__reviews-summary">
-            {%- render 'tlw-stars', rating: rv_obj.rating, max: rv_obj.scale_max, size: 18 -%}
-            <span>{{ rv_obj.rating | times: 1.0 | round: 1 }} average &middot; {{ rv_count }} {% if rv_count == 1 %}review{% else %}reviews{% endif %}</span>
-          </p>
-        {%- endif -%}
+          {%- if section.settings.reviews_summary and rv_obj != blank and rv_count > 0 -%}
+            <p class="tlw-product__reviews-summary">
+              {%- render 'tlw-stars', rating: rv_obj.rating, max: rv_obj.scale_max, size: 18 -%}
+              <span>{{ rv_obj.rating | times: 1.0 | round: 1 }} average &middot; {{ rv_count }} {% if rv_count == 1 %}review{% else %}reviews{% endif %}</span>
+            </p>
+          {%- endif -%}
+        </div>
+
+        {%- comment %} No reviews yet: no big heading, just a small nudge above the Write a review button. {%- endcomment %}
+        <div class="tlw-product__reviews-tip">
+          {%- if section.settings.reviews_empty_title != blank -%}
+            <p class="tlw-product__reviews-tip-title">{{ section.settings.reviews_empty_title | escape }}</p>
+          {%- endif -%}
+          {%- if section.settings.reviews_empty_text != blank -%}
+            <p class="tlw-product__reviews-tip-text">{{ section.settings.reviews_empty_text | escape }}</p>
+          {%- endif -%}
+        </div>
 
         {%- if section.settings.reviews_widget -%}
           <div class="tlw-product__reviews-widget{% if section.settings.reviews_hide_badge %} tlw-product__reviews-widget--nobadge{% endif %}">
@@ -1770,6 +1782,45 @@
     color: var(--tlw-accent);
   }
 
+  /* no reviews yet: a small tip instead of the big heading */
+  #tlw-product-{{ section.id }} .tlw-product__reviews-tip {
+    display: none;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews--empty {
+    margin-top: 64px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews--empty .tlw-product__reviews-head {
+    display: none;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews--empty .tlw-product__reviews-tip {
+    display: block;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews-tip-title {
+    margin: 0 0 6px;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews-tip-text {
+    margin: 0;
+    font-family: var(--tlw-font-body);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews--empty .tlw-product__reviews-widget {
+    margin-top: 20px;
+  }
+
   #tlw-product-{{ section.id }} .tlw-product__reviews-widget,
   #tlw-product-{{ section.id }} .tlw-product__reviews-app {
     margin-top: 48px;
@@ -1814,6 +1865,10 @@
     text-align: left !important;
     margin-left: 0 !important;
     padding-left: 0 !important;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-write-rev-link {
+    margin-left: 0 !important;
   }
 
   #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-widget-actions-wrapper {
@@ -2493,6 +2548,7 @@
     if (leftWrap) {
       var leftAlign = function () {
         leftWrap.querySelectorAll('.jdgm-write-rev-link').forEach(function (btn) {
+          btn.style.setProperty('margin-left', '0', 'important');
           var widget = btn.closest('.jdgm-rev-widg') || btn.closest('.jdgm-widget');
           var node = btn.parentElement;
           while (node && node !== widget && node !== leftWrap) {
@@ -2519,6 +2575,32 @@
       }
       window.addEventListener('load', scheduleLeft);
       scheduleLeft();
+    }
+
+    /* ---- reviews: heading or "leave a review" tip, decided by what Judge.me actually shows ----
+       The page starts with the review count Judge.me stores on the product. If the widget then
+       shows something different (no reviews, or some), swap between the heading and the tip. */
+    var stateWrap = root.querySelector('[data-tlw-reviews]');
+    if (stateWrap) {
+      var syncReviewState = function () {
+        var widget = stateWrap.querySelector('.jdgm-rev-widg');
+        if (!widget) return; /* Judge.me has not drawn yet: keep the starting state */
+        var reported = parseInt(widget.getAttribute('data-number-of-reviews'), 10);
+        var hasReviews = isNaN(reported) ? !!widget.querySelector('.jdgm-rev') : reported > 0;
+        stateWrap.classList.toggle('tlw-product__reviews--empty', !hasReviews);
+      };
+
+      var stateTimer = null;
+      var scheduleState = function () {
+        clearTimeout(stateTimer);
+        stateTimer = setTimeout(syncReviewState, 250);
+      };
+
+      if (window.MutationObserver) {
+        new MutationObserver(scheduleState).observe(stateWrap, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-number-of-reviews'] });
+      }
+      window.addEventListener('load', scheduleState);
+      scheduleState();
     }
   })();
 </script>
@@ -2649,6 +2731,18 @@
       "label": "Show the Judge.me reviews and Write a review button",
       "info": "Turn off only if you add Judge.me's own block instead, to avoid showing reviews twice.",
       "default": true
+    },
+    {
+      "type": "text",
+      "id": "reviews_empty_title",
+      "label": "Tip when there are no reviews: small heading",
+      "default": "Leave a review"
+    },
+    {
+      "type": "text",
+      "id": "reviews_empty_text",
+      "label": "Tip when there are no reviews: message",
+      "default": "Be the first to leave a review."
     },
     {
       "type": "checkbox",
@@ -3033,3 +3127,4 @@
   ]
 }
 {% endschema %}
+
