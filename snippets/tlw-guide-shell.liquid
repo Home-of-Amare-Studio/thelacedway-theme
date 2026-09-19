@@ -1,0 +1,70 @@
+{% comment %}
+  THELACEDWÁY hairline guide: "?" icon that opens a slide-in panel.
+  Home of Amare Studio
+
+  Param: id (any unique string, e.g. the block id)
+
+  All wording and images are edited in the theme editor:
+  Theme settings -> THELACEDWÁY guides -> Hairline pop-up.
+{% endcomment %}
+
+{%- liquid
+  assign h_title = settings.tlw_hairline_title | default: 'Choosing your hairline'
+  assign h_intro = settings.tlw_hairline_intro
+  if h_intro == blank
+    assign h_intro = '<p>Both hairlines are hand-tied and customised to you. The difference is the density and how sculpted the perimeter looks.</p>'
+  endif
+
+  assign any_custom = false
+  if settings.tlw_hairline_1_name != blank or settings.tlw_hairline_2_name != blank or settings.tlw_hairline_3_name != blank or settings.tlw_hairline_4_name != blank
+    assign any_custom = true
+  endif
+-%}
+
+{%- capture guide_trigger -%}
+  <button type="button" class="tlw-guide-icon" data-tlw-guide-open="{{ id }}" aria-haspopup="dialog" aria-label="About hairline options" title="About hairline options">
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+  </button>
+{%- endcapture -%}
+
+{%- capture guide_body -%}
+  <div class="tlw-guide__rich">{{ h_intro }}</div>
+
+  <div class="tlw-guide__cards">
+    {%- assign option_number = 0 -%}
+    {%- for n in (1..4) -%}
+      {%- assign name_key = 'tlw_hairline_' | append: n | append: '_name' -%}
+      {%- assign text_key = 'tlw_hairline_' | append: n | append: '_text' -%}
+      {%- assign image_key = 'tlw_hairline_' | append: n | append: '_image' -%}
+      {%- assign o_name = settings[name_key] -%}
+      {%- assign o_text = settings[text_key] -%}
+      {%- assign o_image = settings[image_key] -%}
+
+      {%- unless any_custom -%}
+        {%- if n == 1 -%}
+          {%- assign o_name = 'Natural hairline' -%}
+          {%- assign o_text = '<p>A softer, denser hairline that follows your own natural growth pattern. Minimal plucking, fuller at the front. Best if you like a low-maintenance, everyday finish.</p>' -%}
+        {%- elsif n == 2 -%}
+          {%- assign o_name = 'Light Lagos hairline' -%}
+          {%- assign o_text = '<p>A more sculpted, airy hairline with finer baby hairs and a lighter density at the perimeter. Gives a more styled, laid finish and photographs beautifully.</p>' -%}
+        {%- endif -%}
+      {%- endunless -%}
+
+      {%- if o_name != blank -%}
+        {%- assign option_number = option_number | plus: 1 -%}
+        <div class="tlw-guide__card">
+          <span class="tlw-guide__eyebrow">Option {{ option_number }}</span>
+          <h3 class="tlw-guide__card-title">{{ o_name | escape }}</h3>
+          {%- if o_text != blank -%}
+            <div class="tlw-guide__card-text">{{ o_text }}</div>
+          {%- endif -%}
+          {%- if o_image != blank -%}
+            {{ o_image | image_url: width: 800 | image_tag: loading: 'lazy', class: 'tlw-guide__img', alt: o_name }}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+{%- endcapture -%}
+
+{%- render 'tlw-guide-shell', id: id, title: h_title, trigger: guide_trigger, body: guide_body -%}
