@@ -152,11 +152,29 @@
         "logo_nudge": 0,
         "link_gap": 32
       }
+    },
+    "tlw_cart_drawer_hmeRrV": {
+      "type": "tlw-cart-drawer",
+      "name": "TLW Cart drawer",
+      "settings": {
+        "title": "Your Bag",
+        "empty_text": "Your bag is empty",
+        "customs_note": "By continuing you confirm you may be responsible for any customs duties, taxes, or import fees on international orders.",
+        "checkout_label": "Checkout",
+        "shipping_note": "Shipping and taxes calculated at checkout",
+        "text_colour": "#241b15",
+        "line_colour": "#d1c4bd",
+        "checkout_colour": "#3a3029",
+        "hover_colour": "#a68b3f",
+        "checkout_new_tab": false,
+        "intercept_bag_links": true
+      }
     }
   },
   "order": [
     "header_announcements_9jGBFp",
     "header_section",
-    "tlw_header_agmzmR"
+    "tlw_header_agmzmR",
+    "tlw_cart_drawer_hmeRrV"
   ]
 }
