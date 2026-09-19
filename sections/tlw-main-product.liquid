@@ -707,16 +707,6 @@
       <div class="tlw-product__clients-head">
         <span class="tlw-label-caps tlw-product__clients-eyebrow">{{ section.settings.clients_eyebrow | default: 'Before You Take Our Word For It.' | escape }}</span>
         <h2 class="tlw-product__clients-title">{{ section.settings.clients_heading | default: 'Fitted On Real Clients.' | escape }}</h2>
-        {%- if request.design_mode -%}
-          <p class="tlw-product__clients-note">
-            Editor note (visitors never see this): previewing &ldquo;{{ product.title | escape }}&rdquo;.
-            Client photos box: {% if meta_photos != blank %}found, {{ meta_photos.size | default: 1 }} photo(s), type {{ meta_field.type | default: 'unknown' }}{% else %}empty, or not found on this product{% endif %}.
-            The cards below come from {% if use_meta %}this product&rsquo;s own boxes{% else %}the template&rsquo;s Client photo blocks{% endif %}.
-            {%- if meta_photos != blank %}
-              <br>Raw data the page received for the photos: <code>{{ meta_photos | json | truncate: 600 | escape }}</code>
-            {%- endif %}
-          </p>
-        {%- endif -%}
       </div>
       <div class="tlw-product__clients-grid" style="--cols-d: {{ cols_d }}; --cols-t: {{ cols_t }};">
         {%- for i in (1..client_total) -%}
