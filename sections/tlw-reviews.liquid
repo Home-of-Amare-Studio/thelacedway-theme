@@ -7,8 +7,13 @@
   That also means you curate which ones show rather than taking whatever came in
   last, which is arguably better for a homepage.
 
-  The row scrolls itself at a slow constant speed and pauses when you hover or
-  touch it. The list is doubled so the loop has no visible seam.
+  Desktop: the row scrolls itself at a slow constant speed and pauses when you
+  hover or touch it. The list is doubled so the loop has no visible seam.
+
+  Phones: the row is swiped by hand. Cards are narrower so the next one always
+  peeks in, and each swipe snaps to a card. (Auto-scrolling fights a swiping
+  thumb, so it is switched off on phones. It can be turned back on in the
+  section settings.)
 {% endcomment %}
 
 {%- liquid
@@ -39,7 +44,7 @@
   assign rem = avg_tenths | modulo: 10
 -%}
 
-<section class="tlw-reviews" id="tlw-reviews-{{ section.id }}">
+<section class="tlw-reviews{% if section.settings.mobile_manual %} tlw-reviews--manual{% endif %}" id="tlw-reviews-{{ section.id }}">
 
   <header class="tlw-reviews__head">
     {%- if section.settings.eyebrow != blank -%}
@@ -284,6 +289,31 @@
     #tlw-reviews-{{ section.id }} .tlw-review { flex-basis: 340px; }
   }
 
+  /* Phones: swipe by hand. Narrower cards so the next one always peeks in, and each swipe
+     snaps to a card. The second (repeat) copy of the list is only for the desktop loop. */
+  @media (max-width: 767px) {
+    #tlw-reviews-{{ section.id }}.tlw-reviews--manual .tlw-reviews__track {
+      scroll-snap-type: x mandatory;
+      scroll-padding-left: var(--tlw-margin);
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #tlw-reviews-{{ section.id }}.tlw-reviews--manual .tlw-reviews__row {
+      gap: 20px;
+      padding-right: var(--tlw-margin);
+    }
+
+    #tlw-reviews-{{ section.id }}.tlw-reviews--manual .tlw-review {
+      flex: 0 0 min(290px, 68vw);
+      scroll-snap-align: start;
+    }
+
+    #tlw-reviews-{{ section.id }}.tlw-reviews--manual .tlw-review[aria-hidden="true"] {
+      display: none;
+    }
+  }
+
   #tlw-reviews-{{ section.id }} .tlw-review__media {
     aspect-ratio: 4 / 5;
     overflow: hidden;
@@ -377,6 +407,10 @@
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+    /* On phones the row is swiped by hand (unless switched off in the settings). */
+    var manualOnPhone = root.classList.contains('tlw-reviews--manual');
+    var phone = window.matchMedia('(max-width: 767px)');
+
     var speed = parseFloat(track.dataset.speed) || 28;
     var paused = false;
     var last = performance.now();
@@ -385,7 +419,7 @@
       var dt = now - last;
       last = now;
 
-      if (!paused) {
+      if (!paused && !(manualOnPhone && phone.matches)) {
         track.scrollLeft += (dt / 1000) * speed;
         /* The list is rendered twice, so jumping back by half is invisible. */
         var half = row.scrollWidth / 2;
@@ -484,6 +518,13 @@
       "max": 80,
       "step": 4,
       "default": 28
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_manual",
+      "label": "On phones, swipe by hand instead of scrolling by itself",
+      "info": "Cards are narrower so the next one peeks in, and each swipe snaps to a card. Desktop keeps the slow auto-scroll.",
+      "default": true
     },
     {
       "type": "text",
