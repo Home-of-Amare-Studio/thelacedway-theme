@@ -16,6 +16,9 @@
   Add-on products are tagged 'addon' in Shopify. They are published so they
   can be added to the cart, but customers should never browse them, so they
   are skipped here.
+
+  Phones: one product per row by default (setting: Products per row on phones),
+  each with a large image, the name on the left and the price on the right.
 {% endcomment %}
 
 {%- liquid
@@ -184,6 +187,8 @@
 </section>
 
 <style>
+  {%- assign m_cols = section.settings.mobile_columns | default: '1' -%}
+
   #tlw-collection-{{ section.id }} {
     padding-block: 48px 80px;
   }
@@ -258,10 +263,13 @@
     color: var(--tlw-primary);
   }
 
+  /* Phones: minmax(0, 1fr) lets each column shrink to the screen. A plain 1fr cannot shrink
+     below its content (long names, "From £285.00"), which is what pushed the second column off
+     the edge. */
   #tlw-collection-{{ section.id }} .tlw-collection__grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px 12px;
+    grid-template-columns: repeat({{ m_cols }}, minmax(0, 1fr));
+    gap: {% if m_cols == '1' %}56px 0{% else %}32px 12px{% endif %};
   }
 
   @media (min-width: 700px) {
@@ -475,6 +483,40 @@
     background: var(--tlw-accent);
     color: var(--tlw-on-primary);
   }
+
+  /* Phones, one product per row: every image is the same tall shape, so each row takes up the
+     same space, and the card can never be wider than the screen. */
+  @media (max-width: 699px) {
+    #tlw-collection-{{ section.id }} .tlw-card,
+    #tlw-collection-{{ section.id }} .tlw-card__body,
+    #tlw-collection-{{ section.id }} .tlw-card__title {
+      min-width: 0;
+    }
+
+    #tlw-collection-{{ section.id }} .tlw-card__title {
+      overflow-wrap: anywhere;
+    }
+
+    {% if m_cols == '1' %}
+    #tlw-collection-{{ section.id }} .tlw-card__media {
+      aspect-ratio: 3 / 4;
+    }
+
+    #tlw-collection-{{ section.id }} .tlw-card__body {
+      padding-top: 20px;
+    }
+
+    #tlw-collection-{{ section.id }} .tlw-card__caption {
+      margin-top: 6px;
+      font-size: 15px;
+    }
+
+    /* the caption is the last line, as in the reference design; the whole card is still tappable */
+    #tlw-collection-{{ section.id }} .tlw-card__view {
+      display: none;
+    }
+    {% endif %}
+  }
 </style>
 
 {% schema %}
@@ -525,6 +567,17 @@
       "step": 8,
       "unit": "px",
       "default": 120
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Products per row on phones",
+      "info": "One per row gives each piece a large image, with the name on the left and the price on the right.",
+      "options": [
+        { "value": "1", "label": "One per row" },
+        { "value": "2", "label": "Two per row" }
+      ],
+      "default": "1"
     },
     {
       "type": "range",
