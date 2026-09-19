@@ -1,0 +1,77 @@
+{% comment %}
+  THELACEDWÁY star rating
+  Home of Amare Studio
+
+  Params:
+    rating  the average, e.g. 4.8
+    max     the top of the scale (default 5)
+    size    star height in px (default 18)
+
+  Gold stars over grey ones, filled to the exact average (4.5 shows four and a half stars).
+{% endcomment %}
+
+{%- liquid
+  assign r = rating | times: 1.0
+  assign m = max | default: 5 | times: 1.0
+  assign pct = r | divided_by: m | times: 100
+  if pct > 100
+    assign pct = 100
+  endif
+  if pct < 0
+    assign pct = 0
+  endif
+  assign h = size | default: 18
+  assign w = h | times: 5
+-%}
+
+<span class="tlw-stars" role="img" aria-label="Rated {{ r | round: 1 }} out of {{ m | round: 0 }}" style="width: {{ w }}px; height: {{ h }}px;">
+  <svg class="tlw-stars__base" viewBox="0 0 120 24" width="{{ w }}" height="{{ h }}" aria-hidden="true" focusable="false">
+    {%- for i in (0..4) -%}
+      <polygon transform="translate({{ i | times: 24 }} 0)" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+    {%- endfor -%}
+  </svg>
+  <span class="tlw-stars__fill" style="width: {{ pct }}%;">
+    <svg viewBox="0 0 120 24" width="{{ w }}" height="{{ h }}" aria-hidden="true" focusable="false">
+      {%- for i in (0..4) -%}
+        <polygon transform="translate({{ i | times: 24 }} 0)" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+      {%- endfor -%}
+    </svg>
+  </span>
+</span>
+
+<style>
+  .tlw-stars {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+    vertical-align: middle;
+    line-height: 0;
+  }
+
+  .tlw-stars svg {
+    display: block;
+    max-width: none;
+  }
+
+  .tlw-stars__base polygon {
+    fill: var(--tlw-outline-variant, #e3ded5);
+    stroke: var(--tlw-outline-variant, #e3ded5);
+    stroke-width: 1;
+    stroke-linejoin: round;
+  }
+
+  .tlw-stars__fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .tlw-stars__fill polygon {
+    fill: var(--tlw-accent, #a68b3f);
+    stroke: var(--tlw-accent, #a68b3f);
+    stroke-width: 1;
+    stroke-linejoin: round;
+  }
+</style>
