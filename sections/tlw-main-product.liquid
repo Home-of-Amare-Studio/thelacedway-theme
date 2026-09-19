@@ -468,8 +468,44 @@
       {%- assign lifespan_word = lifespan_value -%}
     {%- endif -%}
 
+    {% comment %}
+      Per-product overrides. Reads the product metafield custom.accordion_overrides
+      (multi-line text), one instruction per line:
+        Title: hide                    hides the accordion with that title on this product
+        Title: replacement text        replaces that accordion's text on this product
+        + Title: text                  adds an extra accordion to this product only
+      Use || inside a line to start a new paragraph.
+    {% endcomment %}
+    {%- assign overrides_raw = product.metafields.custom.accordion_overrides.value | default: '' -%}
+    {%- assign override_lines = overrides_raw | newline_to_br | split: '<br />' -%}
+
     {%- for block in accordion_blocks -%}
+      {%- assign block_title = block.settings.title | default: 'Accordion' -%}
+      {%- assign block_key = block_title | strip | downcase -%}
       {%- assign body = block.settings.content -%}
+      {%- assign hide_block = false -%}
+
+      {%- for ol in override_lines -%}
+        {%- assign ol_clean = ol | strip -%}
+        {%- unless ol_clean contains ':' -%}
+          {%- continue -%}
+        {%- endunless -%}
+        {%- assign ol_parts = ol_clean | split: ':' -%}
+        {%- assign ol_key = ol_parts[0] | strip | downcase -%}
+        {%- if ol_key == block_key -%}
+          {%- assign ol_val = ol_clean | remove_first: ol_parts[0] | remove_first: ':' | strip -%}
+          {%- assign ol_val_key = ol_val | downcase -%}
+          {%- if ol_val_key == 'hide' -%}
+            {%- assign hide_block = true -%}
+          {%- elsif ol_val != blank -%}
+            {%- assign body = ol_val | replace: '||', '</p><p>' | prepend: '<p>' | append: '</p>' -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if hide_block -%}
+        {%- continue -%}
+      {%- endif -%}
 
       {%- comment %} A Product Details accordion is skipped when the product has no description. {%- endcomment %}
       {%- if body contains '{product_details}' and specs_html == blank -%}
@@ -480,12 +516,44 @@
 
       <div class="tlw-accordion" data-accordion {{ block.shopify_attributes }}>
         <button type="button" class="tlw-accordion__trigger" data-accordion-trigger aria-expanded="false">
-          <span class="tlw-label-caps">{{ block.settings.title | default: 'Accordion' }}</span>
+          <span class="tlw-label-caps">{{ block_title }}</span>
           <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
         </button>
         <div class="tlw-accordion__panel" data-accordion-panel>
           <div class="tlw-accordion__inner">
             {{ body }}
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+
+    {%- comment %} Extra accordions added for this product only ("+ Title: text"). {%- endcomment %}
+    {%- for ol in override_lines -%}
+      {%- assign ol_clean = ol | strip -%}
+      {%- unless ol_clean contains ':' -%}
+        {%- continue -%}
+      {%- endunless -%}
+      {%- assign first_char = ol_clean | slice: 0 -%}
+      {%- unless first_char == '+' -%}
+        {%- continue -%}
+      {%- endunless -%}
+      {%- assign ol_parts = ol_clean | split: ':' -%}
+      {%- assign extra_title = ol_parts[0] | remove_first: '+' | strip -%}
+      {%- assign extra_body = ol_clean | remove_first: ol_parts[0] | remove_first: ':' | strip -%}
+      {%- if extra_title == blank or extra_body == blank -%}
+        {%- continue -%}
+      {%- endif -%}
+      {%- assign extra_body = extra_body | replace: '||', '</p><p>' | prepend: '<p>' | append: '</p>' -%}
+      {%- assign extra_body = extra_body | replace: '<p>{product_details}</p>', specs_html | replace: '{product_details}', specs_html | replace: '{hair_type}', hair_word | replace: '{lifespan}', lifespan_word | replace: '<p><strong>', '<p class="tlw-label-caps tlw-product__disclaimer-heading"><strong>' | replace: '<p>', '<p class="tlw-body-md">' | replace: '<ul>', '<ul class="tlw-product__list">' -%}
+
+      <div class="tlw-accordion" data-accordion>
+        <button type="button" class="tlw-accordion__trigger" data-accordion-trigger aria-expanded="false">
+          <span class="tlw-label-caps">{{ extra_title | escape }}</span>
+          <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+        <div class="tlw-accordion__panel" data-accordion-panel>
+          <div class="tlw-accordion__inner">
+            {{ extra_body }}
           </div>
         </div>
       </div>
