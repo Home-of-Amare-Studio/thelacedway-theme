@@ -1,0 +1,157 @@
+{% comment %}
+  THELACEDWÁY collection call-to-action
+  Home of Amare Studio
+
+  The centred box at the bottom of a collection page: a thin gold line, a
+  heading, a short paragraph and one gold-outlined button. Everything is
+  editable in the theme editor.
+{% endcomment %}
+
+{%- liquid
+  assign cta_link = section.settings.button_link
+  if cta_link == blank
+    assign cta_link = '/pages/contact'
+  endif
+-%}
+
+<section class="tlw-ccta" id="tlw-ccta-{{ section.id }}">
+  <div class="tlw-ccta__inner{% if section.settings.show_line %} tlw-ccta__inner--line{% endif %}">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="tlw-ccta__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.body != blank -%}
+      <p class="tlw-ccta__body">{{ section.settings.body | escape | newline_to_br }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.button_label != blank -%}
+      <a href="{{ cta_link }}" class="tlw-ccta__btn">{{ section.settings.button_label | escape }}</a>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  #tlw-ccta-{{ section.id }} {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 96px var(--tlw-margin, 24px) 96px;
+  }
+
+  #tlw-ccta-{{ section.id }} .tlw-ccta__inner {
+    max-width: 672px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  #tlw-ccta-{{ section.id }} .tlw-ccta__inner--line {
+    padding-top: 64px;
+    border-top: 1px solid rgba(166, 139, 63, 0.4);
+  }
+
+  #tlw-ccta-{{ section.id }} .tlw-ccta__heading {
+    margin: 0 0 16px;
+    font-family: var(--tlw-font-display);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--tlw-primary);
+  }
+
+  #tlw-ccta-{{ section.id }} .tlw-ccta__body {
+    margin: 0 0 32px;
+    font-family: var(--tlw-font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-ccta-{{ section.id }} .tlw-ccta__btn {
+    display: inline-block;
+    padding: 16px 40px;
+    border: 1px solid var(--tlw-accent);
+    background: transparent;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--tlw-primary);
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+
+  #tlw-ccta-{{ section.id }} .tlw-ccta__btn:hover {
+    background: var(--tlw-accent);
+    color: var(--tlw-on-primary);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "TLW Collection CTA",
+  "tag": "div",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Paragraph"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button text",
+      "info": "Leave empty to hide the button."
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link",
+      "info": "Where the button goes. If left empty it goes to /pages/contact."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_line",
+      "label": "Show the thin gold line above",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTA: Lace Systems",
+      "settings": {
+        "heading": "Not sure which lace size?",
+        "body": "Tell us how you part and style your hair and we'll point you to the right closure or frontal.",
+        "button_label": "Contact us",
+        "show_line": true
+      }
+    },
+    {
+      "name": "CTA: Bundles",
+      "settings": {
+        "heading": "Not sure how many bundles?",
+        "body": "Tell us the length and fullness you have in mind and we'll advise on the right quantity.",
+        "button_label": "Enquire",
+        "show_line": true
+      }
+    },
+    {
+      "name": "CTA: Wigs",
+      "settings": {
+        "heading": "Not sure which wig?",
+        "body": "Every piece is built to your measurements. Tell us how you wear your hair and we'll guide the fit.",
+        "button_label": "Contact us",
+        "show_line": true
+      }
+    }
+  ]
+}
+{% endschema %}
