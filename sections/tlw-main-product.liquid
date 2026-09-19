@@ -869,6 +869,11 @@
 
         {%- comment %} No reviews yet: no big heading, just a small nudge above the Write a review button. {%- endcomment %}
         <div class="tlw-product__reviews-tip">
+          {%- if section.settings.reviews_empty_stars -%}
+            <button type="button" class="tlw-product__reviews-stars" data-tlw-open-review aria-label="Write a review">
+              {%- render 'tlw-stars', rating: 0, max: 5, size: 26 -%}
+            </button>
+          {%- endif -%}
           {%- if section.settings.reviews_empty_title != blank -%}
             <p class="tlw-product__reviews-tip-title">{{ section.settings.reviews_empty_title | escape }}</p>
           {%- endif -%}
@@ -1799,6 +1804,22 @@
     display: block;
   }
 
+  #tlw-product-{{ section.id }} .tlw-product__reviews-stars {
+    display: block;
+    margin: 0 0 16px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    line-height: 0;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews-stars:hover .tlw-stars__base polygon,
+  #tlw-product-{{ section.id }} .tlw-product__reviews-stars:focus-visible .tlw-stars__base polygon {
+    fill: var(--tlw-accent);
+    stroke: var(--tlw-accent);
+  }
+
   #tlw-product-{{ section.id }} .tlw-product__reviews-tip-title {
     margin: 0 0 6px;
     font-family: var(--tlw-font-body);
@@ -1811,14 +1832,39 @@
   #tlw-product-{{ section.id }} .tlw-product__reviews-tip-text {
     margin: 0;
     font-family: var(--tlw-font-body);
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 300;
     line-height: 1.6;
-    color: var(--tlw-on-surface-variant);
+    color: var(--tlw-primary);
   }
 
+  /* the Write a review button sits right under the tip, lined up with it, sized to its label
+     (full width on phones so it is easy to tap) */
   #tlw-product-{{ section.id }} .tlw-product__reviews--empty .tlw-product__reviews-widget {
-    margin-top: 20px;
+    margin-top: 22px;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews--empty .jdgm-write-rev-link {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100%;
+    margin: 0 !important;
+    padding: 16px 40px !important;
+    text-align: center !important;
+  }
+
+  @media (max-width: 600px) {
+    #tlw-product-{{ section.id }} .tlw-product__reviews--empty .jdgm-write-rev-link {
+      display: flex !important;
+      width: 100% !important;
+    }
+    #tlw-product-{{ section.id }} .tlw-product__reviews--empty .jdgm-widget-actions-wrapper,
+    #tlw-product-{{ section.id }} .tlw-product__reviews--empty .jdgm-rev-widg__summary {
+      width: 100% !important;
+    }
   }
 
   #tlw-product-{{ section.id }} .tlw-product__reviews-widget,
@@ -2602,6 +2648,14 @@
       window.addEventListener('load', scheduleState);
       scheduleState();
     }
+
+    /* ---- reviews: tapping the empty stars opens the Write a review form ---- */
+    root.addEventListener('click', function (e) {
+      var trigger = e.target.closest ? e.target.closest('[data-tlw-open-review]') : null;
+      if (!trigger) return;
+      var link = root.querySelector('.tlw-product__reviews .jdgm-write-rev-link');
+      if (link) link.click();
+    });
   })();
 </script>
 
@@ -2743,6 +2797,12 @@
       "id": "reviews_empty_text",
       "label": "Tip when there are no reviews: message",
       "default": "Be the first to leave a review."
+    },
+    {
+      "type": "checkbox",
+      "id": "reviews_empty_stars",
+      "label": "Show empty stars people can tap to leave a review",
+      "default": true
     },
     {
       "type": "checkbox",
@@ -3127,4 +3187,3 @@
   ]
 }
 {% endschema %}
-
