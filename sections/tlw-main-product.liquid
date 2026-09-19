@@ -94,6 +94,7 @@
             assign raw = raw | replace: '</p>', '|||' | replace: '<br>', '|||' | replace: '<br />', '|||' | replace: '<br/>', '|||' | replace: '</li>', '|||'
             assign raw = raw | strip_html | strip_newlines
             assign raw = raw | replace: '•', '|||' | replace: '·', '|||' | replace: '‣', '|||' | replace: '▪', '|||'
+            assign raw = raw | replace: '：', ':' | replace: '﹕', ':' | replace: '︰', ':'
             assign chunks = raw | split: '|||'
           endif
         -%}
