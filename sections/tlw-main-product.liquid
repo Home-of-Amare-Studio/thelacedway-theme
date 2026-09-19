@@ -712,7 +712,7 @@
   }
 
   #tlw-product-{{ section.id }} .tlw-field {
-    margin-bottom: 20px;
+    margin-bottom: 32px;
   }
 
   #tlw-product-{{ section.id }} .tlw-field__label {
@@ -1287,6 +1287,7 @@
        an HTML attribute with no escaping headaches. */
     function addonPairsFor(select) {
       var raw = select.dataset.addonPairs;
+      console.log('[TLW DEBUG] field:', select.dataset.propertyName, '| raw data-addon-pairs attribute:', JSON.stringify(raw));
       if (!raw) return [];
       return raw.split('||').filter(Boolean).map(function (pair) {
         var parts = pair.split('::');
@@ -1296,9 +1297,14 @@
 
     function matchedAddon(select) {
       var pairs = addonPairsFor(select);
+      console.log('[TLW DEBUG] field:', select.dataset.propertyName, '| current select.value:', JSON.stringify(select.value), '| parsed pairs:', JSON.stringify(pairs));
       for (var i = 0; i < pairs.length; i++) {
-        if (pairs[i].value === select.value) return pairs[i];
+        if (pairs[i].value === select.value) {
+          console.log('[TLW DEBUG] MATCHED! price:', pairs[i].price);
+          return pairs[i];
+        }
       }
+      console.log('[TLW DEBUG] no match found for this value');
       return null;
     }
 
