@@ -125,7 +125,7 @@
         "hover_second_image": true,
         "empty_text": "New pieces are on their way. Check back soon.",
         "coming_soon_label": "Coming soon",
-        "show_cta": true,
+        "show_cta": false,
         "contact_page_url": "/pages/contact",
         "contact_label": "Contact us",
         "enquire_label": "Enquire"
