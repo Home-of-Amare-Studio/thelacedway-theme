@@ -474,17 +474,6 @@
     "tlw_main_product_DEyKL3": {
       "type": "tlw-main-product",
       "blocks": {
-        "client_TkLCBj": {
-          "type": "client",
-          "disabled": true,
-          "settings": {
-            "image": "shopify://shop_images/Screenshot_2026-09-19_at_20.00.44.png",
-            "name": "Sarah",
-            "length": "18\"",
-            "lace_size": "5x5",
-            "quote": "I love it"
-          }
-        },
         "service_option_PjxzrE": {
           "type": "service_option",
           "name": "Service option - Cap Size",
@@ -676,7 +665,6 @@
         }
       },
       "block_order": [
-        "client_TkLCBj",
         "service_option_PjxzrE",
         "service_option_ba4LbX",
         "service_option_N3dymU",
