@@ -113,14 +113,6 @@
         "padding-block-end": 72
       }
     },
-    "tlw_scroll_target_tLTLdF": {
-      "type": "tlw-scroll-target",
-      "name": "TLW Scroll target",
-      "settings": {
-        "link_text": "Shop all collections",
-        "top_space": 90
-      }
-    },
     "tlw_collections_showcase_rCTPQj": {
       "type": "tlw-collections-showcase",
       "blocks": {
@@ -531,12 +523,20 @@
         "submit_label": "Send enquiry",
         "success_text": "Thank you. Your enquiry is with us and we will be in touch within two working days."
       }
+    },
+    "tlw_scroll_target_daCxgr": {
+      "type": "tlw-scroll-target",
+      "name": "TLW Scroll target",
+      "settings": {
+        "link_text": "Shop all collections, Shop the collections",
+        "top_space": 90
+      }
     }
   },
   "order": [
     "tlw_main_hero_Q8N9Jx",
     "hero_jVaWmY",
-    "tlw_scroll_target_tLTLdF",
+    "tlw_scroll_target_daCxgr",
     "tlw_collections_showcase_rCTPQj",
     "tlw_process_kXWKc3",
     "tlw_ready_to_ship_dmXxXg",
