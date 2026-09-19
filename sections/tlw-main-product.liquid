@@ -712,6 +712,9 @@
             Editor note (visitors never see this): previewing &ldquo;{{ product.title | escape }}&rdquo;.
             Client photos box: {% if meta_photos != blank %}found, {{ meta_photos.size | default: 1 }} photo(s), type {{ meta_field.type | default: 'unknown' }}{% else %}empty, or not found on this product{% endif %}.
             The cards below come from {% if use_meta %}this product&rsquo;s own boxes{% else %}the template&rsquo;s Client photo blocks{% endif %}.
+            {%- if meta_photos != blank %}
+              <br>Raw data the page received for the photos: <code>{{ meta_photos | json | truncate: 600 | escape }}</code>
+            {%- endif %}
           </p>
         {%- endif -%}
       </div>
@@ -728,6 +731,14 @@
 
           {%- if use_meta -%}
             {%- assign c_media = meta_photos[idx] -%}
+            {%- unless c_media -%}
+              {%- for m in meta_photos -%}
+                {%- if forloop.index == i -%}
+                  {%- assign c_media = m -%}
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endunless -%}
             {%- comment %} A file in the box can arrive as a media object (with preview_image) or as an image object. Test for what is really there instead of asking whether it is "blank". {%- endcomment %}
             {%- if c_media.preview_image -%}
               {%- assign c_image = c_media.preview_image -%}
@@ -1483,6 +1494,13 @@
     line-height: 1.5;
     text-align: left;
     color: var(--tlw-on-surface-variant);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__clients-note code {
+    display: block;
+    margin-top: 6px;
+    font-size: 11px;
+    word-break: break-all;
   }
 
   #tlw-product-{{ section.id }} .tlw-product__clients-eyebrow {
