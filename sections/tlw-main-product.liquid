@@ -872,17 +872,25 @@
   {%- endif -%}
 
   {% comment %} ---------- EXPLORE ---------- {% endcomment %}
-  {%- if section.settings.show_explore and product.collections.size > 0 -%}
+  {%- if section.settings.show_explore -%}
+    {%- comment %} Uses the product's first collection. A product that is not in any collection still gets the box, pointing at the collections page. {%- endcomment %}
     {%- assign explore_collection = product.collections.first -%}
-    {%- assign explore_heading = section.settings.explore_heading | default: 'Explore the rest of {collection}' | replace: '{collection}', explore_collection.title -%}
+    {%- if explore_collection -%}
+      {%- assign explore_name = explore_collection.title -%}
+      {%- assign explore_url = explore_collection.url -%}
+    {%- else -%}
+      {%- assign explore_name = section.settings.explore_fallback | default: 'our collections' -%}
+      {%- assign explore_url = routes.collections_url -%}
+    {%- endif -%}
+    {%- assign explore_heading = section.settings.explore_heading | default: 'Explore the rest of {collection}' | replace: '{collection}', explore_name -%}
     {%- assign explore_body = section.settings.explore_body | default: 'Every piece is hand-tied and finished to your measurements. See the full collection.' -%}
-    {%- assign explore_button = section.settings.explore_button | default: 'Back to {collection}' | replace: '{collection}', explore_collection.title -%}
+    {%- assign explore_button = section.settings.explore_button | default: 'Back to {collection}' | replace: '{collection}', explore_name -%}
     <div class="tlw-product__explore">
       <h2 class="tlw-headline-md">{{ explore_heading | escape }}</h2>
       {%- if explore_body != blank -%}
         <p class="tlw-body-md">{{ explore_body | escape }}</p>
       {%- endif -%}
-      <a href="{{ explore_collection.url }}" class="tlw-product__explore-btn">{{ explore_button | escape }}</a>
+      <a href="{{ explore_url }}" class="tlw-product__explore-btn">{{ explore_button | escape }}</a>
     </div>
   {%- endif -%}
 
@@ -2416,6 +2424,13 @@
       "label": "Button text",
       "info": "Type {collection} to include the collection's name.",
       "default": "Back to {collection}"
+    },
+    {
+      "type": "text",
+      "id": "explore_fallback",
+      "label": "Name to use if the product is in no collection",
+      "info": "Replaces {collection}. The button then goes to the collections page.",
+      "default": "our collections"
     }
   ],
   "blocks": [
