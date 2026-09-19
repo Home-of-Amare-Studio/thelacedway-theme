@@ -7,6 +7,9 @@
 
   Tiles are free-standing blocks rather than tied to Shopify collections, so a
   tile can point at a page, or say Coming Soon with no link at all.
+
+  On phones the tiles become a sideways swipe: one card fills most of the screen
+  and the next peeks in from the right. From tablet width up they sit in a grid.
 {% endcomment %}
 
 <section class="tlw-showcase" id="tlw-showcase-{{ section.id }}">
@@ -35,7 +38,7 @@
       {%- endif -%}
     </header>
 
-    <div class="tlw-showcase__grid">
+    <div class="tlw-showcase__grid{% if section.settings.mobile_swipe %} tlw-showcase__grid--swipe{% endif %}">
       {%- for block in section.blocks -%}
         {%- if block.type == 'tile' -%}
           <article class="tlw-tile" {{ block.shopify_attributes }}>
@@ -47,7 +50,7 @@
                     | image_url: width: 1000
                     | image_tag:
                       loading: 'lazy',
-                      sizes: '(min-width: 900px) 32vw, 92vw',
+                      sizes: '(min-width: 900px) 32vw, 84vw',
                       widths: '400, 600, 800, 1000',
                       alt: block.settings.title,
                       class: 'tlw-tile__img'
@@ -71,9 +74,19 @@
                 <p class="tlw-tile__text tlw-body-md">{{ block.settings.body }}</p>
               {%- endif -%}
 
-              {%- if block.settings.link != blank and block.settings.button_label != blank -%}
+              {%- comment %}
+                With a link, this is always a button. If "Text instead of a button" is also filled in
+                (e.g. Coming soon), that text becomes the button's wording and it STILL opens the link.
+                With no link, that text is shown as plain text.
+              {%- endcomment %}
+              {%- assign cta_label = block.settings.button_label -%}
+              {%- if block.settings.status_label != blank -%}
+                {%- assign cta_label = block.settings.status_label -%}
+              {%- endif -%}
+
+              {%- if block.settings.link != blank and cta_label != blank -%}
                 <a class="tlw-btn tlw-btn--ghost tlw-tile__cta" href="{{ block.settings.link }}">
-                  {{ block.settings.button_label }}
+                  {{ cta_label }}
                 </a>
               {%- elsif block.settings.status_label != blank -%}
                 <p class="tlw-label-caps tlw-tile__status">{{ block.settings.status_label }}</p>
@@ -97,6 +110,9 @@
     padding-block: 72px;
     background: var(--tlw-background);
     color: var(--tlw-foreground);
+    /* the sideways swipe on phones must never make the whole page scroll sideways */
+    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   @media (min-width: 900px) {
@@ -159,6 +175,39 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 48px;
+  }
+
+  /* Phones and small tablets: a sideways swipe. One card fills most of the screen and the
+     next peeks in from the right, and each swipe snaps neatly to the next card. */
+  @media (max-width: 899px) {
+    #tlw-showcase-{{ section.id }} .tlw-showcase__grid--swipe {
+      display: flex;
+      gap: 20px;
+      margin-inline: calc(var(--tlw-margin) * -1);
+      padding-inline: var(--tlw-margin);
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--tlw-margin);
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    #tlw-showcase-{{ section.id }} .tlw-showcase__grid--swipe::-webkit-scrollbar {
+      display: none;
+    }
+
+    #tlw-showcase-{{ section.id }} .tlw-showcase__grid--swipe .tlw-tile {
+      flex: 0 0 {{ section.settings.mobile_card_width }}vw;
+      min-width: 0;
+      scroll-snap-align: start;
+    }
+
+    /* room after the last card so it can also settle at the left edge */
+    #tlw-showcase-{{ section.id }} .tlw-showcase__grid--swipe .tlw-tile:last-child {
+      margin-right: max(0px, calc({{ 100 | minus: section.settings.mobile_card_width }}vw - var(--tlw-margin)));
+    }
   }
 
   @media (min-width: 900px) {
@@ -339,6 +388,28 @@
       "id": "show_divider",
       "label": "Line under the tiles",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "On phones"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_swipe",
+      "label": "Swipe sideways between the collections",
+      "info": "One card fills most of the screen and the next one peeks in. Turn off to stack them instead.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "mobile_card_width",
+      "label": "How wide each card is",
+      "info": "The rest of the screen shows the start of the next card.",
+      "min": 70,
+      "max": 94,
+      "step": 2,
+      "unit": "%",
+      "default": 82
     }
   ],
   "blocks": [
@@ -383,8 +454,8 @@
         {
           "type": "text",
           "id": "status_label",
-          "label": "Text instead of a button",
-          "info": "Used when there is no link, e.g. Coming soon"
+          "label": "Button wording override, e.g. Coming soon",
+          "info": "If there is a link, this replaces the button wording and the button still opens the link. With no link it shows as plain text."
         }
       ]
     }
