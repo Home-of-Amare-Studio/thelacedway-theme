@@ -274,6 +274,16 @@
                   {%- if label_downcase contains 'hairline' -%}
                     {%- render 'tlw-hairline-guide', id: block.id -%}
                   {%- endif -%}
+                  {%- assign tip_text = block.settings.tooltip -%}
+                  {%- if tip_text == blank and label_downcase contains 'jet black' -%}
+                    {%- assign tip_text = 'Dyed from natural black to a custom-dyed deep black finish for a bolder look.' -%}
+                  {%- endif -%}
+                  {%- if tip_text != blank -%}
+                    <span class="tlw-tip" tabindex="0" role="button" aria-label="{{ tip_text | escape }}">
+                      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                      <span class="tlw-tip__bubble" role="tooltip">{{ tip_text | escape }}</span>
+                    </span>
+                  {%- endif -%}
                 </span>
               </label>
 
@@ -726,6 +736,60 @@
     margin: 6px 0 0;
     font-size: 13px;
     color: var(--tlw-outline);
+  }
+
+  /* ? help icon with hover / tap pop-up (sentence case, light weight) */
+  #tlw-product-{{ section.id }} .tlw-tip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    color: var(--tlw-on-surface-variant);
+    transition: color 200ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-tip:hover,
+  #tlw-product-{{ section.id }} .tlw-tip:focus {
+    color: var(--tlw-accent);
+    outline: none;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-tip:focus-visible {
+    box-shadow: 0 0 0 2px rgba(166, 139, 63, 0.6);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-tip__bubble {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    width: 208px;
+    max-width: 78vw;
+    margin-bottom: 8px;
+    padding: 12px;
+    border: 1px solid rgba(166, 139, 63, 0.25);
+    border-radius: var(--tlw-radius, 0);
+    background: var(--tlw-surface-container);
+    box-shadow: 0 12px 32px rgba(10, 10, 10, 0.16);
+    color: var(--tlw-primary);
+    font-family: var(--tlw-font-body);
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.45;
+    letter-spacing: 0;
+    text-transform: none;
+    text-align: left;
+    pointer-events: none;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-tip:hover .tlw-tip__bubble,
+  #tlw-product-{{ section.id }} .tlw-tip:focus .tlw-tip__bubble {
+    display: block;
   }
 
   #tlw-product-{{ section.id }} .tlw-visually-hidden {
@@ -1721,6 +1785,12 @@
           "id": "help_text",
           "label": "Helper text",
           "info": "Optional line under the dropdown"
+        },
+        {
+          "type": "text",
+          "id": "tooltip",
+          "label": "Help pop-up text",
+          "info": "Optional. Adds a ? icon beside the option name; hovering or tapping it shows this text. Jet Black already has one built in."
         },
         {
           "type": "header",
