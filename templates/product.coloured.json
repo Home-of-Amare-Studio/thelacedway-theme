@@ -110,7 +110,7 @@
             "addon_product": "",
             "trigger_value_2": "",
             "addon_product_2": "",
-            "trigger_value_3": "",
+            "trigger_value_3": "10",
             "addon_product_3": "pin-intact",
             "trigger_value_4": "",
             "addon_product_4": "",
@@ -162,6 +162,7 @@
         "detail_line": "",
         "button_label": "Add to bag",
         "show_collection_label": true,
+        "unit_details_mode": false,
         "international_orders_text": "For orders shipped outside of the United Kingdom, import duties, taxes and customs fees may apply once your parcel reaches its destination country. These charges are determined by your local customs authorities and are the responsibility of the customer."
       }
     },
