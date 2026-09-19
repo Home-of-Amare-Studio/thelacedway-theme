@@ -12,16 +12,6 @@
     "tlw_main_product_fAykxh": {
       "type": "tlw-main-product",
       "blocks": {
-        "service_option_rMRHqj": {
-          "type": "service_option",
-          "settings": {
-            "label": "",
-            "values": "No, Yes",
-            "trigger_value": "",
-            "addon_product": "",
-            "help_text": ""
-          }
-        },
         "service_option_rVeVxG": {
           "type": "service_option",
           "settings": {
@@ -29,7 +19,12 @@
             "values": "No, Yes",
             "trigger_value": "Yes",
             "addon_product": "customisation",
-            "help_text": ""
+            "trigger_value_2": "",
+            "addon_product_2": "",
+            "trigger_value_3": "",
+            "addon_product_3": "",
+            "help_text": "",
+            "reveal_on_customisation": false
           }
         },
         "service_option_VPQUyc": {
@@ -39,7 +34,76 @@
             "values": "No, Yes",
             "trigger_value": "Yes",
             "addon_product": "jet-black",
-            "help_text": ""
+            "trigger_value_2": "",
+            "addon_product_2": "",
+            "trigger_value_3": "",
+            "addon_product_3": "",
+            "help_text": "",
+            "reveal_on_customisation": false
+          }
+        },
+        "service_option_WezG9F": {
+          "type": "service_option",
+          "name": "Service option - Parting Preference",
+          "settings": {
+            "label": "Parting Preference",
+            "values": "Left side part, Middle part, Right side part",
+            "trigger_value": "",
+            "addon_product": "",
+            "trigger_value_2": "",
+            "addon_product_2": "",
+            "trigger_value_3": "",
+            "addon_product_3": "",
+            "help_text": "Please note: If you select a side part for a 5x5, 6x6 or 7x7 closure, the closure itself will be constructed and positioned towards your preferred side rather than in the centre.",
+            "reveal_on_customisation": false
+          }
+        },
+        "service_option_rcXMHQ": {
+          "type": "service_option",
+          "name": "Service option - Hairline",
+          "settings": {
+            "label": "Hairline",
+            "values": "Natural Hairline, Light Lagos Hairline",
+            "trigger_value": "",
+            "addon_product": "",
+            "trigger_value_2": "",
+            "addon_product_2": "",
+            "trigger_value_3": "",
+            "addon_product_3": "",
+            "help_text": "",
+            "reveal_on_customisation": true
+          }
+        },
+        "service_option_C8CXCk": {
+          "type": "service_option",
+          "name": "Service option - Styled",
+          "settings": {
+            "label": "Styled",
+            "values": "Straight, Curled, Curled (Pin Intact)",
+            "trigger_value": "",
+            "addon_product": "",
+            "trigger_value_2": "",
+            "addon_product_2": "",
+            "trigger_value_3": "",
+            "addon_product_3": "pin-intact",
+            "help_text": "",
+            "reveal_on_customisation": true
+          }
+        },
+        "service_option_GAe39i": {
+          "type": "service_option",
+          "name": "Service option - Layers",
+          "settings": {
+            "label": "Layers",
+            "values": "No, Face Framing, Heavy Layers (Curls Only), Blunt Cut",
+            "trigger_value": "",
+            "addon_product": "",
+            "trigger_value_2": "",
+            "addon_product_2": "face-framing-layers",
+            "trigger_value_3": "",
+            "addon_product_3": "heavy-layers",
+            "help_text": "",
+            "reveal_on_customisation": true
           }
         },
         "client_jAzpxw": {
@@ -54,9 +118,12 @@
         }
       },
       "block_order": [
-        "service_option_rMRHqj",
         "service_option_rVeVxG",
         "service_option_VPQUyc",
+        "service_option_WezG9F",
+        "service_option_rcXMHQ",
+        "service_option_C8CXCk",
+        "service_option_GAe39i",
         "client_jAzpxw"
       ],
       "name": "TLW Product",
