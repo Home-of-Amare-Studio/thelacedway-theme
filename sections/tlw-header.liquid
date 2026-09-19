@@ -14,6 +14,10 @@
   want the hero treatment.
 
   Any menu item with children becomes a dropdown automatically.
+
+  Phone menu: the hamburger turns into an X and the menu drops down under the
+  header. Items with sub-items show a chevron and open with a tap, one at a
+  time, so the list stays short.
 {% endcomment %}
 
 {%- liquid
@@ -140,25 +144,56 @@
   </div>
 </header>
 
-{% comment %} Mobile drawer {% endcomment %}
+{% comment %}
+  Phone menu. Drops down under the header. A row that has sub-items is a button
+  with a chevron; tapping it opens its list. Rows without sub-items are plain links.
+{% endcomment %}
 <div class="tlw-drawer" data-menu-drawer hidden>
   <div class="tlw-drawer__panel">
-    <button type="button" class="tlw-drawer__close" data-menu-close aria-label="Close menu">&times;</button>
+    <nav class="tlw-drawer__nav" aria-label="Menu">
 
-    <nav class="tlw-drawer__nav">
       {%- for list in left.links -%}
-        <a class="tlw-drawer__link" href="{{ list.url }}">{{ list.title }}</a>
-        {%- for child in list.links -%}
-          <a class="tlw-drawer__sublink" href="{{ child.url }}">{{ child.title }}</a>
-        {%- endfor -%}
+        {%- if list.links.size > 0 -%}
+          <div class="tlw-drawer__group">
+            <button type="button" class="tlw-drawer__link tlw-drawer__link--parent" data-drawer-toggle aria-expanded="false" aria-controls="tlw-sub-{{ section.id }}-l{{ forloop.index }}">
+              <span>{{ list.title }}</span>
+              <svg class="tlw-drawer__chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+            </button>
+            <div class="tlw-drawer__sub" id="tlw-sub-{{ section.id }}-l{{ forloop.index }}">
+              {%- if section.settings.drawer_view_all and list.url != blank and list.url != '#' -%}
+                <a class="tlw-drawer__sublink" href="{{ list.url }}">All {{ list.title }}</a>
+              {%- endif -%}
+              {%- for child in list.links -%}
+                <a class="tlw-drawer__sublink" href="{{ child.url }}">{{ child.title }}</a>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- else -%}
+          <a class="tlw-drawer__link" href="{{ list.url }}">{{ list.title }}</a>
+        {%- endif -%}
       {%- endfor -%}
 
       {%- for list in right.links -%}
-        <a class="tlw-drawer__link" href="{{ list.url }}">{{ list.title }}</a>
-        {%- for child in list.links -%}
-          <a class="tlw-drawer__sublink" href="{{ child.url }}">{{ child.title }}</a>
-        {%- endfor -%}
+        {%- if list.links.size > 0 -%}
+          <div class="tlw-drawer__group">
+            <button type="button" class="tlw-drawer__link tlw-drawer__link--parent" data-drawer-toggle aria-expanded="false" aria-controls="tlw-sub-{{ section.id }}-r{{ forloop.index }}">
+              <span>{{ list.title }}</span>
+              <svg class="tlw-drawer__chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+            </button>
+            <div class="tlw-drawer__sub" id="tlw-sub-{{ section.id }}-r{{ forloop.index }}">
+              {%- if section.settings.drawer_view_all and list.url != blank and list.url != '#' -%}
+                <a class="tlw-drawer__sublink" href="{{ list.url }}">All {{ list.title }}</a>
+              {%- endif -%}
+              {%- for child in list.links -%}
+                <a class="tlw-drawer__sublink" href="{{ child.url }}">{{ child.title }}</a>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- else -%}
+          <a class="tlw-drawer__link" href="{{ list.url }}">{{ list.title }}</a>
+        {%- endif -%}
       {%- endfor -%}
+
     </nav>
   </div>
 </div>
@@ -273,6 +308,31 @@
   {% if section.settings.logo_light != blank %}
     #tlw-header-{{ section.id }}.tlw-header--overlay.is-solid .tlw-header__logo--light { display: none !important; }
     #tlw-header-{{ section.id }}.tlw-header--overlay.is-solid .tlw-header__logo--dark { display: block; }
+  {% endif %}
+
+  /* Phone menu open: the bar is always solid and fully visible, even over the hero */
+  #tlw-header-{{ section.id }}.is-menu-open {
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    background: #fff !important;
+    backdrop-filter: none !important;
+    {% if section.settings.show_border %}border-bottom-color: var(--tlw-outline-variant) !important;{% endif %}
+  }
+
+  #tlw-header-{{ section.id }}.is-menu-open .tlw-nav__link,
+  #tlw-header-{{ section.id }}.is-menu-open .tlw-header__cart,
+  #tlw-header-{{ section.id }}.is-menu-open .tlw-header__wordmark {
+    color: var(--tlw-primary) !important;
+  }
+
+  #tlw-header-{{ section.id }}.is-menu-open .tlw-header__burger span {
+    background: var(--tlw-primary) !important;
+  }
+
+  {% if section.settings.logo_light != blank %}
+    #tlw-header-{{ section.id }}.is-menu-open .tlw-header__logo--light { display: none !important; }
+    #tlw-header-{{ section.id }}.is-menu-open .tlw-header__logo--dark { display: block !important; }
   {% endif %}
 
   #tlw-header-{{ section.id }} .tlw-header__inner {
@@ -443,6 +503,20 @@
     display: block;
     height: 1.5px;
     background: var(--tlw-primary);
+    transition: transform 250ms ease, opacity 200ms ease;
+  }
+
+  /* The hamburger turns into an X while the phone menu is open */
+  #tlw-header-{{ section.id }} .tlw-header__burger[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(9.25px) rotate(45deg);
+  }
+
+  #tlw-header-{{ section.id }} .tlw-header__burger[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  #tlw-header-{{ section.id }} .tlw-header__burger[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-9.25px) rotate(-45deg);
   }
 
   /* Mobile: logo left, burger and bag together on the right */
@@ -462,53 +536,86 @@
       margin-inline: 0;
     }
     #tlw-header-{{ section.id }} .tlw-header__cart { order: 0; }
+    .tlw-drawer { display: none !important; }
   }
 
-  /* Mobile drawer */
+  /* Phone menu: drops down under the header (its top edge is set by the script) */
   .tlw-drawer {
     position: fixed;
-    inset: 0;
-    z-index: 100;
-    background: rgba(0, 0, 0, 0.4);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 58;
+    background: rgba(0, 0, 0, 0.35);
   }
 
   .tlw-drawer[hidden] { display: none; }
 
   .tlw-drawer__panel {
-    width: min(88vw, 380px);
-    height: 100%;
-    background: var(--tlw-surface-lowest);
-    padding: 28px 26px;
+    max-height: 100%;
     overflow-y: auto;
-  }
-
-  .tlw-drawer__close {
-    background: none;
-    border: 0;
-    font-size: 30px;
-    line-height: 1;
-    color: var(--tlw-primary);
-    padding: 0;
-    margin-bottom: 24px;
+    padding: 6px 18px 28px;
+    background: var(--tlw-surface-lowest, #fff);
+    border-bottom: 1px solid var(--tlw-outline-variant);
+    -webkit-overflow-scrolling: touch;
   }
 
   .tlw-drawer__nav { display: flex; flex-direction: column; }
 
   .tlw-drawer__link {
-    padding: 14px 0;
-    font-size: 14px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 16px 0;
+    border: 0;
     border-bottom: 1px solid var(--tlw-outline-variant);
+    border-radius: 0;
+    background: none;
+    font-family: inherit;
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-align: left;
+    font-weight: 400;
     color: var(--tlw-primary);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .tlw-drawer__chev {
+    flex: 0 0 auto;
+    color: var(--tlw-primary);
+    transition: transform 250ms ease;
+  }
+
+  .tlw-drawer__group.is-open > .tlw-drawer__link .tlw-drawer__chev {
+    transform: rotate(90deg);
+  }
+
+  /* Sub-items: closed until their row is tapped. The script sets the open height. */
+  .tlw-drawer__sub {
+    max-height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    transition: max-height 320ms ease, visibility 0s linear 320ms;
+  }
+
+  .tlw-drawer__group.is-open > .tlw-drawer__sub {
+    visibility: visible;
+    transition: max-height 320ms ease;
   }
 
   .tlw-drawer__sublink {
-    padding: 11px 0 11px 18px;
+    display: block;
+    padding: 13px 0 13px 18px;
     font-size: 13px;
     letter-spacing: 0.08em;
     color: var(--tlw-on-surface-variant);
+    text-decoration: none;
     border-bottom: 1px solid var(--tlw-outline-variant);
   }
 </style>
@@ -520,31 +627,90 @@
 
     var drawer = document.querySelector('[data-menu-drawer]');
     var toggle = header.querySelector('[data-menu-toggle]');
-    var close = drawer && drawer.querySelector('[data-menu-close]');
+
+    /* ---- phone menu: drops down under the header; rows with sub-items open with a tap ---- */
+    function placeDrawer() {
+      if (!drawer) return;
+      drawer.style.top = Math.round(header.getBoundingClientRect().bottom) + 'px';
+    }
+
+    function closeGroups() {
+      if (!drawer) return;
+      drawer.querySelectorAll('.tlw-drawer__group.is-open').forEach(function (group) {
+        group.classList.remove('is-open');
+        var btn = group.querySelector('[data-drawer-toggle]');
+        var sub = group.querySelector('.tlw-drawer__sub');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+        if (sub) sub.style.maxHeight = '0px';
+      });
+    }
+
+    function openGroup(group) {
+      var btn = group.querySelector('[data-drawer-toggle]');
+      var sub = group.querySelector('.tlw-drawer__sub');
+      group.classList.add('is-open');
+      if (btn) btn.setAttribute('aria-expanded', 'true');
+      if (sub) sub.style.maxHeight = sub.scrollHeight + 'px';
+    }
+
+    function menuIsOpen() {
+      return !!drawer && !drawer.hidden;
+    }
 
     function open() {
       if (!drawer) return;
+      placeDrawer();
       drawer.hidden = false;
+      header.classList.add('is-menu-open');
       toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', 'Close menu');
       document.body.style.overflow = 'hidden';
     }
 
     function shut() {
       if (!drawer) return;
       drawer.hidden = true;
-      toggle.setAttribute('aria-expanded', 'false');
+      header.classList.remove('is-menu-open');
+      if (toggle) {
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open menu');
+      }
       document.body.style.overflow = '';
+      closeGroups();
     }
 
-    if (toggle) toggle.addEventListener('click', open);
-    if (close) close.addEventListener('click', shut);
-    if (drawer) {
-      drawer.addEventListener('click', function (e) {
-        if (e.target === drawer) shut();
+    if (toggle) {
+      toggle.addEventListener('click', function () {
+        if (menuIsOpen()) shut(); else open();
       });
     }
+
+    if (drawer) {
+      drawer.querySelectorAll('[data-drawer-toggle]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var group = btn.closest('.tlw-drawer__group');
+          var willOpen = !group.classList.contains('is-open');
+          closeGroups(); /* one at a time keeps the menu short */
+          if (willOpen) openGroup(group);
+        });
+      });
+
+      drawer.addEventListener('click', function (e) {
+        /* tapping the dimmed area, or any link, closes the menu */
+        if (e.target === drawer || (e.target.closest && e.target.closest('a'))) shut();
+      });
+    }
+
+    var bagLink = header.querySelector('.tlw-header__cart');
+    if (bagLink) bagLink.addEventListener('click', shut);
+
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') shut();
+    });
+
+    window.addEventListener('resize', function () {
+      if (window.innerWidth >= 1100) shut();
+      else if (menuIsOpen()) placeDrawer();
     });
 
     /* Dropdown triggers are buttons now (see markup), so a click never
@@ -815,9 +981,19 @@
       "step": 2,
       "unit": "px",
       "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Phone menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "drawer_view_all",
+      "label": "Add an \"All ...\" link at the top of each dropdown",
+      "info": "Tapping a row that has sub-items only opens it. Turn this on to also link to the row's own page, e.g. All Collections.",
+      "default": false
     }
   ],
   "presets": [{ "name": "TLW Header" }]
 }
 {% endschema %}
-
