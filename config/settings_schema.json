@@ -2116,5 +2116,162 @@
         "default": "equal-width-buttons"
       }
     ]
-  }
+  },
+{
+  "name": "THELACEDWÁY guides",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Measure your cap size pop-up"
+    },
+    {
+      "type": "text",
+      "id": "tlw_measure_title",
+      "label": "Pop-up title",
+      "default": "How to measure your cap size"
+    },
+    {
+      "type": "text",
+      "id": "tlw_measure_table_title",
+      "label": "Size table heading",
+      "default": "Cap size guide"
+    },
+    {
+      "type": "textarea",
+      "id": "tlw_measure_table",
+      "label": "Size table",
+      "info": "One row per line: the size, then a | symbol, then the measurement.",
+      "default": "Small | 20.5\" — 21.5\"\nMedium | 21.5\" — 22.5\"\nLarge | 22.5\" — 23.5\""
+    },
+    {
+      "type": "richtext",
+      "id": "tlw_measure_intro",
+      "label": "Intro text",
+      "default": "<p>Use a soft measuring tape and wrap it around your head from hairline to nape, following your natural hairline. Measure in inches for the most accurate fit.</p>"
+    },
+    {
+      "type": "textarea",
+      "id": "tlw_measure_steps",
+      "label": "Steps",
+      "info": "One step per line. They are numbered automatically.",
+      "default": "Start at the front hairline in the centre of your forehead.\nWrap the tape behind each ear, keeping it level.\nBring the tape around the nape of your neck.\nReturn to the starting point at the front hairline."
+    },
+    {
+      "type": "image_picker",
+      "id": "tlw_measure_image",
+      "label": "Measuring photo",
+      "info": "Choose a photo from your Files, or upload a new one."
+    },
+    {
+      "type": "text",
+      "id": "tlw_measure_video",
+      "label": "Measuring video link (optional)",
+      "info": "Upload the video in Content > Files, click it, copy its link and paste it here. If filled in, the video is shown instead of the photo."
+    },
+    {
+      "type": "text",
+      "id": "tlw_measure_image_caption",
+      "label": "Photo caption",
+      "default": "Wrap the tape around your natural hairline, not too tight and not too loose."
+    },
+    {
+      "type": "header",
+      "content": "Hairline pop-up"
+    },
+    {
+      "type": "text",
+      "id": "tlw_hairline_title",
+      "label": "Pop-up title",
+      "default": "Choosing your hairline"
+    },
+    {
+      "type": "richtext",
+      "id": "tlw_hairline_intro",
+      "label": "Intro text",
+      "default": "<p>Both hairlines are hand-tied and customised to you. The difference is the density and how sculpted the perimeter looks.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Hairline option 1"
+    },
+    {
+      "type": "text",
+      "id": "tlw_hairline_1_name",
+      "label": "Name",
+      "default": "Natural hairline"
+    },
+    {
+      "type": "richtext",
+      "id": "tlw_hairline_1_text",
+      "label": "Description",
+      "default": "<p>A softer, denser hairline that follows your own natural growth pattern. Minimal plucking, fuller at the front. Best if you like a low-maintenance, everyday finish.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "tlw_hairline_1_image",
+      "label": "Photo"
+    },
+    {
+      "type": "header",
+      "content": "Hairline option 2"
+    },
+    {
+      "type": "text",
+      "id": "tlw_hairline_2_name",
+      "label": "Name",
+      "default": "Light Lagos hairline"
+    },
+    {
+      "type": "richtext",
+      "id": "tlw_hairline_2_text",
+      "label": "Description",
+      "default": "<p>A more sculpted, airy hairline with finer baby hairs and a lighter density at the perimeter. Gives a more styled, laid finish and photographs beautifully.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "tlw_hairline_2_image",
+      "label": "Photo"
+    },
+    {
+      "type": "header",
+      "content": "Hairline option 3"
+    },
+    {
+      "type": "text",
+      "id": "tlw_hairline_3_name",
+      "label": "Name",
+      "info": "Leave the name empty to hide this option."
+    },
+    {
+      "type": "richtext",
+      "id": "tlw_hairline_3_text",
+      "label": "Description"
+    },
+    {
+      "type": "image_picker",
+      "id": "tlw_hairline_3_image",
+      "label": "Photo"
+    },
+    {
+      "type": "header",
+      "content": "Hairline option 4"
+    },
+    {
+      "type": "text",
+      "id": "tlw_hairline_4_name",
+      "label": "Name",
+      "info": "Leave the name empty to hide this option."
+    },
+    {
+      "type": "richtext",
+      "id": "tlw_hairline_4_text",
+      "label": "Description"
+    },
+    {
+      "type": "image_picker",
+      "id": "tlw_hairline_4_image",
+      "label": "Photo"
+    }
+  ]
+}
 ]
