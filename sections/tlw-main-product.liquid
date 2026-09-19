@@ -850,7 +850,7 @@
     {%- endunless -%}
     {%- assign rv_heading = section.settings.reviews_heading | default: 'What clients say about {product}' | replace: '{product}', rv_name -%}
 
-    <div class="tlw-product__reviews" id="tlw-reviews">
+    <div class="tlw-product__reviews" id="tlw-reviews" data-tlw-reviews data-clean="{{ section.settings.reviews_clean }}" data-view-more="{{ section.settings.reviews_view_more }}" data-more-label="{{ section.settings.reviews_more_label | default: 'View more' | escape }}" data-less-label="{{ section.settings.reviews_less_label | default: 'View less' | escape }}" style="--tlw-review-lines: {{ section.settings.reviews_lines | default: 5 }};">
       <div class="tlw-product__reviews-inner">
         {%- if section.settings.reviews_eyebrow != blank -%}
           <p class="tlw-product__reviews-eyebrow">{{ section.settings.reviews_eyebrow | escape }}</p>
@@ -866,14 +866,14 @@
         {%- endif -%}
 
         {%- if section.settings.reviews_widget -%}
-          <div class="tlw-product__reviews-widget">
+          <div class="tlw-product__reviews-widget{% if section.settings.reviews_hide_badge %} tlw-product__reviews-widget--nobadge{% endif %}">
             <div id="judgeme_product_reviews" class="jdgm-widget jdgm-review-widget" data-id="{{ product.id }}">{{ product.metafields.judgeme.widget }}</div>
           </div>
         {%- endif -%}
 
         {%- for block in section.blocks -%}
           {%- if block.type == '@app' -%}
-            <div class="tlw-product__reviews-app" {{ block.shopify_attributes }}>
+            <div class="tlw-product__reviews-app{% if section.settings.reviews_hide_badge %} tlw-product__reviews-app--nobadge{% endif %}" {{ block.shopify_attributes }}>
               {% render block %}
             </div>
           {%- endif -%}
@@ -1788,6 +1788,31 @@
     color: var(--tlw-primary);
   }
 
+  /* hide Judge.me's "Diamond Transparency / Verified" badge (switch: Hide Judge.me's Verified badge) */
+  #tlw-product-{{ section.id }} .tlw-product__reviews-widget--nobadge [class*="jdgm-medal"],
+  #tlw-product-{{ section.id }} .tlw-product__reviews-widget--nobadge .jdgm-verified-badge,
+  #tlw-product-{{ section.id }} .tlw-product__reviews-widget--nobadge .jdgm-trust-badge,
+  #tlw-product-{{ section.id }} .tlw-product__reviews-widget--nobadge [class*="jdgm-transparency"],
+  #tlw-product-{{ section.id }} .tlw-product__reviews-app--nobadge [class*="jdgm-medal"],
+  #tlw-product-{{ section.id }} .tlw-product__reviews-app--nobadge .jdgm-verified-badge,
+  #tlw-product-{{ section.id }} .tlw-product__reviews-app--nobadge .jdgm-trust-badge,
+  #tlw-product-{{ section.id }} .tlw-product__reviews-app--nobadge [class*="jdgm-transparency"] {
+    display: none !important;
+  }
+
+  /* clean look: hide Judge.me's bar chart (the script below hides the rest of the summary and the badge) */
+  #tlw-product-{{ section.id }} .tlw-product__reviews[data-clean="true"] .jdgm-histogram,
+  #tlw-product-{{ section.id }} .tlw-product__reviews[data-clean="true"] [class*="histogram"] {
+    display: none !important;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews[data-clean="true"] .jdgm-widget-actions-wrapper {
+    justify-content: flex-start;
+    margin-left: 0;
+    padding-left: 0;
+    border: 0;
+  }
+
   #tlw-product-{{ section.id }} .jdgm-rev-widg__title {
     display: none;
   }
@@ -1823,6 +1848,40 @@
     font-weight: 300;
     line-height: 1.7;
     color: var(--tlw-on-surface-variant);
+  }
+
+  /* long reviews are cut short, with a View more toggle (added by the script below) */
+  #tlw-product-{{ section.id }} .tlw-product__reviews[data-view-more="true"] .jdgm-rev__body {
+    max-height: calc(1.7em * var(--tlw-review-lines, 5));
+    overflow: hidden;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews[data-view-more="true"] .jdgm-rev.tlw-expanded .jdgm-rev__body {
+    max-height: none;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews-more {
+    margin-top: 12px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    color: var(--tlw-primary);
+    transition: color 200ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews-more:hover {
+    color: var(--tlw-accent);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews-more[hidden] {
+    display: none;
   }
 
   #tlw-product-{{ section.id }} .jdgm-rev__author {
@@ -2292,6 +2351,131 @@
       }
       syncCustomisationReveal();
     }
+
+    /* ---- reviews: "View more" on long reviews ----
+       Judge.me draws its reviews after the page loads (and again when the next page of
+       reviews is opened), so watch the reviews area and tidy each review as it appears. */
+    var reviewsWrap = root.querySelector('[data-tlw-reviews]');
+    if (reviewsWrap && reviewsWrap.getAttribute('data-view-more') === 'true') {
+      var moreLabel = reviewsWrap.getAttribute('data-more-label') || 'View more';
+      var lessLabel = reviewsWrap.getAttribute('data-less-label') || 'View less';
+
+      var tidyReviews = function () {
+        reviewsWrap.querySelectorAll('.jdgm-rev__body').forEach(function (body) {
+          var rev = body.closest('.jdgm-rev');
+          if (!rev) return;
+          var btn = body.nextElementSibling;
+          var hasBtn = btn && btn.classList && btn.classList.contains('tlw-product__reviews-more');
+          var isLong = body.scrollHeight > body.clientHeight + 2;
+          var isOpen = rev.classList.contains('tlw-expanded');
+
+          if (!hasBtn) {
+            if (!isLong) return;
+            btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'tlw-product__reviews-more';
+            btn.textContent = moreLabel;
+            btn.setAttribute('aria-expanded', 'false');
+            btn.addEventListener('click', function () {
+              var open = rev.classList.toggle('tlw-expanded');
+              btn.textContent = open ? lessLabel : moreLabel;
+              btn.setAttribute('aria-expanded', String(open));
+            });
+            body.insertAdjacentElement('afterend', btn);
+          } else if (!isOpen) {
+            /* a review that fits after a resize does not need the button */
+            btn.hidden = !isLong;
+          }
+        });
+      };
+
+      var tidyTimer = null;
+      var scheduleTidy = function () {
+        clearTimeout(tidyTimer);
+        tidyTimer = setTimeout(tidyReviews, 120);
+      };
+
+      if (window.MutationObserver) {
+        new MutationObserver(scheduleTidy).observe(reviewsWrap, { childList: true, subtree: true });
+      }
+      window.addEventListener('resize', scheduleTidy);
+      window.addEventListener('load', scheduleTidy);
+      scheduleTidy();
+    }
+
+    /* ---- reviews: clean look ----
+       Hides Judge.me's average-rating summary, star bar chart and Verified/Diamond badge, and
+       keeps the Write a review button, its form, the sort menu, the reviews and the page links.
+       Judge.me's markup can change, so pieces are found by what they say, and anything that
+       contains (or sits inside) something we keep is never hidden. */
+    var cleanWrap = root.querySelector('[data-tlw-reviews]');
+    if (cleanWrap && cleanWrap.getAttribute('data-clean') === 'true') {
+      var KEEP = '.jdgm-write-rev-link, .jdgm-widget-actions-wrapper, .jdgm-form-wrapper, .jdgm-form, ' +
+                 '.jdgm-rev-widg__sort-wrapper, .jdgm-rev-widg__reviews, .jdgm-rev, ' +
+                 '[class*="jdgm-paginate"], [class*="jdgm-sort"], [class*="jdgm-form"]';
+      var DROP_TEXT = /out of \d|based on \d+ review|be the first to write a review|^verified$|transparency/i;
+
+      var isKept = function (el) {
+        return !!(el.matches(KEEP) || el.closest(KEEP) || el.querySelector(KEEP));
+      };
+
+      var hideBlock = function (el) {
+        if (!el || isKept(el)) return;
+        el.style.setProperty('display', 'none', 'important');
+        el.setAttribute('data-tlw-hidden', '1');
+      };
+
+      /* climb from a piece of text to the largest wrapper that only holds "summary" content */
+      var hideAround = function (start, widget) {
+        var top = start;
+        while (
+          top.parentElement &&
+          top.parentElement !== widget &&
+          !top.parentElement.classList.contains('jdgm-widget') &&
+          !isKept(top.parentElement) &&
+          top.parentElement.textContent.trim().length < 160
+        ) {
+          top = top.parentElement;
+        }
+        hideBlock(top);
+      };
+
+      var cleanReviews = function () {
+        cleanWrap.querySelectorAll('.jdgm-rev-widg, .jdgm-review-widget').forEach(function (widget) {
+          var walker = document.createTreeWalker(widget, NodeFilter.SHOW_TEXT, null, false);
+          var hits = [];
+          var node;
+          while ((node = walker.nextNode())) {
+            var text = node.nodeValue.trim();
+            if (text && DROP_TEXT.test(text) && node.parentElement && !node.parentElement.closest('.jdgm-rev')) {
+              hits.push(node.parentElement);
+            }
+          }
+          hits.forEach(function (el) { hideAround(el, widget); });
+
+          /* the 5-to-1 star bar chart (its rows are just numbers, so find it by name) */
+          widget.querySelectorAll('.jdgm-histogram, [class*="histogram"]').forEach(function (el) { hideBlock(el); });
+
+          /* the medal artwork: an image or svg from Judge.me sitting outside the reviews */
+          widget.querySelectorAll('img[src*="medal"], img[src*="badge"], img[alt*="ransparency"], [class*="medal"], [class*="verified-badge"], [class*="trust-badge"]').forEach(function (el) {
+            if (el.closest('.jdgm-rev')) return;
+            hideAround(el, widget);
+          });
+        });
+      };
+
+      var cleanTimer = null;
+      var scheduleClean = function () {
+        clearTimeout(cleanTimer);
+        cleanTimer = setTimeout(cleanReviews, 80);
+      };
+
+      if (window.MutationObserver) {
+        new MutationObserver(scheduleClean).observe(cleanWrap, { childList: true, subtree: true });
+      }
+      window.addEventListener('load', scheduleClean);
+      scheduleClean();
+    }
   })();
 </script>
 
@@ -2421,6 +2605,47 @@
       "label": "Show the Judge.me reviews and Write a review button",
       "info": "Turn off only if you add Judge.me's own block instead, to avoid showing reviews twice.",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "reviews_hide_badge",
+      "label": "Hide Judge.me's Verified badge",
+      "info": "The round Diamond Transparency badge and the Verified link above the reviews.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "reviews_clean",
+      "label": "Clean look: hide the rating summary, bar chart and badge",
+      "info": "Keeps the Write a review button, the sort menu and the reviews themselves.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "reviews_view_more",
+      "label": "Cut long reviews short with a View more button",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "reviews_lines",
+      "label": "Lines to show before View more",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "text",
+      "id": "reviews_more_label",
+      "label": "View more button text",
+      "default": "View more"
+    },
+    {
+      "type": "text",
+      "id": "reviews_less_label",
+      "label": "View less button text",
+      "default": "View less"
     },
     {
       "type": "header",
