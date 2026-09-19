@@ -476,6 +476,7 @@
       "blocks": {
         "client_TkLCBj": {
           "type": "client",
+          "disabled": true,
           "settings": {
             "image": "shopify://shop_images/Screenshot_2026-09-19_at_20.00.44.png",
             "name": "Sarah",
