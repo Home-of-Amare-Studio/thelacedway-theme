@@ -100,12 +100,23 @@
         "padding-block-end": 48
       }
     },
+    "collection_header_G8Bm9d": {
+      "type": "collection-header",
+      "name": "Header: Lace Systems",
+      "settings": {
+        "eyebrow": "Hair",
+        "heading": "Premium Lace Systems",
+        "show_rule": true,
+        "lead": "Closures and frontals, finished by hand.",
+        "body": "Choose your lace size and length. Every system is prepared to sit flat and blend seamlessly."
+      }
+    },
     "tlw_main_collection_9GFRha": {
       "type": "tlw-main-collection",
       "name": "TLW Collection",
       "settings": {
-        "show_header": true,
-        "show_description": true,
+        "show_header": false,
+        "show_description": false,
         "show_breadcrumb": true,
         "show_count": false,
         "columns": 3,
@@ -123,6 +134,7 @@
   },
   "order": [
     "section",
+    "collection_header_G8Bm9d",
     "tlw_main_collection_9GFRha"
   ]
 }
