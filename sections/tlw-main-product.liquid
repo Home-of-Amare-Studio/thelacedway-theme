@@ -1083,7 +1083,7 @@
     display: inline-flex;
     align-items: center;
     gap: 16px;
-    margin: 20px 0 8px;
+    margin: 20px 0 0;
     text-decoration: none;
     color: var(--tlw-on-surface-variant);
   }
@@ -1105,9 +1105,9 @@
   }
 
   #tlw-product-{{ section.id }} .tlw-product__price {
-    margin: 0 0 48px;
+    margin: 32px 0 48px;
     font-family: var(--tlw-font-body);
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 300;
     letter-spacing: 0.025em;
     color: var(--tlw-on-surface-variant);
@@ -1806,11 +1806,21 @@
     display: none !important;
   }
 
-  #tlw-product-{{ section.id }} .tlw-product__reviews[data-clean="true"] .jdgm-widget-actions-wrapper {
-    justify-content: flex-start;
-    margin-left: 0;
-    padding-left: 0;
-    border: 0;
+  /* keep Write a review on the left, not centred */
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-rev-widg__summary {
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__reviews .jdgm-widget-actions-wrapper {
+    justify-content: flex-start !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    text-align: left !important;
   }
 
   #tlw-product-{{ section.id }} .jdgm-rev-widg__title {
@@ -2475,6 +2485,40 @@
       }
       window.addEventListener('load', scheduleClean);
       scheduleClean();
+    }
+
+    /* ---- reviews: keep the Write a review button on the left ----
+       Judge.me centres its top row. Walk up from the button and left-align every wrapper around it. */
+    var leftWrap = root.querySelector('[data-tlw-reviews]');
+    if (leftWrap) {
+      var leftAlign = function () {
+        leftWrap.querySelectorAll('.jdgm-write-rev-link').forEach(function (btn) {
+          var widget = btn.closest('.jdgm-rev-widg') || btn.closest('.jdgm-widget');
+          var node = btn.parentElement;
+          while (node && node !== widget && node !== leftWrap) {
+            node.style.setProperty('justify-content', 'flex-start', 'important');
+            node.style.setProperty('align-items', 'flex-start', 'important');
+            node.style.setProperty('text-align', 'left', 'important');
+            node.style.setProperty('margin-left', '0', 'important');
+            node.style.setProperty('padding-left', '0', 'important');
+            node.style.setProperty('border-left', '0', 'important');
+            node.style.setProperty('border-right', '0', 'important');
+            node = node.parentElement;
+          }
+        });
+      };
+
+      var leftTimer = null;
+      var scheduleLeft = function () {
+        clearTimeout(leftTimer);
+        leftTimer = setTimeout(leftAlign, 100);
+      };
+
+      if (window.MutationObserver) {
+        new MutationObserver(scheduleLeft).observe(leftWrap, { childList: true, subtree: true });
+      }
+      window.addEventListener('load', scheduleLeft);
+      scheduleLeft();
     }
   })();
 </script>
