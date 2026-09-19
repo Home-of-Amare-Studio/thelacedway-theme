@@ -639,33 +639,123 @@
   </div>
   {%- endif -%}
 
-  {% comment %} ---------- FITTED ON REAL CLIENTS ---------- {% endcomment %}
-  {%- if section.blocks.size > 0 -%}
-    {%- assign client_blocks = section.blocks | where: 'type', 'client' -%}
-    {%- if client_blocks.size > 0 -%}
-      <div class="tlw-product__clients">
-        <div class="tlw-product__clients-head">
-          <span class="tlw-label-caps tlw-product__clients-eyebrow">Before You Take Our Word For It.</span>
-          <h2 class="tlw-headline-md">Fitted On Real Clients.</h2>
-        </div>
-        <div class="tlw-product__clients-grid">
-          {%- for block in client_blocks -%}
-            <div class="tlw-product__client" {{ block.shopify_attributes }}>
-              <div class="tlw-product__client-media">
-                {%- if block.settings.image != blank -%}
-                  {{ block.settings.image | image_url: width: 700 | image_tag: loading: 'lazy', alt: block.settings.name }}
-                {%- endif -%}
-                <div class="tlw-product__client-overlay">
-                  <p class="tlw-product__client-quote">&ldquo;{{ block.settings.quote }}&rdquo;</p>
-                  <p class="tlw-label-caps tlw-product__client-caption">{{ block.settings.name }} / {{ block.settings.length }} / {{ block.settings.lace_size }} lace</p>
-                </div>
-              </div>
-              <p class="tlw-label-caps tlw-product__client-caption tlw-product__client-caption--mobile">{{ block.settings.name }} / {{ block.settings.length }} / {{ block.settings.lace_size }} lace</p>
-            </div>
-          {%- endfor -%}
-        </div>
-      </div>
+  {% comment %}
+    ---------- FITTED ON REAL CLIENTS ----------
+    Two sources, in this order:
+      1. This product's own metafields (custom.client_photos + custom.client_details),
+         so every product can have its own clients.
+      2. Otherwise the "Client photo" blocks on the template (shared by every
+         product on that template).
+    The cards spread across the full width: 4 cards make 4 columns, 3 cards make
+    3 wider columns, 2 make 2, and so on, so removing one never leaves a gap.
+  {% endcomment %}
+  {%- assign client_blocks = section.blocks | where: 'type', 'client' -%}
+  {%- assign meta_photos = product.metafields.custom.client_photos.value -%}
+  {%- assign meta_details = product.metafields.custom.client_details.value | default: '' -%}
+  {%- assign detail_lines = meta_details | newline_to_br | split: '<br />' -%}
+
+  {%- assign use_meta = false -%}
+  {%- if meta_photos != blank -%}
+    {%- assign use_meta = true -%}
+    {%- assign client_total = meta_photos.size -%}
+  {%- else -%}
+    {%- assign client_total = client_blocks.size -%}
+  {%- endif -%}
+  {%- if client_total > 8 -%}
+    {%- assign client_total = 8 -%}
+  {%- endif -%}
+
+  {%- if client_total > 0 -%}
+    {%- assign cols_d = client_total | at_most: 4 -%}
+    {%- assign cols_t = client_total | at_most: 2 -%}
+    {%- assign clients_max = '1680px' -%}
+    {%- if section.settings.clients_size == 'standard' -%}
+      {%- assign clients_max = '1400px' -%}
+    {%- elsif section.settings.clients_size == 'full' -%}
+      {%- assign clients_max = '100%' -%}
     {%- endif -%}
+
+    <div class="tlw-product__clients" style="--clients-max: {{ clients_max }};">
+      <div class="tlw-product__clients-head">
+        <span class="tlw-label-caps tlw-product__clients-eyebrow">{{ section.settings.clients_eyebrow | default: 'Before You Take Our Word For It.' | escape }}</span>
+        <h2 class="tlw-product__clients-title">{{ section.settings.clients_heading | default: 'Fitted On Real Clients.' | escape }}</h2>
+      </div>
+      <div class="tlw-product__clients-grid" style="--cols-d: {{ cols_d }}; --cols-t: {{ cols_t }};">
+        {%- for i in (1..client_total) -%}
+          {%- assign idx = i | minus: 1 -%}
+          {%- assign c_image = nil -%}
+          {%- assign c_alt = '' -%}
+          {%- assign c_name = '' -%}
+          {%- assign c_length = '' -%}
+          {%- assign c_lace = '' -%}
+          {%- assign c_quote = '' -%}
+          {%- assign c_attrs = '' -%}
+
+          {%- if use_meta -%}
+            {%- assign c_media = meta_photos[idx] -%}
+            {%- assign c_image = c_media.preview_image | default: c_media -%}
+            {%- assign c_alt = c_media.alt -%}
+            {%- assign c_line = detail_lines[idx] | strip -%}
+            {%- assign c_parts = c_line | split: '|' -%}
+            {%- assign c_name = c_parts[0] | strip -%}
+            {%- assign c_length = c_parts[1] | strip -%}
+            {%- assign c_lace = c_parts[2] | strip -%}
+            {%- assign c_quote = c_parts[3] | strip -%}
+          {%- else -%}
+            {%- assign block = client_blocks[idx] -%}
+            {%- assign c_image = block.settings.image -%}
+            {%- assign c_name = block.settings.name -%}
+            {%- assign c_length = block.settings.length -%}
+            {%- assign c_lace = block.settings.lace_size -%}
+            {%- assign c_quote = block.settings.quote -%}
+            {%- assign c_attrs = block.shopify_attributes -%}
+          {%- endif -%}
+
+          {%- assign c_caption = c_name -%}
+          {%- if c_length != blank -%}
+            {%- if c_caption != blank -%}
+              {%- assign c_caption = c_caption | append: ' / ' -%}
+            {%- endif -%}
+            {%- assign c_caption = c_caption | append: c_length -%}
+          {%- endif -%}
+          {%- if c_lace != blank -%}
+            {%- if c_caption != blank -%}
+              {%- assign c_caption = c_caption | append: ' / ' -%}
+            {%- endif -%}
+            {%- assign c_caption = c_caption | append: c_lace | append: ' lace' -%}
+          {%- endif -%}
+          {%- assign c_alt = c_alt | default: c_name | default: product.title -%}
+
+          <div class="tlw-product__client" {{ c_attrs }}>
+            <div class="tlw-product__client-media">
+              {%- if c_image != blank -%}
+                {{ c_image
+                  | image_url: width: 900
+                  | image_tag:
+                    loading: 'lazy',
+                    widths: '400, 600, 900',
+                    sizes: '(min-width: 1100px) 30vw, (min-width: 768px) 45vw, 78vw',
+                    alt: c_alt
+                }}
+              {%- endif -%}
+              {%- if c_quote != blank or c_caption != blank -%}
+                <div class="tlw-product__client-overlay">
+                  {%- if c_quote != blank -%}
+                    <p class="tlw-product__client-quote">&ldquo;{{ c_quote | escape }}&rdquo;</p>
+                  {%- endif -%}
+                  {%- if c_caption != blank -%}
+                    <p class="tlw-label-caps tlw-product__client-caption">{{ c_caption | escape }}</p>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            </div>
+            {%- if c_caption != blank -%}
+              <p class="tlw-label-caps tlw-product__client-caption tlw-product__client-caption--mobile">{{ c_caption | escape }}</p>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
   {%- endif -%}
 
   {% comment %} ---------- EXPLORE ---------- {% endcomment %}
@@ -1315,8 +1405,8 @@
 
   /* ---------- Fitted on real clients ---------- */
   #tlw-product-{{ section.id }} .tlw-product__clients {
-    max-width: 1400px;
-    margin: 80px auto 0;
+    max-width: var(--clients-max, 1680px);
+    margin: 96px auto 0;
     padding-inline: var(--tlw-margin);
   }
 
@@ -1331,12 +1421,26 @@
     color: var(--tlw-accent);
   }
 
+  #tlw-product-{{ section.id }} .tlw-product__clients-title {
+    margin: 0;
+    font-family: var(--tlw-font-display);
+    font-size: 36px;
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--tlw-primary);
+  }
+
   @media (min-width: 768px) {
     #tlw-product-{{ section.id }} .tlw-product__clients-head {
       margin-bottom: 64px;
     }
+    #tlw-product-{{ section.id }} .tlw-product__clients-title {
+      font-size: 56px;
+    }
   }
 
+  /* Phones: swipeable row. Tablet and up: cards share the width evenly. */
   #tlw-product-{{ section.id }} .tlw-product__clients-grid {
     display: flex;
     gap: 16px;
@@ -1345,40 +1449,41 @@
     scroll-snap-type: x mandatory;
   }
 
+  #tlw-product-{{ section.id }} .tlw-product__client {
+    flex: 0 0 82%;
+    scroll-snap-align: start;
+  }
+
   @media (min-width: 768px) {
     #tlw-product-{{ section.id }} .tlw-product__clients-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 24px;
       overflow: visible;
+    }
+    #tlw-product-{{ section.id }} .tlw-product__client {
+      flex: 0 0 calc((100% - (var(--cols-t, 2) - 1) * 24px) / var(--cols-t, 2));
     }
   }
 
   @media (min-width: 1100px) {
     #tlw-product-{{ section.id }} .tlw-product__clients-grid {
-      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
     }
-  }
-
-  #tlw-product-{{ section.id }} .tlw-product__client {
-    flex: 0 0 78%;
-    scroll-snap-align: start;
-  }
-
-  @media (min-width: 768px) {
     #tlw-product-{{ section.id }} .tlw-product__client {
-      flex: initial;
+      flex: 0 0 calc((100% - (var(--cols-d, 4) - 1) * 32px) / var(--cols-d, 4));
     }
   }
 
   #tlw-product-{{ section.id }} .tlw-product__client-media {
     position: relative;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 3 / 4;
     overflow: hidden;
     background: var(--tlw-surface-container);
   }
 
   #tlw-product-{{ section.id }} .tlw-product__client-media img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -1395,11 +1500,14 @@
 
   #tlw-product-{{ section.id }} .tlw-product__client-overlay {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: none;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 24px;
+    padding: 32px;
     background: rgba(10, 10, 10, 0.8);
     color: #fff;
     opacity: 0;
@@ -1420,18 +1528,18 @@
   #tlw-product-{{ section.id }} .tlw-product__client-quote {
     font-family: var(--tlw-font-display);
     font-style: italic;
-    font-size: 17px;
+    font-size: 22px;
     line-height: 1.4;
     margin: 0;
   }
 
   #tlw-product-{{ section.id }} .tlw-product__client-caption {
-    margin-top: 12px;
+    margin: 14px 0 0;
     opacity: 0.7;
   }
 
   #tlw-product-{{ section.id }} .tlw-product__client-caption--mobile {
-    margin-top: 12px;
+    margin-top: 14px;
     opacity: 1;
     color: var(--tlw-on-surface-variant);
   }
@@ -1899,6 +2007,43 @@
       "label": "Ready to Ship: show fixed Unit Details card",
       "info": "Use on Ready to Ship templates \u2014 the unit is already made, so there's nothing to customise. Turns off every dropdown and just lists the specs from the description.",
       "default": false
+    },
+    {
+      "type": "header",
+      "content": "Fitted on real clients"
+    },
+    {
+      "type": "text",
+      "id": "clients_eyebrow",
+      "label": "Small line above the heading",
+      "default": "Before You Take Our Word For It."
+    },
+    {
+      "type": "text",
+      "id": "clients_heading",
+      "label": "Heading",
+      "default": "Fitted On Real Clients."
+    },
+    {
+      "type": "select",
+      "id": "clients_size",
+      "label": "Size of the section",
+      "info": "Large gives bigger photos. Full width stretches edge to edge.",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        },
+        {
+          "value": "full",
+          "label": "Full width"
+        }
+      ],
+      "default": "large"
     }
   ],
   "blocks": [
