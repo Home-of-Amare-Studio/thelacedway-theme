@@ -665,17 +665,33 @@
     {%- assign client_total = 8 -%}
   {%- endif -%}
 
-  {%- if client_total > 0 -%}
-    {%- assign cols_d = client_total | at_most: 4 -%}
-    {%- assign cols_t = client_total | at_most: 2 -%}
+  {%- comment %} On the live site a card with no photo is left out, so nobody sees an empty grey box. In the theme editor every card shows so it can be filled in. {%- endcomment %}
+  {%- assign visible_total = client_total -%}
+  {%- unless use_meta -%}
+    {%- unless request.design_mode -%}
+      {%- assign visible_total = 0 -%}
+      {%- for b in client_blocks limit: 8 -%}
+        {%- if b.settings.image != blank -%}
+          {%- assign visible_total = visible_total | plus: 1 -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endunless -%}
+  {%- endunless -%}
+
+  {%- if visible_total > 0 -%}
+    {%- assign cols_d = visible_total | at_most: 4 -%}
+    {%- assign cols_t = visible_total | at_most: 2 -%}
     {%- assign clients_max = '1680px' -%}
+    {%- assign client_max = '440px' -%}
     {%- if section.settings.clients_size == 'standard' -%}
       {%- assign clients_max = '1400px' -%}
+      {%- assign client_max = '360px' -%}
     {%- elsif section.settings.clients_size == 'full' -%}
       {%- assign clients_max = '100%' -%}
+      {%- assign client_max = '560px' -%}
     {%- endif -%}
 
-    <div class="tlw-product__clients" style="--clients-max: {{ clients_max }};">
+    <div class="tlw-product__clients" style="--clients-max: {{ clients_max }}; --client-max: {{ client_max }};">
       <div class="tlw-product__clients-head">
         <span class="tlw-label-caps tlw-product__clients-eyebrow">{{ section.settings.clients_eyebrow | default: 'Before You Take Our Word For It.' | escape }}</span>
         <h2 class="tlw-product__clients-title">{{ section.settings.clients_heading | default: 'Fitted On Real Clients.' | escape }}</h2>
@@ -711,6 +727,10 @@
             {%- assign c_attrs = block.shopify_attributes -%}
           {%- endif -%}
 
+          {%- if c_image == blank and request.design_mode == false -%}
+            {%- continue -%}
+          {%- endif -%}
+
           {%- assign c_caption = c_name -%}
           {%- if c_length != blank -%}
             {%- if c_caption != blank -%}
@@ -737,6 +757,8 @@
                     sizes: '(min-width: 1100px) 30vw, (min-width: 768px) 45vw, 78vw',
                     alt: c_alt
                 }}
+              {%- elsif request.design_mode -%}
+                <span class="tlw-product__client-empty">Add a photo</span>
               {%- endif -%}
               {%- if c_quote != blank or c_caption != blank -%}
                 <div class="tlw-product__client-overlay">
@@ -1424,7 +1446,7 @@
   #tlw-product-{{ section.id }} .tlw-product__clients-title {
     margin: 0;
     font-family: var(--tlw-font-display);
-    font-size: 36px;
+    font-size: 32px;
     font-weight: 300;
     line-height: 1.1;
     letter-spacing: -0.02em;
@@ -1433,10 +1455,10 @@
 
   @media (min-width: 768px) {
     #tlw-product-{{ section.id }} .tlw-product__clients-head {
-      margin-bottom: 64px;
+      margin-bottom: 56px;
     }
     #tlw-product-{{ section.id }} .tlw-product__clients-title {
-      font-size: 56px;
+      font-size: 44px;
     }
   }
 
@@ -1462,7 +1484,7 @@
       overflow: visible;
     }
     #tlw-product-{{ section.id }} .tlw-product__client {
-      flex: 0 0 calc((100% - (var(--cols-t, 2) - 1) * 24px) / var(--cols-t, 2));
+      flex: 0 0 min(calc((100% - (var(--cols-t, 2) - 1) * 24px) / var(--cols-t, 2)), var(--client-max, 440px));
     }
   }
 
@@ -1471,7 +1493,7 @@
       gap: 32px;
     }
     #tlw-product-{{ section.id }} .tlw-product__client {
-      flex: 0 0 calc((100% - (var(--cols-d, 4) - 1) * 32px) / var(--cols-d, 4));
+      flex: 0 0 min(calc((100% - (var(--cols-d, 4) - 1) * 32px) / var(--cols-d, 4)), var(--client-max, 440px));
     }
   }
 
@@ -1496,6 +1518,22 @@
       filter: grayscale(0);
       transform: scale(1.05);
     }
+  }
+
+  #tlw-product-{{ section.id }} .tlw-product__client-empty {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tlw-outline);
   }
 
   #tlw-product-{{ section.id }} .tlw-product__client-overlay {
