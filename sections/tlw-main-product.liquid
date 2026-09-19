@@ -124,7 +124,8 @@
                   {%- assign words = label_candidate | downcase | split: ' ' -%}
                   {%- assign title_label = '' -%}
                   {%- for word in words -%}
-                    {%- assign title_label = title_label | append: word | capitalize | append: ' ' -%}
+                    {%- assign capped_word = word | capitalize -%}
+                    {%- assign title_label = title_label | append: capped_word | append: ' ' -%}
                   {%- endfor -%}
                   {%- assign title_label = title_label | strip -%}
 
@@ -439,7 +440,8 @@
                   {%- assign words = label_candidate | downcase | split: ' ' -%}
                   {%- assign title_label = '' -%}
                   {%- for word in words -%}
-                    {%- assign title_label = title_label | append: word | capitalize | append: ' ' -%}
+                    {%- assign capped_word = word | capitalize -%}
+                    {%- assign title_label = title_label | append: capped_word | append: ' ' -%}
                   {%- endfor -%}
                   {%- assign title_label = title_label | strip -%}
 
