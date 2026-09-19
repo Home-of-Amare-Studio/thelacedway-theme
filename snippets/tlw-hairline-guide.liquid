@@ -1,278 +1,70 @@
 {% comment %}
-  THELACEDWÁY hairline guide
+  THELACEDWÁY hairline guide: "?" icon that opens a slide-in panel.
   Home of Amare Studio
 
-  Built from src/components/HairlineGuide.tsx. A small "?" trigger opens a
-  right-hand slide-over panel explaining the two hairline options. Rendered
-  once per product page; the trigger itself gets placed next to whichever
-  service option's label contains "hairline" (see tlw-main-product.liquid).
+  Param: id (any unique string, e.g. the block id)
 
-  Usage: {% render 'tlw-hairline-guide', id: unique_string %}
+  All wording and images are edited in the theme editor:
+  Theme settings -> THELACEDWÁY guides -> Hairline pop-up.
 {% endcomment %}
 
-<button
-  type="button"
-  class="tlw-hairline__trigger"
-  aria-label="About hairline options"
-  title="About hairline options"
-  data-hairline-open="{{ id }}"
->
-  <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-    <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.3"/>
-    <path d="M5.8 6.2c0-1.2 1-2 2.2-2s2.1.8 2.1 1.8c0 1.4-2.1 1.4-2.1 3.1" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-    <circle cx="8" cy="11.4" r="0.15" fill="currentColor" stroke="currentColor" stroke-width="1"/>
-  </svg>
-</button>
+{%- liquid
+  assign h_title = settings.tlw_hairline_title | default: 'Choosing your hairline'
+  assign h_intro = settings.tlw_hairline_intro
+  if h_intro == blank
+    assign h_intro = '<p>Both hairlines are hand-tied and customised to you. The difference is the density and how sculpted the perimeter looks.</p>'
+  endif
 
-<div class="tlw-hairline" id="tlw-hairline-{{ id }}" data-hairline-panel aria-hidden="true">
-  <button class="tlw-hairline__scrim" data-hairline-close aria-label="Close"></button>
+  assign any_custom = false
+  if settings.tlw_hairline_1_name != blank or settings.tlw_hairline_2_name != blank or settings.tlw_hairline_3_name != blank or settings.tlw_hairline_4_name != blank
+    assign any_custom = true
+  endif
+-%}
 
-  <div class="tlw-hairline__panel" role="dialog" aria-modal="true" aria-label="Hairline options">
-    <div class="tlw-hairline__head">
-      <h2 class="tlw-headline-sm">Choosing your hairline</h2>
-      <button class="tlw-hairline__x" data-hairline-close aria-label="Close">
-        <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
-          <path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
+{%- capture guide_trigger -%}
+  <button type="button" class="tlw-guide-icon" data-tlw-guide-open="{{ id }}" aria-haspopup="dialog" aria-label="About hairline options" title="About hairline options">
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+  </button>
+{%- endcapture -%}
 
-    <div class="tlw-hairline__body">
-      <p class="tlw-body-md tlw-hairline__intro">
-        Both hairlines are hand-tied and customised to you. The difference is the density and how sculpted the perimeter looks.
-      </p>
+{%- capture guide_body -%}
+  <div class="tlw-guide__rich">{{ h_intro }}</div>
 
-      <div class="tlw-hairline__option">
-        <span class="tlw-label-caps tlw-hairline__option-label">Option 1</span>
-        <h3 class="tlw-headline-sm tlw-hairline__option-title">Natural hairline</h3>
-        <p class="tlw-body-md">A softer, denser hairline that follows your own natural growth pattern. Minimal plucking, fuller at the front — best if you like a low-maintenance, everyday finish.</p>
-        <div class="tlw-hairline__image-row">
-          <div class="tlw-hairline__image-placeholder">
-            <span class="tlw-label-caps">Coming soon</span>
-          </div>
-          <span class="tlw-hairline__image-caption">Image guide for this hairline</span>
+  <div class="tlw-guide__cards">
+    {%- assign option_number = 0 -%}
+    {%- for n in (1..4) -%}
+      {%- assign name_key = 'tlw_hairline_' | append: n | append: '_name' -%}
+      {%- assign text_key = 'tlw_hairline_' | append: n | append: '_text' -%}
+      {%- assign image_key = 'tlw_hairline_' | append: n | append: '_image' -%}
+      {%- assign o_name = settings[name_key] -%}
+      {%- assign o_text = settings[text_key] -%}
+      {%- assign o_image = settings[image_key] -%}
+
+      {%- unless any_custom -%}
+        {%- if n == 1 -%}
+          {%- assign o_name = 'Natural hairline' -%}
+          {%- assign o_text = '<p>A softer, denser hairline that follows your own natural growth pattern. Minimal plucking, fuller at the front. Best if you like a low-maintenance, everyday finish.</p>' -%}
+        {%- elsif n == 2 -%}
+          {%- assign o_name = 'Light Lagos hairline' -%}
+          {%- assign o_text = '<p>A more sculpted, airy hairline with finer baby hairs and a lighter density at the perimeter. Gives a more styled, laid finish and photographs beautifully.</p>' -%}
+        {%- endif -%}
+      {%- endunless -%}
+
+      {%- if o_name != blank -%}
+        {%- assign option_number = option_number | plus: 1 -%}
+        <div class="tlw-guide__card">
+          <span class="tlw-guide__eyebrow">Option {{ option_number }}</span>
+          <h3 class="tlw-guide__card-title">{{ o_name | escape }}</h3>
+          {%- if o_text != blank -%}
+            <div class="tlw-guide__card-text">{{ o_text }}</div>
+          {%- endif -%}
+          {%- if o_image != blank -%}
+            {{ o_image | image_url: width: 800 | image_tag: loading: 'lazy', class: 'tlw-guide__img', alt: o_name }}
+          {%- endif -%}
         </div>
-      </div>
-
-      <div class="tlw-hairline__option">
-        <span class="tlw-label-caps tlw-hairline__option-label">Option 2</span>
-        <h3 class="tlw-headline-sm tlw-hairline__option-title">Light Lagos hairline</h3>
-        <p class="tlw-body-md">A more sculpted, airy hairline with finer baby hairs and a lighter density at the perimeter. Gives a more styled, laid finish and photographs beautifully.</p>
-        <div class="tlw-hairline__image-row">
-          <div class="tlw-hairline__image-placeholder">
-            <span class="tlw-label-caps">Coming soon</span>
-          </div>
-          <span class="tlw-hairline__image-caption">Image guide for this hairline</span>
-        </div>
-      </div>
-    </div>
+      {%- endif -%}
+    {%- endfor -%}
   </div>
-</div>
+{%- endcapture -%}
 
-<style>
-  .tlw-hairline__trigger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    padding: 0;
-    border: none;
-    background: none;
-    color: var(--tlw-on-surface-variant);
-    cursor: pointer;
-    transition: color 200ms ease;
-  }
-
-  .tlw-hairline__trigger:hover {
-    color: var(--tlw-accent);
-  }
-
-  .tlw-hairline {
-    position: fixed;
-    inset: 0;
-    z-index: 130;
-    visibility: hidden;
-  }
-
-  .tlw-hairline.is-open {
-    visibility: visible;
-  }
-
-  .tlw-hairline__scrim {
-    position: absolute;
-    inset: 0;
-    border: none;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
-    opacity: 0;
-    transition: opacity 400ms ease;
-    cursor: pointer;
-  }
-
-  .tlw-hairline.is-open .tlw-hairline__scrim {
-    opacity: 1;
-  }
-
-  .tlw-hairline__panel {
-    position: absolute;
-    inset-block: 0;
-    right: 0;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 440px;
-    background: var(--tlw-surface-lowest);
-    border-left: 1px solid var(--tlw-outline-variant);
-    box-shadow: -20px 0 40px rgba(0, 0, 0, 0.15);
-    transform: translateX(100%);
-    transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  @media (min-width: 768px) {
-    .tlw-hairline__panel {
-      width: 38vw;
-      min-width: 380px;
-    }
-  }
-
-  .tlw-hairline.is-open .tlw-hairline__panel {
-    transform: translateX(0);
-  }
-
-  .tlw-hairline__head {
-    position: relative;
-    flex-shrink: 0;
-    padding: 24px;
-    border-bottom: 1px solid var(--tlw-outline-variant);
-  }
-
-  @media (min-width: 768px) {
-    .tlw-hairline__head {
-      padding: 32px;
-    }
-  }
-
-  .tlw-hairline__head h2 {
-    padding-right: 40px;
-    color: var(--tlw-primary);
-    margin: 0;
-  }
-
-  .tlw-hairline__x {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    border: none;
-    background: none;
-    color: var(--tlw-primary);
-    cursor: pointer;
-    opacity: 0.8;
-    transition: opacity 200ms ease;
-  }
-
-  .tlw-hairline__x:hover {
-    opacity: 1;
-  }
-
-  .tlw-hairline__body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px 24px 64px;
-  }
-
-  @media (min-width: 768px) {
-    .tlw-hairline__body {
-      padding: 32px 32px 80px;
-    }
-  }
-
-  .tlw-hairline__intro {
-    margin: 0 0 28px;
-    color: var(--tlw-on-surface-variant);
-  }
-
-  .tlw-hairline__option {
-    border-radius: 16px;
-    background: var(--tlw-surface-container);
-    padding: 16px;
-    margin-bottom: 12px;
-  }
-
-  .tlw-hairline__option-label {
-    display: block;
-    margin-bottom: 4px;
-    color: var(--tlw-accent);
-  }
-
-  .tlw-hairline__option-title {
-    margin: 0 0 4px;
-    color: var(--tlw-primary);
-  }
-
-  .tlw-hairline__option p {
-    margin: 0;
-    color: var(--tlw-on-surface-variant);
-  }
-
-  .tlw-hairline__image-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 16px;
-  }
-
-  .tlw-hairline__image-placeholder {
-    position: relative;
-    flex-shrink: 0;
-    width: 96px;
-    height: 64px;
-    border-radius: 8px;
-    background: var(--tlw-surface-container-high);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .tlw-hairline__image-placeholder span {
-    font-size: 10px;
-    color: var(--tlw-on-surface-variant);
-  }
-
-  .tlw-hairline__image-caption {
-    font-family: var(--tlw-font-body);
-    font-size: 12px;
-    color: var(--tlw-outline);
-  }
-</style>
-
-<script>
-  (function () {
-    var id = {{ id | json }};
-    var trigger = document.querySelector('[data-hairline-open="' + id + '"]');
-    var panel = document.getElementById('tlw-hairline-' + id);
-    if (!trigger || !panel) return;
-
-    function open() {
-      panel.classList.add('is-open');
-      panel.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function close() {
-      panel.classList.remove('is-open');
-      panel.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-
-    trigger.addEventListener('click', open);
-    panel.querySelectorAll('[data-hairline-close]').forEach(function (btn) {
-      btn.addEventListener('click', close);
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && panel.classList.contains('is-open')) close();
-    });
-  })();
-</script>
+{%- render 'tlw-guide-shell', id: id, title: h_title, trigger: guide_trigger, body: guide_body -%}
