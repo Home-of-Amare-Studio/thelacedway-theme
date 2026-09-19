@@ -1,0 +1,991 @@
+{% comment %}
+  THELACEDWÁY bag (cart drawer)
+  Home of Amare Studio
+
+  A slide-in "Your Bag" panel. Add it once, in the theme editor's Header group,
+  and it works on every page:
+    - clicking the bag icon in the header opens it (links to the cart page are intercepted)
+    - "Add to bag" on a product page opens it
+  Paid add-ons (Jet Black, Layers, ...) are separate cart lines, so they are
+  shown nested under the unit they belong to, and change/remove with it.
+  The page at /cart still works as a fallback.
+{% endcomment %}
+
+<div
+  class="tlw-bag"
+  id="tlw-bag-{{ section.id }}"
+  data-tlw-bag
+  data-new-tab="{{ section.settings.checkout_new_tab }}"
+  data-intercept="{{ section.settings.intercept_bag_links }}"
+  hidden
+  aria-hidden="true"
+>
+  <div class="tlw-bag__overlay" data-bag-action="close"></div>
+
+  <aside class="tlw-bag__panel" role="dialog" aria-modal="true" aria-labelledby="tlw-bag-title-{{ section.id }}" tabindex="-1">
+    <header class="tlw-bag__head">
+      <h2 class="tlw-bag__title" id="tlw-bag-title-{{ section.id }}">{{ section.settings.title | default: 'Your Bag' | escape }}</h2>
+      <button type="button" class="tlw-bag__close" data-bag-action="close" aria-label="Close bag">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </header>
+
+    <div class="tlw-bag__main">
+      <div class="tlw-bag__empty" data-bag-empty hidden>
+        <svg viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <p>{{ section.settings.empty_text | default: 'Your bag is empty' | escape }}</p>
+      </div>
+
+      <div class="tlw-bag__scroll" data-bag-scroll hidden>
+        <ul class="tlw-bag__list" data-bag-list></ul>
+      </div>
+
+      <p class="tlw-bag__error" data-bag-error role="alert" hidden></p>
+
+      <div class="tlw-bag__foot" data-bag-foot hidden>
+        <div class="tlw-bag__subtotal">
+          <span class="tlw-bag__subtotal-label">Subtotal</span>
+          <span class="tlw-bag__subtotal-amount" data-bag-subtotal></span>
+        </div>
+        {%- if section.settings.customs_note != blank -%}
+          <p class="tlw-bag__note">{{ section.settings.customs_note | escape }}</p>
+        {%- endif -%}
+        <button type="button" class="tlw-bag__checkout" data-bag-action="checkout">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+          <span>{{ section.settings.checkout_label | default: 'Checkout' | escape }}</span>
+        </button>
+        {%- if section.settings.shipping_note != blank -%}
+          <p class="tlw-bag__shipping">{{ section.settings.shipping_note | escape }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+  </aside>
+</div>
+
+<style>
+  html.tlw-bag-lock {
+    overflow: hidden;
+  }
+
+  .tlw-bag {
+    --tlw-bag-checkout: {{ section.settings.checkout_colour | default: '#3a3029' }};
+    --bag-text: {{ section.settings.text_colour | default: '#241b15' }};
+    --bag-line: {{ section.settings.line_colour | default: '#d1c4bd' }};
+    --bag-hover: {{ section.settings.hover_colour | default: '#a68b3f' }};
+    --bag-muted: #4e4540;
+    --bag-soft: #f2ede7;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1100;
+    font-family: var(--tlw-font-body);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--bag-text);
+  }
+
+  .tlw-bag[hidden] {
+    display: none;
+  }
+
+  .tlw-bag__overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(10, 10, 10, 0.5);
+    opacity: 0;
+    transition: opacity 350ms ease;
+  }
+
+  .tlw-bag.is-shown .tlw-bag__overlay {
+    opacity: 1;
+  }
+
+  .tlw-bag__panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 448px;
+    background: #fff;
+    border-left: 1px solid var(--bag-line);
+    box-shadow: 0 24px 80px rgba(10, 10, 10, 0.25);
+    transform: translateX(100%);
+    transition: transform 450ms cubic-bezier(0.16, 1, 0.3, 1);
+    outline: none;
+  }
+
+  .tlw-bag.is-shown .tlw-bag__panel {
+    transform: translateX(0);
+  }
+
+  .tlw-bag__head {
+    position: relative;
+    flex-shrink: 0;
+    padding: 20px 64px 20px 24px;
+    border-bottom: 1px solid var(--bag-line);
+  }
+
+  .tlw-bag__title {
+    margin: 0;
+    font-family: var(--tlw-font-display);
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-transform: uppercase;
+    color: var(--bag-text);
+  }
+
+  .tlw-bag__close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--bag-text);
+    transition: opacity 200ms ease;
+  }
+
+  .tlw-bag__close:hover {
+    opacity: 0.6;
+  }
+
+  .tlw-bag__main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .tlw-bag__empty {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 24px;
+    text-align: center;
+    color: rgba(36, 27, 21, 0.3);
+  }
+
+  .tlw-bag__empty[hidden],
+  .tlw-bag__scroll[hidden],
+  .tlw-bag__foot[hidden],
+  .tlw-bag__error[hidden] {
+    display: none;
+  }
+
+  .tlw-bag__empty p {
+    margin: 16px 0 0;
+    color: rgba(36, 27, 21, 0.7);
+  }
+
+  .tlw-bag__scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px;
+  }
+
+  .tlw-bag__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tlw-bag__item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .tlw-bag__thumb {
+    flex: 0 0 80px;
+    width: 80px;
+    height: 96px;
+    overflow: hidden;
+    background: var(--bag-soft);
+  }
+
+  .tlw-bag__thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .tlw-bag__info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .tlw-bag__name {
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-family: var(--tlw-font-display);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--bag-text);
+  }
+
+  .tlw-bag__opts {
+    margin: 4px 0 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--bag-muted);
+  }
+
+  .tlw-bag__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 4px;
+  }
+
+  .tlw-bag__qty {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--bag-line);
+  }
+
+  .tlw-bag__qty button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--bag-text);
+    transition: background-color 200ms ease;
+  }
+
+  .tlw-bag__qty button:hover {
+    background: var(--bag-soft);
+  }
+
+  .tlw-bag__qty button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .tlw-bag__qty-count {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .tlw-bag__price {
+    margin: 0;
+    font-size: 16px;
+    color: var(--bag-text);
+  }
+
+  .tlw-bag__stock {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: var(--bag-muted);
+  }
+
+  .tlw-bag__remove {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 4px;
+    margin-top: 12px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: var(--tlw-font-body);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bag-muted);
+    transition: color 200ms ease;
+  }
+
+  .tlw-bag__remove:hover {
+    color: var(--bag-text);
+  }
+
+  .tlw-bag__confirm {
+    margin-top: 16px;
+    padding: 12px;
+    border: 1px solid var(--bag-line);
+    background: var(--bag-soft);
+  }
+
+  .tlw-bag__confirm p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--bag-text);
+  }
+
+  .tlw-bag__confirm-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .tlw-bag__confirm-actions button {
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    background: none;
+    cursor: pointer;
+    font-family: var(--tlw-font-body);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bag-muted);
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  .tlw-bag__confirm-actions button[data-bag-action="remove-yes"] {
+    border-color: var(--bag-text);
+    color: var(--bag-text);
+  }
+
+  .tlw-bag__confirm-actions button[data-bag-action="remove-yes"]:hover {
+    background: var(--bag-text);
+    color: #fff;
+  }
+
+  .tlw-bag__confirm-actions button[data-bag-action="remove-no"]:hover {
+    color: var(--bag-text);
+  }
+
+  .tlw-bag__addon {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin: -12px 0 24px 96px;
+    padding-left: 12px;
+    border-left: 1px solid var(--bag-line);
+  }
+
+  .tlw-bag__addon-label {
+    margin: 0;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bag-muted);
+  }
+
+  .tlw-bag__addon-name,
+  .tlw-bag__addon-price {
+    margin: 0;
+    font-size: 13px;
+    color: var(--bag-text);
+  }
+
+  .tlw-bag__error {
+    margin: 0;
+    padding: 12px 24px;
+    border-top: 1px solid var(--bag-line);
+    border-bottom: 1px solid var(--bag-line);
+    background: var(--bag-soft);
+    font-size: 14px;
+    color: #c0392b;
+  }
+
+  .tlw-bag__foot {
+    padding: 20px 24px;
+    border-top: 1px solid var(--bag-line);
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .tlw-bag__subtotal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .tlw-bag__subtotal-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bag-text);
+  }
+
+  .tlw-bag__subtotal-amount {
+    font-family: var(--tlw-font-display);
+    font-size: 24px;
+    line-height: 1.3;
+    color: var(--bag-text);
+  }
+
+  .tlw-bag__note {
+    margin: 0 0 16px;
+    font-size: 12px;
+    line-height: 1.3;
+    color: var(--bag-muted);
+  }
+
+  .tlw-bag__checkout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 24px;
+    border: 1px solid transparent;
+    border-radius: 0;
+    background: var(--tlw-bag-checkout);
+    cursor: pointer;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #fff;
+    transition: background-color 250ms ease, border-color 250ms ease;
+  }
+
+  .tlw-bag__checkout:hover {
+    border-color: var(--bag-hover);
+    background: var(--bag-hover);
+  }
+
+  .tlw-bag__checkout:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .tlw-bag__shipping {
+    margin: 12px 0 0;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(36, 27, 21, 0.6);
+  }
+
+  .tlw-bag__panel.is-loading .tlw-bag__qty button,
+  .tlw-bag__panel.is-loading .tlw-bag__remove {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+</style>
+
+<script>
+  (function () {
+    /* The theme editor re-runs this script when the section is edited: tidy up the previous copy first. */
+    if (window.tlwCart && window.tlwCart.destroy) window.tlwCart.destroy();
+
+    var root = document.getElementById('tlw-bag-{{ section.id }}');
+    if (!root) return;
+
+    var panel = root.querySelector('.tlw-bag__panel');
+    var listEl = root.querySelector('[data-bag-list]');
+    var scrollEl = root.querySelector('[data-bag-scroll]');
+    var emptyEl = root.querySelector('[data-bag-empty]');
+    var footEl = root.querySelector('[data-bag-foot]');
+    var errorEl = root.querySelector('[data-bag-error]');
+    var subtotalEl = root.querySelector('[data-bag-subtotal]');
+    var checkoutBtn = root.querySelector('.tlw-bag__checkout');
+
+    var CART_JS = {{ routes.cart_url | append: '.js' | json }};
+    var UPDATE_JS = {{ routes.cart_update_url | append: '.js' | json }};
+    var CART_URL = {{ routes.cart_url | json }};
+    var CHECKOUT_URL = '/checkout';
+    var NEW_TAB = root.getAttribute('data-new-tab') === 'true';
+    var INTERCEPT = root.getAttribute('data-intercept') !== 'false';
+    var LOCALE = document.documentElement.lang || 'en-GB';
+
+    var HIDDEN_KEYS = ['customs & import fees', 'add-on for', '_bag group'];
+    var OPTION_ORDER = ['length', 'lace size', 'cap size'];
+
+    var cart = null;
+    var pendingRemove = null;
+    var capped = {};
+    var lastFocus = null;
+    var closeTimer = null;
+
+    /* ---------- helpers ---------- */
+    function money(cents, currency) {
+      try {
+        return new Intl.NumberFormat(LOCALE, { style: 'currency', currency: currency || 'GBP' }).format(cents / 100);
+      } catch (e) {
+        return (cents / 100).toFixed(2);
+      }
+    }
+
+    function el(tag, cls, text) {
+      var node = document.createElement(tag);
+      if (cls) node.className = cls;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+
+    function icon(paths, size) {
+      var wrap = document.createElement('span');
+      wrap.innerHTML = '<svg viewBox="0 0 24 24" width="' + size + '" height="' + size + '" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
+      return wrap.firstChild;
+    }
+
+    var ICON_MINUS = '<path d="M5 12h14"/>';
+    var ICON_PLUS = '<path d="M5 12h14M12 5v14"/>';
+    var ICON_TRASH = '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6M14 11v6"/>';
+
+    function prop(item, name) {
+      var p = item.properties;
+      if (!p) return null;
+      for (var k in p) {
+        if (Object.prototype.hasOwnProperty.call(p, k) && k.toLowerCase() === name) return p[k];
+      }
+      return null;
+    }
+    function addonParent(item) { return prop(item, 'add-on for'); }
+    function bagGroup(item) { return prop(item, '_bag group'); }
+
+    function orderKey(name) {
+      var i = OPTION_ORDER.indexOf(name.toLowerCase());
+      return i === -1 ? OPTION_ORDER.length : i;
+    }
+
+    /* every choice on the line, e.g. "18" · 5x5 · Medium · No · Left side part" */
+    function optionsText(item) {
+      var all = [];
+      (item.options_with_values || []).forEach(function (o) {
+        if (o.value && String(o.value).toLowerCase() !== 'default title') all.push({ name: o.name, value: o.value });
+      });
+      var p = item.properties || {};
+      Object.keys(p).forEach(function (k) {
+        var lk = k.toLowerCase();
+        if (HIDDEN_KEYS.indexOf(lk) !== -1 || lk.charAt(0) === '_') return;
+        if (p[k] === null || p[k] === '' || p[k] === undefined) return;
+        all.push({ name: k, value: String(p[k]) });
+      });
+      var seen = {};
+      var out = all.filter(function (o) {
+        var k = o.name.toLowerCase();
+        if (seen[k]) return false;
+        seen[k] = true;
+        return true;
+      });
+      out = out.map(function (o, i) { return { o: o, i: i }; })
+        .sort(function (a, b) { return (orderKey(a.o.name) - orderKey(b.o.name)) || (a.i - b.i); })
+        .map(function (x) { return x.o.value; });
+      return out.join(' \u00b7 ');
+    }
+
+    function unitsAndAddons(c) {
+      var lines = (c.items || []).filter(function (i) { return i.quantity > 0; });
+      var units = lines.filter(function (i) { return !addonParent(i); });
+      var addons = lines.filter(function (i) { return addonParent(i); });
+      function addonsFor(unit) {
+        var group = bagGroup(unit);
+        if (group) return addons.filter(function (a) { return bagGroup(a) === group; });
+        var title = String(unit.product_title || unit.title).toLowerCase();
+        return addons.filter(function (a) {
+          if (bagGroup(a)) return false;
+          var parent = String(addonParent(a) || '').toLowerCase();
+          return parent === title || title.indexOf(parent) === 0;
+        });
+      }
+      var claimed = {};
+      units.forEach(function (u) { addonsFor(u).forEach(function (a) { claimed[a.key] = true; }); });
+      var orphans = addons.filter(function (a) { return !claimed[a.key]; });
+      return { units: units, addonsFor: addonsFor, orphans: orphans };
+    }
+
+    function imageUrl(item) {
+      var url = item.image || (item.featured_image && item.featured_image.url) || '';
+      if (!url) return '';
+      return url + (url.indexOf('?') === -1 ? '?' : '&') + 'width=240';
+    }
+
+    /* ---------- render ---------- */
+    function addonRow(a, currency) {
+      var li = el('li', 'tlw-bag__addon');
+      var left = el('div');
+      left.appendChild(el('p', 'tlw-bag__addon-label', 'Add-on'));
+      left.appendChild(el('p', 'tlw-bag__addon-name', a.product_title || a.title));
+      li.appendChild(left);
+      li.appendChild(el('p', 'tlw-bag__addon-price', money(a.final_line_price, currency)));
+      return li;
+    }
+
+    function unitRow(unit, addons, currency) {
+      var li = el('li', 'tlw-bag__item');
+      li.setAttribute('data-key', unit.key);
+
+      var thumb = el('div', 'tlw-bag__thumb');
+      var src = imageUrl(unit);
+      if (src) {
+        var img = document.createElement('img');
+        img.src = src;
+        img.alt = (unit.featured_image && unit.featured_image.alt) || unit.product_title || '';
+        img.loading = 'lazy';
+        thumb.appendChild(img);
+      }
+      li.appendChild(thumb);
+
+      var info = el('div', 'tlw-bag__info');
+      info.appendChild(el('p', 'tlw-bag__name', unit.product_title || unit.title));
+      var opts = optionsText(unit);
+      if (opts) info.appendChild(el('p', 'tlw-bag__opts', opts));
+
+      var row = el('div', 'tlw-bag__row');
+      var qty = el('div', 'tlw-bag__qty');
+      var dec = el('button');
+      dec.type = 'button';
+      dec.setAttribute('data-bag-action', 'dec');
+      dec.setAttribute('aria-label', 'Decrease quantity');
+      dec.appendChild(icon(ICON_MINUS, 18));
+      var count = el('span', 'tlw-bag__qty-count', String(unit.quantity));
+      var inc = el('button');
+      inc.type = 'button';
+      inc.setAttribute('data-bag-action', 'inc');
+      inc.setAttribute('aria-label', 'Increase quantity');
+      inc.appendChild(icon(ICON_PLUS, 18));
+      if (capped[unit.key] === unit.quantity) inc.disabled = true;
+      qty.appendChild(dec);
+      qty.appendChild(count);
+      qty.appendChild(inc);
+      row.appendChild(qty);
+      row.appendChild(el('p', 'tlw-bag__price', money(unit.final_line_price, currency)));
+      info.appendChild(row);
+
+      if (capped[unit.key] === unit.quantity) {
+        info.appendChild(el('p', 'tlw-bag__stock', 'No more of this size in stock'));
+      }
+
+      if (pendingRemove === unit.key) {
+        var box = el('div', 'tlw-bag__confirm');
+        box.appendChild(el('p', null, 'Remove ' + (unit.product_title || unit.title) + ' from your bag?'));
+        var actions = el('div', 'tlw-bag__confirm-actions');
+        var yes = el('button', null, 'Remove');
+        yes.type = 'button';
+        yes.setAttribute('data-bag-action', 'remove-yes');
+        var no = el('button', null, 'Keep');
+        no.type = 'button';
+        no.setAttribute('data-bag-action', 'remove-no');
+        actions.appendChild(yes);
+        actions.appendChild(no);
+        box.appendChild(actions);
+        info.appendChild(box);
+      } else {
+        var rm = el('button', 'tlw-bag__remove');
+        rm.type = 'button';
+        rm.setAttribute('data-bag-action', 'remove-ask');
+        rm.appendChild(icon(ICON_TRASH, 16));
+        rm.appendChild(document.createTextNode(' Remove'));
+        info.appendChild(rm);
+      }
+
+      li.appendChild(info);
+      return li;
+    }
+
+    function render() {
+      listEl.innerHTML = '';
+      var lines = cart ? (cart.items || []).filter(function (i) { return i.quantity > 0; }) : [];
+
+      if (!lines.length) {
+        scrollEl.hidden = true;
+        footEl.hidden = true;
+        emptyEl.hidden = false;
+        return;
+      }
+
+      var currency = cart.currency;
+      var groups = unitsAndAddons(cart);
+      groups.units.forEach(function (u) {
+        listEl.appendChild(unitRow(u, null, currency));
+        groups.addonsFor(u).forEach(function (a) { listEl.appendChild(addonRow(a, currency)); });
+      });
+      groups.orphans.forEach(function (a) { listEl.appendChild(addonRow(a, currency)); });
+
+      subtotalEl.textContent = money(cart.total_price, currency);
+      emptyEl.hidden = true;
+      scrollEl.hidden = false;
+      footEl.hidden = false;
+    }
+
+    function showError(message) {
+      if (message) {
+        errorEl.textContent = message;
+        errorEl.hidden = false;
+      } else {
+        errorEl.hidden = true;
+      }
+    }
+
+    function announce() {
+      var count = cart ? cart.item_count : 0;
+      try {
+        document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true, detail: { cart: cart } }));
+        document.dispatchEvent(new CustomEvent('tlw:cart-updated', { bubbles: true, detail: { count: count, cart: cart } }));
+      } catch (e) {}
+    }
+
+    /* ---------- cart requests ---------- */
+    function setLoading(on) {
+      panel.classList.toggle('is-loading', on);
+      checkoutBtn.disabled = on;
+    }
+
+    function fetchCart() {
+      return fetch(CART_JS, { headers: { Accept: 'application/json' } }).then(function (r) { return r.json(); });
+    }
+
+    function pushUpdates(updates) {
+      setLoading(true);
+      showError('');
+      return fetch(UPDATE_JS, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ updates: updates })
+      })
+        .then(function (r) {
+          if (!r.ok) {
+            return r.json().then(function (d) { throw new Error(d.description || d.message || 'Could not update your bag'); });
+          }
+          return r.json();
+        })
+        .then(function (c) { cart = c; announce(); return c; })
+        .catch(function (err) {
+          showError(err.message);
+          return fetchCart().then(function (c) { cart = c; return c; });
+        })
+        .then(function (c) { setLoading(false); return c; });
+    }
+
+    function findUnit(key) {
+      if (!cart) return null;
+      var groups = unitsAndAddons(cart);
+      for (var i = 0; i < groups.units.length; i++) {
+        if (groups.units[i].key === key) return { unit: groups.units[i], addons: groups.addonsFor(groups.units[i]) };
+      }
+      return null;
+    }
+
+    function setQuantity(key, quantity) {
+      var found = findUnit(key);
+      if (!found) return;
+      var updates = {};
+      updates[found.unit.key] = Math.max(0, quantity);
+      found.addons.forEach(function (a) { updates[a.key] = Math.max(0, quantity); });
+
+      pushUpdates(updates).then(function () {
+        var after = null;
+        (cart.items || []).forEach(function (i) { if (i.key === key) after = i; });
+        if (after && after.quantity < quantity) capped[key] = after.quantity;
+        else delete capped[key];
+        pendingRemove = null;
+        render();
+      });
+    }
+
+    /* ---------- open / close ---------- */
+    function open() {
+      clearTimeout(closeTimer);
+      lastFocus = document.activeElement;
+      root.hidden = false;
+      root.setAttribute('aria-hidden', 'false');
+      document.documentElement.classList.add('tlw-bag-lock');
+      capped = {};
+      pendingRemove = null;
+      requestAnimationFrame(function () {
+        root.classList.add('is-shown');
+        panel.focus();
+      });
+      setLoading(true);
+      return fetchCart()
+        .then(function (c) { cart = c; render(); announce(); })
+        .catch(function () { showError('Could not load your bag. Please try again.'); })
+        .then(function () { setLoading(false); });
+    }
+
+    function close() {
+      root.classList.remove('is-shown');
+      root.setAttribute('aria-hidden', 'true');
+      closeTimer = setTimeout(function () {
+        root.hidden = true;
+        document.documentElement.classList.remove('tlw-bag-lock');
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+      }, 400);
+    }
+
+    function isOpen() { return !root.hidden && root.classList.contains('is-shown'); }
+
+    /* ---------- events ---------- */
+    function onRootClick(e) {
+      var btn = e.target.closest('[data-bag-action]');
+      if (!btn) return;
+      var action = btn.getAttribute('data-bag-action');
+      var li = btn.closest('[data-key]');
+      var key = li ? li.getAttribute('data-key') : null;
+      var found = key ? findUnit(key) : null;
+
+      if (action === 'close') { close(); return; }
+      if (action === 'dec' && found) { setQuantity(key, found.unit.quantity - 1); return; }
+      if (action === 'inc' && found) { setQuantity(key, found.unit.quantity + 1); return; }
+      if (action === 'remove-ask' && key) { pendingRemove = key; render(); return; }
+      if (action === 'remove-no') { pendingRemove = null; render(); return; }
+      if (action === 'remove-yes' && key) { setQuantity(key, 0); return; }
+      if (action === 'checkout') {
+        if (NEW_TAB) window.open(CHECKOUT_URL, '_blank');
+        else window.location.href = CHECKOUT_URL;
+      }
+    }
+
+    function onKeydown(e) {
+      if (!isOpen()) return;
+      if (e.key === 'Escape') { close(); return; }
+      if (e.key === 'Tab') {
+        var focusables = Array.prototype.slice.call(panel.querySelectorAll('button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'));
+        if (!focusables.length) return;
+        var first = focusables[0];
+        var last = focusables[focusables.length - 1];
+        if (e.shiftKey && (document.activeElement === first || document.activeElement === panel)) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+
+    /* any link to the cart page (the header bag icon) opens the drawer instead */
+    function onDocClick(e) {
+      if (!INTERCEPT) return;
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var a = e.target.closest ? e.target.closest('a[href]') : null;
+      if (!a || a.hasAttribute('data-tlw-no-drawer') || root.contains(a)) return;
+      var path;
+      try { path = new URL(a.href, window.location.href).pathname.replace(/\/+$/, ''); } catch (err) { return; }
+      if (path !== CART_URL.replace(/\/+$/, '')) return;
+      if (window.location.pathname.replace(/\/+$/, '') === path) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      open();
+    }
+
+    function onOpenEvent() { open(); }
+
+    root.addEventListener('click', onRootClick);
+    document.addEventListener('keydown', onKeydown);
+    document.addEventListener('click', onDocClick, true);
+    document.addEventListener('tlw:cart-open', onOpenEvent);
+
+    window.tlwCart = {
+      open: open,
+      close: close,
+      refresh: function () { return fetchCart().then(function (c) { cart = c; render(); announce(); }); },
+      destroy: function () {
+        root.removeEventListener('click', onRootClick);
+        document.removeEventListener('keydown', onKeydown);
+        document.removeEventListener('click', onDocClick, true);
+        document.removeEventListener('tlw:cart-open', onOpenEvent);
+        document.documentElement.classList.remove('tlw-bag-lock');
+        window.tlwCart = null;
+      }
+    };
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "TLW Cart drawer",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Your Bag"
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "Message when the bag is empty",
+      "default": "Your bag is empty"
+    },
+    {
+      "type": "textarea",
+      "id": "customs_note",
+      "label": "Note above the checkout button",
+      "default": "By continuing you confirm you may be responsible for any customs duties, taxes, or import fees on international orders."
+    },
+    {
+      "type": "text",
+      "id": "checkout_label",
+      "label": "Checkout button text",
+      "default": "Checkout"
+    },
+    {
+      "type": "text",
+      "id": "shipping_note",
+      "label": "Small note under the button",
+      "default": "Shipping and taxes calculated at checkout"
+    },
+    {
+      "type": "color",
+      "id": "text_colour",
+      "label": "Text colour",
+      "default": "#241b15"
+    },
+    {
+      "type": "color",
+      "id": "line_colour",
+      "label": "Line and border colour",
+      "default": "#d1c4bd"
+    },
+    {
+      "type": "color",
+      "id": "checkout_colour",
+      "label": "Checkout button colour",
+      "default": "#3a3029"
+    },
+    {
+      "type": "color",
+      "id": "hover_colour",
+      "label": "Checkout button colour on hover",
+      "default": "#a68b3f"
+    },
+    {
+      "type": "checkbox",
+      "id": "checkout_new_tab",
+      "label": "Open checkout in a new tab",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "intercept_bag_links",
+      "label": "Open this bag when the header bag icon is clicked",
+      "info": "Turn off to send the bag icon to the normal cart page instead.",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "TLW Cart drawer"
+    }
+  ]
+}
+{% endschema %}
