@@ -650,7 +650,8 @@
     3 wider columns, 2 make 2, and so on, so removing one never leaves a gap.
   {% endcomment %}
   {%- assign client_blocks = section.blocks | where: 'type', 'client' -%}
-  {%- assign meta_photos = product.metafields.custom.client_photos.value -%}
+  {%- assign meta_field = product.metafields.custom.client_photos -%}
+  {%- assign meta_photos = meta_field.value -%}
   {%- assign meta_details = product.metafields.custom.client_details.value | default: '' -%}
   {%- assign detail_lines = meta_details | newline_to_br | split: '<br />' -%}
 
@@ -695,6 +696,13 @@
       <div class="tlw-product__clients-head">
         <span class="tlw-label-caps tlw-product__clients-eyebrow">{{ section.settings.clients_eyebrow | default: 'Before You Take Our Word For It.' | escape }}</span>
         <h2 class="tlw-product__clients-title">{{ section.settings.clients_heading | default: 'Fitted On Real Clients.' | escape }}</h2>
+        {%- if request.design_mode -%}
+          <p class="tlw-product__clients-note">
+            Editor note (visitors never see this): previewing &ldquo;{{ product.title | escape }}&rdquo;.
+            Client photos box: {% if meta_photos != blank %}found, {{ meta_photos.size | default: 1 }} photo(s), type {{ meta_field.type | default: 'unknown' }}{% else %}empty, or not found on this product{% endif %}.
+            The cards below come from {% if use_meta %}this product&rsquo;s own boxes{% else %}the template&rsquo;s Client photo blocks{% endif %}.
+          </p>
+        {%- endif -%}
       </div>
       <div class="tlw-product__clients-grid" style="--cols-d: {{ cols_d }}; --cols-t: {{ cols_t }};">
         {%- for i in (1..client_total) -%}
@@ -758,7 +766,13 @@
                     alt: c_alt
                 }}
               {%- elsif request.design_mode -%}
-                <span class="tlw-product__client-empty">Add a photo</span>
+                <span class="tlw-product__client-empty">
+                  {%- if use_meta -%}
+                    Photo {{ i }} in this product's Client photos box could not be read
+                  {%- else -%}
+                    Add a photo to this Client photo block
+                  {%- endif -%}
+                </span>
               {%- endif -%}
               {%- if c_quote != blank or c_caption != blank -%}
                 <div class="tlw-product__client-overlay">
@@ -1437,6 +1451,18 @@
     margin-bottom: 40px;
   }
 
+  #tlw-product-{{ section.id }} .tlw-product__clients-note {
+    max-width: 620px;
+    margin: 16px auto 0;
+    padding: 10px 14px;
+    border: 1px dashed var(--tlw-outline);
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: left;
+    color: var(--tlw-on-surface-variant);
+  }
+
   #tlw-product-{{ section.id }} .tlw-product__clients-eyebrow {
     display: block;
     margin-bottom: 12px;
@@ -1529,8 +1555,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0 24px;
+    text-align: center;
     font-family: var(--tlw-font-body);
     font-size: 12px;
+    line-height: 1.6;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--tlw-outline);
@@ -1795,6 +1824,11 @@
       var properties = {};
       var addons = [];
 
+      /* one id shared by the wig and its paid add-ons, so the bag can keep them together
+         (a leading underscore hides it from the customer at checkout) */
+      var bagGroup = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      properties['_Bag group'] = bagGroup;
+
       root.querySelectorAll('[data-service-option]').forEach(function (s) {
         /* every service choice is recorded on the main line so the order
            shows exactly what was picked, paid or not */
@@ -1805,7 +1839,7 @@
           addons.push({
             id: match.variantId,
             quantity: 1,
-            properties: { 'Add-on for': productTitle }
+            properties: { 'Add-on for': productTitle, '_Bag group': bagGroup }
           });
         }
       });
@@ -1825,9 +1859,13 @@
           return res.json();
         })
         .then(function () {
-          /* let Horizon's cart drawer know something changed */
-          document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
-          window.location.href = '{{ routes.cart_url }}';
+          /* open the slide-in bag if it is installed, otherwise go to the cart page */
+          if (window.tlwCart && typeof window.tlwCart.open === 'function') {
+            window.tlwCart.open();
+          } else {
+            document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+            window.location.href = '{{ routes.cart_url }}';
+          }
         })
         .catch(function (err) {
           errorEl.textContent = err.message;
