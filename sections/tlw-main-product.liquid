@@ -186,13 +186,9 @@
                   aria-expanded="false"
                   aria-labelledby="tlw-opt-label-{{ section.id }}-{{ forloop.index }} tlw-opt-{{ section.id }}-{{ forloop.index }}-value"
                 >
-                  {%- if option.selected_value != blank -%}
-                    <span data-dropdown-value id="tlw-opt-{{ section.id }}-{{ forloop.index }}-value">{{ option.selected_value }}</span>
-                  {%- else -%}
-                    <span data-dropdown-value id="tlw-opt-{{ section.id }}-{{ forloop.index }}-value" class="tlw-dropdown__placeholder">
-                      Select {{ option.name | downcase }}...
-                    </span>
-                  {%- endif -%}
+                  <span data-dropdown-value id="tlw-opt-{{ section.id }}-{{ forloop.index }}-value" class="tlw-dropdown__placeholder">
+                    Select {{ option.name | downcase }}...
+                  </span>
                   <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" class="tlw-dropdown__chevron">
                     <path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
@@ -200,7 +196,7 @@
 
                 <ul class="tlw-dropdown__panel" data-dropdown-panel role="listbox" aria-label="{{ option.name }}" hidden>
                   {%- for value in option.values -%}
-                    <li role="option" data-dropdown-option data-value="{{ value | escape }}"{% if option.selected_value == value %} class="is-selected"{% endif %}>
+                    <li role="option" data-dropdown-option data-value="{{ value | escape }}">
                       <button type="button" class="tlw-dropdown__option">
                         <span>{{ value }}</span>
                         <span class="tlw-dropdown__option-note" data-sold-out-label hidden>(Sold out)</span>
