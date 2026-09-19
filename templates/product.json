@@ -23,6 +23,8 @@
             "addon_product_2": "",
             "trigger_value_3": "",
             "addon_product_3": "",
+            "trigger_value_4": "",
+            "addon_product_4": "",
             "help_text": "",
             "reveal_on_customisation": false
           }
@@ -38,6 +40,8 @@
             "addon_product_2": "",
             "trigger_value_3": "",
             "addon_product_3": "",
+            "trigger_value_4": "",
+            "addon_product_4": "",
             "help_text": "",
             "reveal_on_customisation": false
           }
@@ -54,6 +58,8 @@
             "addon_product_2": "",
             "trigger_value_3": "",
             "addon_product_3": "",
+            "trigger_value_4": "",
+            "addon_product_4": "",
             "help_text": "Please note: If you select a side part for a 5x5, 6x6 or 7x7 closure, the closure itself will be constructed and positioned towards your preferred side rather than in the centre.",
             "reveal_on_customisation": false
           }
@@ -70,6 +76,8 @@
             "addon_product_2": "",
             "trigger_value_3": "",
             "addon_product_3": "",
+            "trigger_value_4": "",
+            "addon_product_4": "",
             "help_text": "",
             "reveal_on_customisation": true
           }
@@ -86,6 +94,8 @@
             "addon_product_2": "",
             "trigger_value_3": "",
             "addon_product_3": "pin-intact",
+            "trigger_value_4": "",
+            "addon_product_4": "",
             "help_text": "",
             "reveal_on_customisation": true
           }
@@ -102,6 +112,8 @@
             "addon_product_2": "face-framing-layers",
             "trigger_value_3": "",
             "addon_product_3": "heavy-layers",
+            "trigger_value_4": "",
+            "addon_product_4": "",
             "help_text": "",
             "reveal_on_customisation": true
           }
