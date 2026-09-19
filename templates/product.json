@@ -690,24 +690,18 @@
         "unit_details_mode": false,
         "clients_eyebrow": "Before You Take Our Word For It.",
         "clients_heading": "Fitted On Real Clients.",
-        "clients_size": "large"
-      }
-    },
-    "tlw_product_reviews_Lyw9XQ": {
-      "type": "tlw-product-reviews",
-      "name": "Reviews: Wigs",
-      "settings": {
-        "eyebrow": "Reviews",
-        "heading": "What clients say about our wigs",
-        "show_summary": true,
-        "show_widget": true
+        "clients_size": "large",
+        "show_reviews": true,
+        "reviews_eyebrow": "Reviews",
+        "reviews_heading": "What clients say about our wigs",
+        "reviews_summary": true,
+        "reviews_widget": true
       }
     }
   },
   "order": [
     "main",
     "product_recommendations_qggXJq",
-    "tlw_main_product_DEyKL3",
-    "tlw_product_reviews_Lyw9XQ"
+    "tlw_main_product_DEyKL3"
   ]
 }
