@@ -140,7 +140,6 @@
         "logo": "shopify://shop_images/logo-gold-v3.webp",
         "logo_light": "shopify://shop_images/logo-white-v3.webp",
         "logo_width": 160,
-        "overlay_first": true,
         "hide_until_scroll": true,
         "top_behaviour": "hide",
         "reveal_distance": 200,

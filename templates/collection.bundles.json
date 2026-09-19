@@ -102,6 +102,7 @@
     },
     "tlw_main_collection_9GFRha": {
       "type": "tlw-main-collection",
+      "disabled": true,
       "name": "TLW Collection",
       "settings": {
         "show_header": true,
@@ -119,10 +120,43 @@
         "contact_label": "Contact us",
         "enquire_label": "Enquire"
       }
+    },
+    "collection_header_gRA4B4": {
+      "type": "collection-header",
+      "name": "Header: Bundles",
+      "settings": {
+        "eyebrow": "Hair",
+        "heading": "Bundles",
+        "show_rule": true,
+        "lead": "Virgin and raw hair, by the bundle.",
+        "body": "Choose your lengths and quantity, and build the look your way. Our bundles arrive soft, full and ready to install."
+      }
+    },
+    "tlw_main_collection_nN84A7": {
+      "type": "tlw-main-collection",
+      "name": "TLW Collection",
+      "settings": {
+        "show_header": false,
+        "show_description": false,
+        "show_breadcrumb": true,
+        "show_count": false,
+        "columns": 3,
+        "gap": 120,
+        "per_page": 16,
+        "hover_second_image": true,
+        "empty_text": "New pieces are on their way. Check back soon.",
+        "coming_soon_label": "Coming soon",
+        "show_cta": true,
+        "contact_page_url": "/pages/contact",
+        "contact_label": "Contact us",
+        "enquire_label": "Enquire"
+      }
     }
   },
   "order": [
     "section",
-    "tlw_main_collection_9GFRha"
+    "tlw_main_collection_9GFRha",
+    "collection_header_gRA4B4",
+    "tlw_main_collection_nN84A7"
   ]
 }
