@@ -1,334 +1,102 @@
 {% comment %}
-  THELACEDWÁY measurement guide
+  THELACEDWÁY cap size guide: "How to measure your cap size" link that opens a slide-in panel.
   Home of Amare Studio
 
-  Built from src/components/MeasureModal.tsx. Trigger text/link opens a
-  right-hand slide-over: measuring steps, then the cap size table.
+  Param: id (any unique string)
 
-  The source also shows a photo demonstrating how to measure
-  (cap-size-measurement.png) — same limitation as needle.png earlier, the
-  Lovable export only has a broken CDN pointer, not the actual file. Upload
-  it via Content > Files once you have it, using the exact filename
-  cap-size-measurement.png, and it'll appear automatically — no code change
-  needed, the snippet already looks for it.
-
-  Usage: {% render 'tlw-measure-guide', id: unique_string, trigger_label: 'How do I measure my cap size?' %}
+  All wording, the size table and the photo are edited in the theme editor:
+  Theme settings -> THELACEDWÁY guides -> Measure your cap size pop-up.
 {% endcomment %}
 
-<button type="button" class="tlw-measure__trigger" data-measure-open="{{ id }}">
-  {{ trigger_label | default: 'How do I measure my cap size?' }}
-</button>
+{%- liquid
+  assign m_title = settings.tlw_measure_title | default: 'How to measure your cap size'
+  assign m_table_title = settings.tlw_measure_table_title | default: 'Cap size guide'
+  assign m_caption = settings.tlw_measure_image_caption | default: 'Wrap the tape around your natural hairline, not too tight and not too loose.'
+  assign m_intro = settings.tlw_measure_intro
+  if m_intro == blank
+    assign m_intro = '<p>Use a soft measuring tape and wrap it around your head from hairline to nape, following your natural hairline. Measure in inches for the most accurate fit.</p>'
+  endif
+  assign m_image = settings.tlw_measure_image
+  assign m_video = settings.tlw_measure_video | strip
+-%}
 
-<div class="tlw-measure" id="tlw-measure-{{ id }}" data-measure-panel aria-hidden="true">
-  <button class="tlw-measure__scrim" data-measure-close aria-label="Close"></button>
+{%- assign m_steps = settings.tlw_measure_steps -%}
+{%- if m_steps == blank -%}
+  {%- capture m_steps -%}
+Start at the front hairline in the centre of your forehead.
+Wrap the tape behind each ear, keeping it level.
+Bring the tape around the nape of your neck.
+Return to the starting point at the front hairline.
+  {%- endcapture -%}
+{%- endif -%}
 
-  <div class="tlw-measure__panel" role="dialog" aria-modal="true" aria-label="How to measure your cap size">
-    <div class="tlw-measure__head">
-      <h2 class="tlw-headline-sm">How to measure your cap size</h2>
-      <button class="tlw-measure__x" data-measure-close aria-label="Close">
-        <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
-          <path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
+{%- assign m_table = settings.tlw_measure_table -%}
+{%- if m_table == blank -%}
+  {%- capture m_table -%}
+Small | 20.5" — 21.5"
+Medium | 21.5" — 22.5"
+Large | 22.5" — 23.5"
+  {%- endcapture -%}
+{%- endif -%}
 
-    <div class="tlw-measure__body">
-      <p class="tlw-body-md tlw-measure__intro">
-        Use a soft measuring tape and wrap it around your head from hairline to nape, following your natural hairline. Measure in inches for the most accurate fit.
-      </p>
+{%- assign step_lines = m_steps | newline_to_br | split: '<br />' -%}
+{%- assign table_lines = m_table | newline_to_br | split: '<br />' -%}
 
-      <div class="tlw-measure__steps">
-        <div class="tlw-measure__step">
-          <span class="tlw-label-caps tlw-measure__step-label">Step 1</span>
-          <p class="tlw-body-md">Start at the front hairline in the centre of your forehead.</p>
-        </div>
-        <div class="tlw-measure__step">
-          <span class="tlw-label-caps tlw-measure__step-label">Step 2</span>
-          <p class="tlw-body-md">Wrap the tape behind each ear, keeping it level.</p>
-        </div>
-        <div class="tlw-measure__step">
-          <span class="tlw-label-caps tlw-measure__step-label">Step 3</span>
-          <p class="tlw-body-md">Bring the tape around the nape of your neck.</p>
-        </div>
-        <div class="tlw-measure__step">
-          <span class="tlw-label-caps tlw-measure__step-label">Step 4</span>
-          <p class="tlw-body-md">Return to the starting point at the front hairline.</p>
-        </div>
-      </div>
+{%- capture guide_trigger -%}
+  <button type="button" class="tlw-guide-link" data-tlw-guide-open="{{ id }}" aria-haspopup="dialog">How to measure your cap size</button>
+{%- endcapture -%}
 
-      {%- assign measure_image = images['cap-size-measurement.png'] -%}
-      {%- if measure_image -%}
-        <div class="tlw-measure__image-wrap">
-          {{ measure_image | image_url: width: 700 | image_tag: loading: 'lazy', alt: 'Measuring head circumference with a soft tape around the hairline' }}
-          <p class="tlw-measure__image-caption">Wrap the tape around your natural hairline, not too tight and not too loose.</p>
-        </div>
-      {%- endif -%}
-
-      <h3 class="tlw-headline-sm tlw-measure__table-heading">Cap size guide</h3>
-      <div class="tlw-measure__table-wrap">
-        <table class="tlw-measure__table">
-          <thead>
-            <tr>
-              <th>Size</th>
-              <th>Measurement</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Small</td>
-              <td>20.5&Prime; &mdash; 21.5&Prime;</td>
-            </tr>
-            <tr>
-              <td>Medium</td>
-              <td>21.5&Prime; &mdash; 22.5&Prime;</td>
-            </tr>
-            <tr>
-              <td>Large</td>
-              <td>22.5&Prime; &mdash; 23.5&Prime;</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+{%- capture guide_body -%}
+  <h3 class="tlw-guide__h3">{{ m_table_title | escape }}</h3>
+  <div class="tlw-guide__table-wrap">
+    <table class="tlw-guide__table">
+      <thead>
+        <tr><th>Size</th><th>Measurement</th></tr>
+      </thead>
+      <tbody>
+        {%- for line in table_lines -%}
+          {%- assign row = line | strip -%}
+          {%- if row == blank -%}
+            {%- continue -%}
+          {%- endif -%}
+          {%- assign cells = row | split: '|' -%}
+          {%- assign cell_size = cells[0] | strip -%}
+          {%- assign cell_measure = cells[1] | strip -%}
+          <tr><td>{{ cell_size | escape }}</td><td>{{ cell_measure | escape }}</td></tr>
+        {%- endfor -%}
+      </tbody>
+    </table>
   </div>
-</div>
 
-<style>
-  .tlw-measure__trigger {
-    display: inline-block;
-    border: none;
-    background: none;
-    padding: 0;
-    font-family: var(--tlw-font-body);
-    font-size: 13px;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    color: var(--tlw-on-surface-variant);
-    cursor: pointer;
-    transition: color 200ms ease;
-  }
+  <div class="tlw-guide__rich">{{ m_intro }}</div>
 
-  .tlw-measure__trigger:hover {
-    color: var(--tlw-accent);
-  }
+  <div class="tlw-guide__cards">
+    {%- assign step_number = 0 -%}
+    {%- for line in step_lines -%}
+      {%- assign step_text = line | strip -%}
+      {%- if step_text == blank -%}
+        {%- continue -%}
+      {%- endif -%}
+      {%- assign step_number = step_number | plus: 1 -%}
+      <div class="tlw-guide__card tlw-guide__card--step">
+        <span class="tlw-guide__eyebrow">Step {{ step_number }}</span>
+        <p>{{ step_text | escape }}</p>
+      </div>
+    {%- endfor -%}
+  </div>
 
-  .tlw-measure {
-    position: fixed;
-    inset: 0;
-    z-index: 130;
-    visibility: hidden;
-  }
+  {%- if m_video contains 'https://' or m_image != blank -%}
+    <figure class="tlw-guide__figure">
+      {%- if m_video contains 'https://' -%}
+        <video class="tlw-guide__img" controls playsinline preload="metadata" src="{{ m_video | escape }}"{% if m_image != blank %} poster="{{ m_image | image_url: width: 900 }}"{% endif %}></video>
+      {%- else -%}
+        {{ m_image | image_url: width: 900 | image_tag: loading: 'lazy', class: 'tlw-guide__img', alt: 'Measuring head circumference with a soft tape around the hairline' }}
+      {%- endif -%}
+      {%- if m_caption != blank -%}
+        <figcaption class="tlw-guide__caption">{{ m_caption | escape }}</figcaption>
+      {%- endif -%}
+    </figure>
+  {%- endif -%}
+{%- endcapture -%}
 
-  .tlw-measure.is-open {
-    visibility: visible;
-  }
-
-  .tlw-measure__scrim {
-    position: absolute;
-    inset: 0;
-    border: none;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
-    opacity: 0;
-    transition: opacity 400ms ease;
-    cursor: pointer;
-  }
-
-  .tlw-measure.is-open .tlw-measure__scrim {
-    opacity: 1;
-  }
-
-  .tlw-measure__panel {
-    position: absolute;
-    inset-block: 0;
-    right: 0;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 440px;
-    background: var(--tlw-surface-lowest);
-    border-left: 1px solid var(--tlw-outline-variant);
-    box-shadow: -20px 0 40px rgba(0, 0, 0, 0.15);
-    transform: translateX(100%);
-    transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  @media (min-width: 768px) {
-    .tlw-measure__panel {
-      width: 38vw;
-      min-width: 380px;
-    }
-  }
-
-  .tlw-measure.is-open .tlw-measure__panel {
-    transform: translateX(0);
-  }
-
-  .tlw-measure__head {
-    position: relative;
-    flex-shrink: 0;
-    padding: 24px;
-    border-bottom: 1px solid var(--tlw-outline-variant);
-  }
-
-  @media (min-width: 768px) {
-    .tlw-measure__head {
-      padding: 32px;
-    }
-  }
-
-  .tlw-measure__head h2 {
-    padding-right: 40px;
-    color: var(--tlw-primary);
-    margin: 0;
-  }
-
-  .tlw-measure__x {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    border: none;
-    background: none;
-    color: var(--tlw-primary);
-    cursor: pointer;
-    opacity: 0.8;
-    transition: opacity 200ms ease;
-  }
-
-  .tlw-measure__x:hover {
-    opacity: 1;
-  }
-
-  .tlw-measure__body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px 24px 64px;
-  }
-
-  @media (min-width: 768px) {
-    .tlw-measure__body {
-      padding: 32px 32px 80px;
-    }
-  }
-
-  .tlw-measure__intro {
-    margin: 0 0 28px;
-    color: var(--tlw-on-surface-variant);
-  }
-
-  .tlw-measure__steps {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-
-  .tlw-measure__step {
-    border-radius: 16px;
-    background: var(--tlw-surface-container);
-    padding: 16px;
-  }
-
-  .tlw-measure__step-label {
-    display: block;
-    margin-bottom: 4px;
-    color: var(--tlw-accent);
-  }
-
-  .tlw-measure__step p {
-    margin: 0;
-    color: var(--tlw-primary);
-  }
-
-  .tlw-measure__image-wrap {
-    border-radius: 16px;
-    overflow: hidden;
-    background: var(--tlw-surface-container);
-    margin-bottom: 28px;
-  }
-
-  .tlw-measure__image-wrap img {
-    display: block;
-    width: 100%;
-    object-fit: cover;
-  }
-
-  .tlw-measure__image-caption {
-    margin: 0;
-    padding: 12px 20px;
-    font-size: 12px;
-    color: var(--tlw-on-surface-variant);
-  }
-
-  .tlw-measure__table-heading {
-    margin: 0 0 16px;
-    color: var(--tlw-primary);
-  }
-
-  .tlw-measure__table-wrap {
-    border: 1px solid var(--tlw-outline-variant);
-    border-radius: 16px;
-    overflow: hidden;
-  }
-
-  .tlw-measure__table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .tlw-measure__table thead {
-    background: var(--tlw-surface-container);
-  }
-
-  .tlw-measure__table th {
-    padding: 12px 16px;
-    text-align: left;
-    font-family: var(--tlw-font-body);
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--tlw-on-surface-variant);
-  }
-
-  .tlw-measure__table td {
-    padding: 12px 16px;
-    border-top: 1px solid var(--tlw-outline-variant);
-    font-family: var(--tlw-font-body);
-    font-size: 15px;
-    color: var(--tlw-primary);
-  }
-
-  .tlw-measure__table td:last-child {
-    color: var(--tlw-on-surface-variant);
-  }
-</style>
-
-<script>
-  (function () {
-    var id = {{ id | json }};
-    var trigger = document.querySelector('[data-measure-open="' + id + '"]');
-    var panel = document.getElementById('tlw-measure-' + id);
-    if (!trigger || !panel) return;
-
-    function open() {
-      panel.classList.add('is-open');
-      panel.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function close() {
-      panel.classList.remove('is-open');
-      panel.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-
-    trigger.addEventListener('click', open);
-    panel.querySelectorAll('[data-measure-close]').forEach(function (btn) {
-      btn.addEventListener('click', close);
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && panel.classList.contains('is-open')) close();
-    });
-  })();
-</script>
+{%- render 'tlw-guide-shell', id: id, title: m_title, trigger: guide_trigger, body: guide_body -%}
