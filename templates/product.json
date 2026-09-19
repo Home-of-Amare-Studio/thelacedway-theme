@@ -14,6 +14,7 @@
       "blocks": {
         "service_option_VPQUyc": {
           "type": "service_option",
+          "disabled": true,
           "settings": {
             "label": "Jet Black",
             "values": "No, Yes",
