@@ -1,70 +1,390 @@
 {% comment %}
-  THELACEDWÁY hairline guide: "?" icon that opens a slide-in panel.
+  THELACEDWÁY guide pop-up shell (shared by the hairline and cap size guides)
   Home of Amare Studio
 
-  Param: id (any unique string, e.g. the block id)
+  Params:
+    id       unique id for this pop-up
+    title    heading shown at the top of the panel
+    trigger  HTML for the button that opens it (must carry data-tlw-guide-open="<id>")
+    body     HTML for the panel content
 
-  All wording and images are edited in the theme editor:
-  Theme settings -> THELACEDWÁY guides -> Hairline pop-up.
+  The panel is moved to <body> the first time it opens, so it is never
+  affected by the uppercase label or any parent it was written inside.
 {% endcomment %}
 
-{%- liquid
-  assign h_title = settings.tlw_hairline_title | default: 'Choosing your hairline'
-  assign h_intro = settings.tlw_hairline_intro
-  if h_intro == blank
-    assign h_intro = '<p>Both hairlines are hand-tied and customised to you. The difference is the density and how sculpted the perimeter looks.</p>'
-  endif
+{{ trigger }}
 
-  assign any_custom = false
-  if settings.tlw_hairline_1_name != blank or settings.tlw_hairline_2_name != blank or settings.tlw_hairline_3_name != blank or settings.tlw_hairline_4_name != blank
-    assign any_custom = true
-  endif
--%}
-
-{%- capture guide_trigger -%}
-  <button type="button" class="tlw-guide-icon" data-tlw-guide-open="{{ id }}" aria-haspopup="dialog" aria-label="About hairline options" title="About hairline options">
-    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
-  </button>
-{%- endcapture -%}
-
-{%- capture guide_body -%}
-  <div class="tlw-guide__rich">{{ h_intro }}</div>
-
-  <div class="tlw-guide__cards">
-    {%- assign option_number = 0 -%}
-    {%- for n in (1..4) -%}
-      {%- assign name_key = 'tlw_hairline_' | append: n | append: '_name' -%}
-      {%- assign text_key = 'tlw_hairline_' | append: n | append: '_text' -%}
-      {%- assign image_key = 'tlw_hairline_' | append: n | append: '_image' -%}
-      {%- assign o_name = settings[name_key] -%}
-      {%- assign o_text = settings[text_key] -%}
-      {%- assign o_image = settings[image_key] -%}
-
-      {%- unless any_custom -%}
-        {%- if n == 1 -%}
-          {%- assign o_name = 'Natural hairline' -%}
-          {%- assign o_text = '<p>A softer, denser hairline that follows your own natural growth pattern. Minimal plucking, fuller at the front. Best if you like a low-maintenance, everyday finish.</p>' -%}
-        {%- elsif n == 2 -%}
-          {%- assign o_name = 'Light Lagos hairline' -%}
-          {%- assign o_text = '<p>A more sculpted, airy hairline with finer baby hairs and a lighter density at the perimeter. Gives a more styled, laid finish and photographs beautifully.</p>' -%}
-        {%- endif -%}
-      {%- endunless -%}
-
-      {%- if o_name != blank -%}
-        {%- assign option_number = option_number | plus: 1 -%}
-        <div class="tlw-guide__card">
-          <span class="tlw-guide__eyebrow">Option {{ option_number }}</span>
-          <h3 class="tlw-guide__card-title">{{ o_name | escape }}</h3>
-          {%- if o_text != blank -%}
-            <div class="tlw-guide__card-text">{{ o_text }}</div>
-          {%- endif -%}
-          {%- if o_image != blank -%}
-            {{ o_image | image_url: width: 800 | image_tag: loading: 'lazy', class: 'tlw-guide__img', alt: o_name }}
-          {%- endif -%}
-        </div>
-      {%- endif -%}
-    {%- endfor -%}
+<div class="tlw-guide" data-tlw-guide-id="{{ id }}" hidden aria-hidden="true">
+  <div class="tlw-guide__overlay" data-tlw-guide-close></div>
+  <div class="tlw-guide__panel" role="dialog" aria-modal="true" aria-label="{{ title | escape }}" tabindex="-1">
+    <div class="tlw-guide__head">
+      <h2 class="tlw-guide__title">{{ title }}</h2>
+      <button type="button" class="tlw-guide__close" data-tlw-guide-close aria-label="Close">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="tlw-guide__body">
+      {{ body }}
+    </div>
   </div>
-{%- endcapture -%}
+</div>
 
-{%- render 'tlw-guide-shell', id: id, title: h_title, trigger: guide_trigger, body: guide_body -%}
+<style>
+  .tlw-guide-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--tlw-on-surface-variant);
+    transition: color 200ms ease;
+  }
+
+  .tlw-guide-icon:hover,
+  .tlw-guide-icon:focus-visible {
+    color: var(--tlw-accent);
+    outline: none;
+  }
+
+  .tlw-guide-link {
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font: inherit;
+    letter-spacing: normal;
+    text-transform: none;
+    text-align: left;
+    color: var(--tlw-on-surface-variant);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: color 200ms ease;
+  }
+
+  .tlw-guide-link:hover {
+    color: var(--tlw-primary);
+  }
+
+  html.tlw-guide-lock {
+    overflow: hidden;
+  }
+
+  .tlw-guide {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    font-family: var(--tlw-font-body);
+    font-size: 15px;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1.6;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--tlw-primary);
+  }
+
+  .tlw-guide[hidden] {
+    display: none;
+  }
+
+  .tlw-guide__overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(10, 10, 10, 0.4);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 400ms ease;
+  }
+
+  .tlw-guide.is-shown .tlw-guide__overlay {
+    opacity: 1;
+  }
+
+  .tlw-guide__panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 440px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.97);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    backdrop-filter: blur(28px) saturate(180%);
+    border-left: 1px solid var(--tlw-outline-variant);
+    border-radius: 28px 0 0 28px;
+    box-shadow: 0 24px 80px rgba(10, 10, 10, 0.25);
+    transform: translateX(100%);
+    transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+    outline: none;
+  }
+
+  .tlw-guide.is-shown .tlw-guide__panel {
+    transform: translateX(0);
+  }
+
+  @media (min-width: 768px) {
+    .tlw-guide__panel {
+      width: 38vw;
+      min-width: 380px;
+    }
+  }
+
+  .tlw-guide__head {
+    position: relative;
+    flex-shrink: 0;
+    padding: 24px 64px 24px 24px;
+    border-bottom: 1px solid var(--tlw-outline-variant);
+  }
+
+  .tlw-guide__title {
+    margin: 0;
+    font-family: var(--tlw-font-display);
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--tlw-primary);
+  }
+
+  .tlw-guide__close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 4px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--tlw-primary);
+    transition: opacity 200ms ease;
+  }
+
+  .tlw-guide__close:hover {
+    opacity: 0.6;
+  }
+
+  .tlw-guide__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 24px calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  @media (min-width: 768px) {
+    .tlw-guide__head {
+      padding: 32px 72px 32px 32px;
+    }
+    .tlw-guide__body {
+      padding: 32px 32px calc(80px + env(safe-area-inset-bottom, 0px));
+    }
+  }
+
+  .tlw-guide__rich {
+    margin-bottom: 28px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  .tlw-guide__rich p,
+  .tlw-guide__card p {
+    margin: 0 0 10px;
+  }
+
+  .tlw-guide__rich p:last-child,
+  .tlw-guide__card p:last-child {
+    margin-bottom: 0;
+  }
+
+  .tlw-guide__rich a,
+  .tlw-guide__card a {
+    color: var(--tlw-primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .tlw-guide__cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .tlw-guide__card {
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--tlw-surface-container);
+  }
+
+  .tlw-guide__eyebrow {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tlw-accent);
+  }
+
+  .tlw-guide__card-title {
+    margin: 0 0 8px;
+    font-family: var(--tlw-font-display);
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--tlw-primary);
+  }
+
+  .tlw-guide__card-text {
+    color: var(--tlw-on-surface-variant);
+  }
+
+  .tlw-guide__card--step p {
+    color: var(--tlw-primary);
+  }
+
+  .tlw-guide__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 14px;
+    border-radius: 12px;
+  }
+
+  .tlw-guide__figure {
+    margin: 0 0 28px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--tlw-surface-container);
+  }
+
+  .tlw-guide__figure .tlw-guide__img {
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .tlw-guide__caption {
+    margin: 0;
+    padding: 12px 20px;
+    font-size: 12px;
+    color: var(--tlw-on-surface-variant);
+  }
+
+  .tlw-guide__h3 {
+    margin: 0 0 16px;
+    font-family: var(--tlw-font-display);
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--tlw-primary);
+  }
+
+  .tlw-guide__table-wrap {
+    margin-bottom: 28px;
+    overflow: hidden;
+    border: 1px solid var(--tlw-outline-variant);
+    border-radius: 16px;
+  }
+
+  .tlw-guide__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .tlw-guide__table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--tlw-on-surface-variant);
+    background: var(--tlw-surface-container);
+  }
+
+  .tlw-guide__table td {
+    padding: 12px 16px;
+    border-top: 1px solid var(--tlw-outline-variant);
+    color: var(--tlw-on-surface-variant);
+  }
+
+  .tlw-guide__table td:first-child {
+    color: var(--tlw-primary);
+  }
+</style>
+
+<script>
+  (function () {
+    if (window.__tlwGuides) return;
+    window.__tlwGuides = true;
+
+    var current = null;
+    var lastTrigger = null;
+
+    function openGuide(id, trigger) {
+      var nodes = Array.prototype.slice.call(document.querySelectorAll('[data-tlw-guide-id="' + id + '"]'));
+      if (!nodes.length) return;
+
+      /* prefer the freshly rendered copy (the theme editor re-renders sections),
+         and drop any stale copy left over on <body> */
+      var guide = nodes.filter(function (n) { return n.parentNode !== document.body; })[0] || nodes[0];
+      nodes.forEach(function (n) { if (n !== guide) n.parentNode.removeChild(n); });
+      if (guide.parentNode !== document.body) document.body.appendChild(guide);
+
+      guide.hidden = false;
+      guide.setAttribute('aria-hidden', 'false');
+      document.documentElement.classList.add('tlw-guide-lock');
+      current = guide;
+      lastTrigger = trigger;
+
+      requestAnimationFrame(function () {
+        guide.classList.add('is-shown');
+        var panel = guide.querySelector('.tlw-guide__panel');
+        if (panel) panel.focus();
+      });
+    }
+
+    function closeGuide() {
+      if (!current) return;
+      var guide = current;
+      var trigger = lastTrigger;
+      current = null;
+      guide.classList.remove('is-shown');
+      window.setTimeout(function () {
+        guide.hidden = true;
+        guide.setAttribute('aria-hidden', 'true');
+        document.documentElement.classList.remove('tlw-guide-lock');
+        if (trigger && trigger.focus) trigger.focus();
+      }, 400);
+    }
+
+    document.addEventListener('click', function (e) {
+      var opener = e.target.closest('[data-tlw-guide-open]');
+      if (opener) {
+        e.preventDefault();
+        e.stopPropagation();
+        openGuide(opener.getAttribute('data-tlw-guide-open'), opener);
+        return;
+      }
+      if (e.target.closest('[data-tlw-guide-close]')) closeGuide();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeGuide();
+    });
+  })();
+</script>
