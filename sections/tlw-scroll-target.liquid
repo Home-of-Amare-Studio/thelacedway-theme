@@ -5,7 +5,7 @@
   An invisible marker. Place it directly above the collections section on the
   homepage. Clicking a link with the matching text (default "Shop all collections")
   then glides down to this spot instead of opening another page. A link whose
-  address is #tlw-collections does the same.
+  address is #tlw-collections does the same. Several phrases can be listed, separated by commas.
 {% endcomment %}
 
 <div
@@ -38,7 +38,11 @@
       return String(text || '').replace(/\s+/g, ' ').trim().toLowerCase();
     }
 
-    var label = norm(target.getAttribute('data-label'));
+    /* one or more phrases, separated by commas, e.g. "Shop all collections, Shop the collections" */
+    var labels = String(target.getAttribute('data-label') || '')
+      .split(',')
+      .map(norm)
+      .filter(Boolean);
     var offset = parseInt(target.getAttribute('data-offset'), 10) || 0;
 
     function scrollToTarget() {
@@ -60,7 +64,7 @@
       var href = link.getAttribute('href') || '';
       var text = norm(link.textContent);
       var isAnchor = href === '#tlw-collections' || href === '#collections';
-      var isLabel = label && text.length < 80 && text.indexOf(label) !== -1;
+      var isLabel = text.length < 80 && labels.some(function (phrase) { return text.indexOf(phrase) !== -1; });
       if (!isAnchor && !isLabel) return;
 
       e.preventDefault();
@@ -91,9 +95,9 @@
     {
       "type": "text",
       "id": "link_text",
-      "label": "Scroll here when this link text is clicked",
-      "info": "Any link whose text contains this will glide to this spot instead of opening a page.",
-      "default": "Shop all collections"
+      "label": "Scroll here when a link with this text is clicked",
+      "info": "Any link whose text contains this glides to this spot instead of opening a page. Separate several phrases with commas.",
+      "default": "Shop all collections, Shop the collections"
     },
     {
       "type": "range",
