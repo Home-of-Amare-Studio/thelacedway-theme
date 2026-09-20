@@ -12,6 +12,13 @@
     "tlw_main_product_fAykxh": {
       "type": "tlw-main-product",
       "blocks": {
+        "accordion_tKzMNd": {
+          "type": "accordion",
+          "settings": {
+            "title": "New accordion",
+            "content": "<p>Add your text here.</p>"
+          }
+        },
         "service_option_wNfFF4": {
           "type": "service_option",
           "name": "Service option - Cap Size",
@@ -143,27 +150,17 @@
             "tooltip": "",
             "reveal_on_customisation": true
           }
-        },
-        "client_MbNz47": {
-          "type": "client",
-          "settings": {
-            "image": "shopify://shop_images/Screenshot_2026-09-19_at_20.00.39.png",
-            "name": "Sara",
-            "length": "55",
-            "lace_size": "6",
-            "quote": "loveeee"
-          }
         }
       },
       "block_order": [
+        "accordion_tKzMNd",
         "service_option_wNfFF4",
         "service_option_VPQUyc",
         "service_option_rVeVxG",
         "service_option_WezG9F",
         "service_option_rcXMHQ",
         "service_option_C8CXCk",
-        "service_option_GAe39i",
-        "client_MbNz47"
+        "service_option_GAe39i"
       ],
       "name": "TLW Product",
       "settings": {

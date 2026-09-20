@@ -674,12 +674,23 @@
         "show_reviews": true,
         "reviews_eyebrow": "Reviews",
         "reviews_heading": "What clients say about our wigs",
+        "reviews_name_style": "neat",
         "reviews_summary": true,
         "reviews_widget": true,
+        "reviews_empty_title": "Leave a review",
+        "reviews_empty_text": "Be the first to leave a review.",
+        "reviews_empty_stars": true,
+        "reviews_hide_badge": true,
+        "reviews_clean": true,
+        "reviews_view_more": true,
+        "reviews_lines": 5,
+        "reviews_more_label": "View more",
+        "reviews_less_label": "View less",
         "show_explore": true,
         "explore_heading": "Explore the rest of {collection}",
         "explore_body": "Every piece is hand-tied and finished to your measurements. See the full collection.",
-        "explore_button": "Back to {collection}"
+        "explore_button": "Back to {collection}",
+        "explore_fallback": "our collections"
       }
     }
   },
