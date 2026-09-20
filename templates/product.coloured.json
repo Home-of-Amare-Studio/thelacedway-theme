@@ -15,8 +15,57 @@
         "accordion_tKzMNd": {
           "type": "accordion",
           "settings": {
-            "title": "New accordion",
-            "content": "<p>Add your text here.</p>"
+            "title": "Product Details",
+            "content": "<p>&lcub;product_details&rcub;</p>"
+          }
+        },
+        "accordion_ALhV6E": {
+          "type": "accordion",
+          "settings": {
+            "title": "Hair Care",
+            "content": "<p>Our &lcub;hair_type&rcub; Hair can be washed and conditioned just like your natural hair. For the best results, we recommend using sulphate-free or organic hair care products to maintain the softness and longevity of the hair.</p><p>For best results, we recommend air drying your hair after washing. This helps retain moisture, reduces unnecessary heat exposure, and prolongs the life and quality of your hair.</p>"
+          }
+        },
+        "accordion_iLNKdr": {
+          "type": "accordion",
+          "settings": {
+            "title": "Longevity",
+            "content": "<p>With the correct maintenance and aftercare, our hair can last &lcub;lifespan&rcub;, making it a worthwhile investment.</p>"
+          }
+        },
+        "accordion_e3m7r7": {
+          "type": "accordion",
+          "settings": {
+            "title": "Closure Placement Notice",
+            "content": "<p>Please note that if you select Side Part for a 5x5, 6x6, or 7x7 closure unit the closure itself will be constructed and positioned on the side rather than in the centre. Please ensure you are happy with this before placing your order.</p><p>If you would like your closure to remain positioned in the centre but simply styled with a side part, please select Middle Part and at checkout leave a note requesting a side part. This will allow the closure to be installed centrally while still achieving your desired look.</p><p>Please note that 9x6 closure units are always constructed with the closure positioned in the centre due to the larger closure size.</p>"
+          }
+        },
+        "accordion_hmRKMw": {
+          "type": "accordion",
+          "settings": {
+            "title": "Shipping and Returns",
+            "content": "<p>Once your order has been placed, you have 24 hours to contact us if you wish to make any amendments. After this period, your order will be processed and no further changes can be made.</p><p>Each unit is custom made to order. Please allow 7-15 working days for your unit to be made before dispatch.</p><p>Once your order has been shipped, delivery typically takes:</p><ul><li>Royal Mail Tracked 24 (Tracked and Signed)</li><li>Royal Mail Special Delivery (Covers parcel if lost): Next working day before 1pm.</li></ul><p>For full details, please refer to our <a href=\"/pages/shipping-returns\">Shipping & Returns Policy</a>.</p>"
+          }
+        },
+        "accordion_p8Fhqd": {
+          "type": "accordion",
+          "settings": {
+            "title": "How to Measure Your Head",
+            "content": "<p>To ensure the best fit, we recommend measuring your head before selecting your wig size.</p><p>Using a soft measuring tape, start at the centre of your hairline and wrap the tape around your head, passing just above your ears and around the nape of your neck before bringing it back to the starting point.</p><p>This measurement is your head circumference and will help you choose the correct cap size for the most secure and comfortable fit.</p><p>Please note: We strongly recommend measuring your head accurately before placing your order. As all units are custom-made, we cannot accept responsibility for incorrect measurements provided by the customer and cap sizes cannot be changed once production has begun.</p>"
+          }
+        },
+        "accordion_HFz8mN": {
+          "type": "accordion",
+          "settings": {
+            "title": "International Orders",
+            "content": "<p>For orders shipped outside of the United Kingdom, import duties, taxes and customs fees may apply once your parcel reaches its destination country. These charges are determined by your local customs authorities and are the responsibility of the customer.</p>"
+          }
+        },
+        "accordion_i9LmbL": {
+          "type": "accordion",
+          "settings": {
+            "title": "Disclaimer (Please Read)",
+            "content": "<p><strong>Colour Disclaimer</strong></p><p>Every unit is unique. Slight variations in colour may occur. Please note that colours may appear differently depending on your device screen and lighting.</p><p><strong>Hair Length Disclaimer</strong></p><p>When selecting your desired hair length, please keep in mind that the final appearance will vary depending on how the hair is styled.</p><p>Curls may reduce the visible length by approximately 2-4 inches.</p><p>For example: If you would like your curled hair to appear approximately 22 inches long, we recommend selecting a straight hair length of 24-26 inches.</p><p>Please note that all hair lengths are measured when the hair is straight and fully stretched.</p><p><strong>Texture Disclaimer</strong></p><p>Please note that any unit displayed with a curled, loose wave or similar styled appearance has been heat styled. These looks are achieved by curling our straight hair and are intended to showcase the hair's versatility. This style is temporary and will gradually loosen over time, particularly after brushing or washing.</p><p>Once washed, the hair will return to its natural texture. The hair can be restyled using heat whenever desired.</p>"
           }
         },
         "service_option_wNfFF4": {
@@ -154,6 +203,13 @@
       },
       "block_order": [
         "accordion_tKzMNd",
+        "accordion_ALhV6E",
+        "accordion_iLNKdr",
+        "accordion_e3m7r7",
+        "accordion_hmRKMw",
+        "accordion_p8Fhqd",
+        "accordion_HFz8mN",
+        "accordion_i9LmbL",
         "service_option_wNfFF4",
         "service_option_VPQUyc",
         "service_option_rVeVxG",
