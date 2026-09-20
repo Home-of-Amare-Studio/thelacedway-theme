@@ -4,16 +4,22 @@
 
   Replaces the earlier multi-step wizard with Shopify's plain native contact
   form (Name, Email, Phone, Message) — no custom fields, no JS steps, no app.
-  Submissions arrive as an email at whatever address is set under
-  Settings > Notifications > Contact form, tagged "Custom Wig Enquiry" in the
-  hidden field below so they're easy to tell apart from any other contact
-  form on the site.
+
+  WHERE ENQUIRIES GO: Shopify's contact form emails every submission to the
+  store's Sender email address (Shopify admin > Settings, look for "Sender
+  email"). The emails come from mailer@shopify.com, so check spam the first
+  time. Nothing is stored in Shopify admin, so there is no list of enquiries
+  to look at later. The hidden field below tags each one "Custom Wig Enquiry"
+  so it is easy to tell apart from any other contact form on the site.
 
   Two modes, picked by the "Show the form open by default" setting:
   - Off (default): the homepage teaser. The form expands in place when
     clicked.
   - On: for a dedicated page (e.g. /custom-wig-enquiry). No toggle button,
     the form is open on load, and the heading renders as an <h1>.
+
+  After a successful send, only the thank-you message and its button are
+  shown. The fields are hidden until the page is loaded again.
 {% endcomment %}
 
 {%- liquid
@@ -77,79 +83,85 @@
   >
     <div class="tlw-custom__form-wrap">
       <div class="tlw-custom__card{% unless section.settings.start_open %} tlw-custom__card--center{% endunless %}">
-        {%- if section.settings.form_eyebrow != blank -%}
-          <p class="tlw-custom__form-eyebrow">{{ section.settings.form_eyebrow }}</p>
-        {%- endif -%}
 
         {%- form 'contact', id: form_id, class: 'tlw-custom__form' -%}
 
           {%- if form.posted_successfully? -%}
+
+            {%- comment -%} Sent: show only the thank-you and its button. {%- endcomment -%}
             <p class="tlw-form__success">{{ section.settings.success_text }}</p>
             {%- if section.settings.success_button_label != blank and section.settings.success_button_link != blank -%}
               <a href="{{ section.settings.success_button_link }}" class="tlw-custom__success-btn">
                 {{ section.settings.success_button_label }}
               </a>
             {%- endif -%}
-          {%- endif -%}
 
-          {%- if form.errors -%}
-            <p class="tlw-form__error">{{ form.errors | default_errors }}</p>
-          {%- endif -%}
+          {%- else -%}
 
-          <input type="hidden" name="contact[enquiry_type]" value="Custom Wig Enquiry">
+            {%- if section.settings.form_eyebrow != blank -%}
+              <p class="tlw-custom__form-eyebrow">{{ section.settings.form_eyebrow }}</p>
+            {%- endif -%}
 
-          <div class="tlw-custom__field">
-            <label for="{{ form_id }}-name">Full name</label>
-            <input
-              type="text"
-              id="{{ form_id }}-name"
-              name="contact[name]"
-              value="{{ form.name }}"
-              placeholder="Your full name"
-              autocomplete="name"
-              required
-            >
-          </div>
+            {%- if form.errors -%}
+              <p class="tlw-form__error">{{ form.errors | default_errors }}</p>
+            {%- endif -%}
 
-          <div class="tlw-custom__field">
-            <label for="{{ form_id }}-email">Email address</label>
-            <input
-              type="email"
-              id="{{ form_id }}-email"
-              name="contact[email]"
-              value="{{ form.email }}"
-              placeholder="you@email.com"
-              autocomplete="email"
-              required
-            >
-          </div>
+            <input type="hidden" name="contact[enquiry_type]" value="Custom Wig Enquiry">
 
-          {%- if section.settings.show_phone -%}
             <div class="tlw-custom__field">
-              <label for="{{ form_id }}-phone">Contact number</label>
+              <label for="{{ form_id }}-name">Full name</label>
               <input
-                type="tel"
-                id="{{ form_id }}-phone"
-                name="contact[phone]"
-                value="{{ form.phone }}"
-                placeholder="Optional"
-                autocomplete="tel"
+                type="text"
+                id="{{ form_id }}-name"
+                name="contact[name]"
+                value="{{ form.name }}"
+                placeholder="Your full name"
+                autocomplete="name"
+                required
               >
             </div>
+
+            <div class="tlw-custom__field">
+              <label for="{{ form_id }}-email">Email address</label>
+              <input
+                type="email"
+                id="{{ form_id }}-email"
+                name="contact[email]"
+                value="{{ form.email }}"
+                placeholder="you@email.com"
+                autocomplete="email"
+                required
+              >
+            </div>
+
+            {%- if section.settings.show_phone -%}
+              <div class="tlw-custom__field">
+                <label for="{{ form_id }}-phone">Contact number</label>
+                <input
+                  type="tel"
+                  id="{{ form_id }}-phone"
+                  name="contact[phone]"
+                  value="{{ form.phone }}"
+                  placeholder="Optional"
+                  autocomplete="tel"
+                >
+              </div>
+            {%- endif -%}
+
+            <div class="tlw-custom__field tlw-custom__field--wide">
+              <label for="{{ form_id }}-body">{{ section.settings.message_label }}</label>
+              <textarea
+                id="{{ form_id }}-body"
+                name="contact[body]"
+                rows="5"
+                placeholder="Describe the look you have in mind"
+                required
+              >{{ form.body }}</textarea>
+            </div>
+
+            <button type="submit" class="tlw-custom__submit">{{ section.settings.submit_label }}</button>
+
           {%- endif -%}
-
-          <div class="tlw-custom__field tlw-custom__field--wide">
-            <label for="{{ form_id }}-body">{{ section.settings.message_label }}</label>
-            <textarea
-              id="{{ form_id }}-body"
-              name="contact[body]"
-              rows="5"
-              placeholder="Describe the look you have in mind"
-              required
-            >{{ form.body }}</textarea>
-          </div>
-
-          <button type="submit" class="tlw-custom__submit">{{ section.settings.submit_label }}</button>
 
         {%- endform -%}
       </div>
@@ -298,8 +310,11 @@
     }
   }
 
+  /* The gold "Details" label now sits inside the form, so it can be hidden
+     with the fields after a successful send. */
   #tlw-custom-{{ section.id }} .tlw-custom__form-eyebrow {
-    margin: 0 0 32px;
+    grid-column: 1 / -1;
+    margin: 0 0 12px;
     font-family: var(--tlw-font-body);
     font-size: 13px;
     letter-spacing: 0.2em;
@@ -392,7 +407,7 @@
     grid-column: 1 / -1;
     display: inline-block;
     width: fit-content;
-    margin: -8px auto 0;
+    margin: 12px auto 0;
     padding: 14px 32px;
     border: 1px solid var(--tlw-accent);
     border-radius: 0;
