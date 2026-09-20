@@ -143,6 +143,16 @@
             "tooltip": "",
             "reveal_on_customisation": true
           }
+        },
+        "client_MbNz47": {
+          "type": "client",
+          "settings": {
+            "image": "shopify://shop_images/Screenshot_2026-09-19_at_20.00.39.png",
+            "name": "Sara",
+            "length": "55",
+            "lace_size": "6",
+            "quote": "loveeee"
+          }
         }
       },
       "block_order": [
@@ -152,7 +162,8 @@
         "service_option_WezG9F",
         "service_option_rcXMHQ",
         "service_option_C8CXCk",
-        "service_option_GAe39i"
+        "service_option_GAe39i",
+        "client_MbNz47"
       ],
       "name": "TLW Product",
       "settings": {
@@ -170,6 +181,9 @@
         "reviews_name_style": "neat",
         "reviews_summary": true,
         "reviews_widget": true,
+        "reviews_empty_title": "Leave a review",
+        "reviews_empty_text": "Be the first to leave a review.",
+        "reviews_empty_stars": true,
         "reviews_hide_badge": true,
         "reviews_clean": true,
         "reviews_view_more": true,
