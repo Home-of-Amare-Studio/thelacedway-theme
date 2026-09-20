@@ -595,6 +595,12 @@
         {%- continue -%}
       {%- endif -%}
 
+      {%- comment %}
+        Rich text can save curly brackets as HTML entities (for example &#123; and &#125;).
+        Turn them back into plain brackets first, so the fill-in codes below are always found.
+      {%- endcomment %}
+      {%- assign body = body | replace: '&#123;', '{' | replace: '&#125;', '}' | replace: '&#x7B;', '{' | replace: '&#x7b;', '{' | replace: '&#x7D;', '}' | replace: '&#x7d;', '}' | replace: '&lbrace;', '{' | replace: '&rbrace;', '}' | replace: '&lcub;', '{' | replace: '&rcub;', '}' -%}
+
       {%- comment %} A Product Details accordion is skipped when the product has no description. {%- endcomment %}
       {%- if body contains '{product_details}' and specs_html == blank -%}
         {%- continue -%}
