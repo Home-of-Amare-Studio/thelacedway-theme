@@ -410,6 +410,13 @@
 
   #tlw-header-{{ section.id }} .tlw-nav__item {
     position: relative;
+    /* Forces every item onto the same center line regardless of whether
+       its child is an <a> (a plain link) or a <button> (used for the
+       dropdown-triggering items) — the two don't always share identical
+       default vertical metrics in every browser, which is what was
+       making the dropdown items look slightly higher than the rest. */
+    display: flex;
+    align-items: center;
   }
 
   #tlw-header-{{ section.id }} .tlw-nav__link {
@@ -567,8 +574,9 @@
     #tlw-header-{{ section.id }} .tlw-header__nav--left {
       grid-column: 2;
       display: flex;
+      align-items: center;
       flex-wrap: wrap;
-      justify-content: space-between;
+      justify-content: flex-end;
       row-gap: 6px;
       gap: clamp(8px, 1.3vw, {{ split_gap }}px);
       min-width: 0;
@@ -596,8 +604,9 @@
     #tlw-header-{{ section.id }} .tlw-header__nav--right {
       grid-column: 4;
       display: flex;
+      align-items: center;
       flex-wrap: wrap;
-      justify-content: space-between;
+      justify-content: flex-start;
       row-gap: 6px;
       gap: clamp(8px, 1.3vw, {{ split_gap }}px);
       min-width: 0;
