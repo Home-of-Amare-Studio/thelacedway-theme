@@ -2,8 +2,20 @@
   THELACEDWÁY custom wigs
   Home of Amare Studio
 
-  Replaces the earlier multi-step wizard with Shopify's plain native contact
-  form (Name, Email, Phone, Message) — no custom fields, no JS steps, no app.
+  A 6-step accordion built on Shopify's plain native contact form — no app,
+  nothing stored in Shopify admin. Each step opens one at a time (CSS
+  class-toggle, not JS-measured height, so it behaves correctly even nested
+  inside the collapsed homepage-teaser panel). Steps:
+    1. Your Details — Full Name, Email Address, Contact Number
+    2. Lace & Length — lace size, length
+    3. Hair Type & Colour — hair type, colour
+    4. Fit & Parting — cap/head size, parting preference
+    5. Styling & Extras — styling/customisation notes, anything else
+    6. Timing — when the wig is needed by
+  Name/Email/Phone/Message reuse Shopify's native contact[name],
+  contact[email], contact[phone] and contact[body] fields; everything else is
+  a named contact[Custom Label] field that Shopify forwards into the
+  notification email as "Custom Label: value".
 
   WHERE ENQUIRIES GO: Shopify's contact form emails every submission to the
   store's Sender email address (Shopify admin > Settings, look for "Sender
@@ -108,55 +120,158 @@
 
             <input type="hidden" name="contact[enquiry_type]" value="Custom Wig Enquiry">
 
-            <div class="tlw-custom__field">
-              <label for="{{ form_id }}-name">Full name</label>
-              <input
-                type="text"
-                id="{{ form_id }}-name"
-                name="contact[name]"
-                value="{{ form.name }}"
-                placeholder="Your full name"
-                autocomplete="name"
-                required
-              >
-            </div>
+            <div class="tlw-custom__steps">
 
-            <div class="tlw-custom__field">
-              <label for="{{ form_id }}-email">Email address</label>
-              <input
-                type="email"
-                id="{{ form_id }}-email"
-                name="contact[email]"
-                value="{{ form.email }}"
-                placeholder="you@email.com"
-                autocomplete="email"
-                required
-              >
-            </div>
-
-            {%- if section.settings.show_phone -%}
-              <div class="tlw-custom__field">
-                <label for="{{ form_id }}-phone">Contact number</label>
-                <input
-                  type="tel"
-                  id="{{ form_id }}-phone"
-                  name="contact[phone]"
-                  value="{{ form.phone }}"
-                  placeholder="Optional"
-                  autocomplete="tel"
-                >
+              {%- comment -%} Step 1 — Your Details {%- endcomment -%}
+              <div class="tlw-custom__step is-open" data-step>
+                <button type="button" class="tlw-custom__step-header" data-step-toggle aria-expanded="true" aria-controls="{{ form_id }}-step-1">
+                  <span class="tlw-custom__step-number">1</span>
+                  <span class="tlw-custom__step-title">Your Details</span>
+                  <svg class="tlw-custom__step-chevron" viewBox="0 0 12 8" width="14" height="10" aria-hidden="true">
+                    <path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  </svg>
+                </button>
+                <div class="tlw-custom__step-panel" id="{{ form_id }}-step-1" data-step-panel>
+                  <div class="tlw-custom__step-body">
+                    <div class="tlw-custom__field">
+                      <label for="{{ form_id }}-name">Full Name</label>
+                      <input type="text" id="{{ form_id }}-name" name="contact[name]" value="{{ form.name }}" placeholder="Your full name" autocomplete="name" required>
+                    </div>
+                    <div class="tlw-custom__field">
+                      <label for="{{ form_id }}-email">Email Address</label>
+                      <input type="email" id="{{ form_id }}-email" name="contact[email]" value="{{ form.email }}" placeholder="you@email.com" autocomplete="email" required>
+                    </div>
+                    <div class="tlw-custom__field">
+                      <label for="{{ form_id }}-phone">Contact Number</label>
+                      <input type="tel" id="{{ form_id }}-phone" name="contact[phone]" value="{{ form.phone }}" placeholder="Your phone number" autocomplete="tel" required>
+                    </div>
+                    <button type="button" class="tlw-custom__step-next" data-step-next>Continue</button>
+                  </div>
+                </div>
               </div>
-            {%- endif -%}
 
-            <div class="tlw-custom__field tlw-custom__field--wide">
-              <label for="{{ form_id }}-body">{{ section.settings.message_label }}</label>
-              <textarea
-                id="{{ form_id }}-body"
-                name="contact[body]"
-                rows="5"
-                placeholder="Describe the look you have in mind"
-                required
-              >{{ form.body }}</textarea>
+              {%- comment -%} Step 2 — Lace & Length {%- endcomment -%}
+              <div class="tlw-custom__step" data-step>
+                <button type="button" class="tlw-custom__step-header" data-step-toggle aria-expanded="false" aria-controls="{{ form_id }}-step-2">
+                  <span class="tlw-custom__step-number">2</span>
+                  <span class="tlw-custom__step-title">Lace &amp; Length</span>
+                  <svg class="tlw-custom__step-chevron" viewBox="0 0 12 8" width="14" height="10" aria-hidden="true">
+                    <path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  </svg>
+                </button>
+                <div class="tlw-custom__step-panel" id="{{ form_id }}-step-2" data-step-panel>
+                  <div class="tlw-custom__step-body">
+                    <div class="tlw-custom__field">
+                      <label for="{{ form_id }}-lace">What lace size would you prefer?</label>
+                      <p class="tlw-custom__hint">e.g. 5x5, 6x6, 7x7, 9x6 or 13x6. If you're unsure, please state this.</p>
+                      <input type="text" id="{{ form_id }}-lace" name="contact[Lace Size]" placeholder="e.g. 6x6, or 'not sure'" required>
+                    </div>
+                    <div class="tlw-custom__field">
+                      <label for="{{ form_id }}-length">What length would you like?</label>
+                      <input type="text" id="{{ form_id }}-length" name="contact[Length]" placeholder="e.g. 18 inches" required>
+                    </div>
+                    <button type="button" class="tlw-custom__step-next" data-step-next>Continue</button>
+                  </div>
+                </div>
+              </div>
+
+              {%- comment -%} Step 3 — Hair Type & Colour {%- endcomment -%}
+              <div class="tlw-custom__step" data-step>
+                <button type="button" class="tlw-custom__step-header" data-step-toggle aria-expanded="false" aria-controls="{{ form_id }}-step-3">
+                  <span class="tlw-custom__step-number">3</span>
+                  <span class="tlw-custom__step-title">Hair Type &amp; Colour</span>
+                  <svg class="tlw-custom__step-chevron" viewBox="0 0 12 8" width="14" height="10" aria-hidden="true">
+                    <path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  </svg>
+                </button>
+                <div class="tlw-custom__step-panel" id="{{ form_id }}-step-3" data-step-panel>
+                  <div class="tlw-custom__step-body">
+                    <div class="tlw-custom__field">
+                      <label for="{{ form_id }}-hair-type">What hair type would you prefer?</label>
+                      <p class="tlw-custom__hint">Virgin Hair, Raw Hair or please state if you would like a recommendation.</p>
+                      <input type="text" id="{{ form_id }}-hair-type" name="contact[Hair Type]" placeholder="e.g. Virgin Hair" required>
+                    </div>
+                    <div class="tlw-custom__field">
+                      <label for="{{ form_id }}-colour">What colour would you like?</label>
+                      <p class="tlw-custom__hint">Please describe your preferred colour as clearly as possible.</p>
+                      <input type="text" id="{{ form_id }}-colour" name="contact[Colour]" placeholder="e.g. Natural black, rich burgundy..." required>
+                    </div>
+                    <button type="button" class="tlw-custom__step-next" data-step-next>Continue</button>
+                  </div>
+                </div>
+              </div>
+
+              {%- comment -%} Step 4 — Fit & Parting {%- endcomment -%}
+              <div class="tlw-custom__step" data-step>
+                <button type="button" class="tlw-custom__step-header" data-step-toggle aria-expanded="false" aria-controls="{{ form_id }}-step-4">
+                  <span class="tlw-custom__step-number">4</span>
+                  <span class="tlw-custom__step-title">Fit &amp; Parting</span>
+                  <svg class="tlw-custom__step-chevron" viewBox="0 0 12 8" width="14" height="10" aria-hidden="true">
+                    <path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  </svg>
+                </button>
+                <div class="tlw-custom__step-panel" id="{{ form_id }}-step-4" data-step-panel>
+                  <div class="tlw-custom__step-body">
+                    <div class="tlw-custom__field">
+                      <label for="{{ form_id }}-cap-size">What is your cap/head size?</label>
+                      <p class="tlw-custom__hint">Please state Small, Medium, Large or Unsure.</p>
+                      <input type="text" id="{{ form_id }}-cap-size" name="contact[Cap/Head Size]" placeholder="e.g. Medium" required>
+                    </div>
+                    <div class="tlw-custom__field">
+                      <label for="{{ form_id }}-parting">What parting would you prefer?</label>
+                      <p class="tlw-custom__hint">Middle, Left Side, Right Side or No Preference.</p>
+                      <input type="text" id="{{ form_id }}-parting" name="contact[Parting Preference]" placeholder="e.g. Middle" required>
+                    </div>
+                    <button type="button" class="tlw-custom__step-next" data-step-next>Continue</button>
+                  </div>
+                </div>
+              </div>
+
+              {%- comment -%} Step 5 — Styling & Extras {%- endcomment -%}
+              <div class="tlw-custom__step" data-step>
+                <button type="button" class="tlw-custom__step-header" data-step-toggle aria-expanded="false" aria-controls="{{ form_id }}-step-5">
+                  <span class="tlw-custom__step-number">5</span>
+                  <span class="tlw-custom__step-title">Styling &amp; Extras</span>
+                  <svg class="tlw-custom__step-chevron" viewBox="0 0 12 8" width="14" height="10" aria-hidden="true">
+                    <path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  </svg>
+                </button>
+                <div class="tlw-custom__step-panel" id="{{ form_id }}-step-5" data-step-panel>
+                  <div class="tlw-custom__step-body">
+                    <div class="tlw-custom__field">
+                      <label for="{{ form_id }}-styling">Please describe how you would like your wig styled/customised.</label>
+                      <p class="tlw-custom__hint">Please include as much detail as possible, e.g. layers, curls, straight, fringe, etc.</p>
+                      <textarea id="{{ form_id }}-styling" name="contact[Styling & Customisation]" rows="4" placeholder="Describe the look you have in mind" required></textarea>
+                    </div>
+                    <div class="tlw-custom__field">
+                      <label for="{{ form_id }}-extra">Is there anything else you would like to add or request?</label>
+                      <textarea id="{{ form_id }}-extra" name="contact[body]" rows="3" placeholder="Optional">{{ form.body }}</textarea>
+                    </div>
+                    <button type="button" class="tlw-custom__step-next" data-step-next>Continue</button>
+                  </div>
+                </div>
+              </div>
+
+              {%- comment -%} Step 6 — Timing {%- endcomment -%}
+              <div class="tlw-custom__step" data-step>
+                <button type="button" class="tlw-custom__step-header" data-step-toggle aria-expanded="false" aria-controls="{{ form_id }}-step-6">
+                  <span class="tlw-custom__step-number">6</span>
+                  <span class="tlw-custom__step-title">Timing</span>
+                  <svg class="tlw-custom__step-chevron" viewBox="0 0 12 8" width="14" height="10" aria-hidden="true">
+                    <path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  </svg>
+                </button>
+                <div class="tlw-custom__step-panel" id="{{ form_id }}-step-6" data-step-panel>
+                  <div class="tlw-custom__step-body">
+                    <div class="tlw-custom__field">
+                      <label for="{{ form_id }}-needed-by">When would you ideally need your wig by?</label>
+                      <p class="tlw-custom__hint">Please include the date, particularly if it is required for an event or special occasion.</p>
+                      <input type="text" id="{{ form_id }}-needed-by" name="contact[Needed By]" placeholder="e.g. 15th March, or for a wedding on 2nd June" required>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             <button type="submit" class="tlw-custom__submit">{{ section.settings.submit_label }}</button>
@@ -328,6 +443,115 @@
     gap: 20px;
   }
 
+  #tlw-custom-{{ section.id }} .tlw-custom__steps {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 4px;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__step {
+    border-top: 1px solid var(--tlw-outline-variant);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__step:last-child {
+    border-bottom: 1px solid var(--tlw-outline-variant);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__step-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 4px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__step-number {
+    flex: 0 0 auto;
+    width: 26px;
+    height: 26px;
+    border: 1px solid var(--tlw-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--tlw-font-body);
+    font-size: 12px;
+    color: var(--tlw-accent);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__step-title {
+    flex: 1;
+    font-family: var(--tlw-font-body);
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tlw-primary);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__step-chevron {
+    flex: 0 0 auto;
+    color: var(--tlw-primary);
+    transition: transform 300ms ease;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__step.is-open .tlw-custom__step-chevron {
+    transform: rotate(180deg);
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__step-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 450ms ease;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__step.is-open .tlw-custom__step-panel {
+    max-height: 800px;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__step-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 4px 4px 24px;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__hint {
+    margin: -4px 0 0;
+    font-family: var(--tlw-font-body);
+    font-size: 12.5px;
+    color: var(--tlw-outline);
+    line-height: 1.5;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__step-next {
+    align-self: flex-start;
+    margin-top: 4px;
+    padding: 10px 22px;
+    border: 1px solid var(--tlw-primary);
+    border-radius: 0;
+    background: transparent;
+    font-family: var(--tlw-font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--tlw-primary);
+    cursor: pointer;
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__step-next:hover {
+    background: var(--tlw-primary);
+    color: var(--tlw-on-primary);
+  }
+
   #tlw-custom-{{ section.id }} .tlw-custom__field {
     display: flex;
     flex-direction: column;
@@ -473,6 +697,67 @@
         toggle.textContent = toggle.dataset.closeLabel;
       }
     }
+
+    /* Multi-step accordion */
+    var steps = Array.prototype.slice.call(root.querySelectorAll('[data-step]'));
+
+    function openStep(step) {
+      step.classList.add('is-open');
+      var header = step.querySelector('[data-step-toggle]');
+      if (header) header.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeStep(step) {
+      step.classList.remove('is-open');
+      var header = step.querySelector('[data-step-toggle]');
+      if (header) header.setAttribute('aria-expanded', 'false');
+    }
+
+    steps.forEach(function (step, i) {
+      var header = step.querySelector('[data-step-toggle]');
+      var next = step.querySelector('[data-step-next]');
+
+      if (header) {
+        header.addEventListener('click', function () {
+          if (step.classList.contains('is-open')) closeStep(step); else openStep(step);
+        });
+      }
+
+      if (next) {
+        next.addEventListener('click', function () {
+          closeStep(step);
+          var nextStep = steps[i + 1];
+          if (nextStep) {
+            openStep(nextStep);
+            window.setTimeout(function () {
+              var y = nextStep.getBoundingClientRect().top + window.scrollY - 140;
+              window.scrollTo({ top: y, behavior: 'smooth' });
+            }, 80);
+          }
+        });
+      }
+    });
+
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        var badStep = null;
+        steps.forEach(function (step) {
+          if (!badStep && step.querySelector(':invalid')) badStep = step;
+        });
+        if (badStep && !badStep.classList.contains('is-open')) {
+          e.preventDefault();
+          openStep(badStep);
+          window.setTimeout(function () {
+            var invalidField = badStep.querySelector(':invalid');
+            if (invalidField) {
+              var y = badStep.getBoundingClientRect().top + window.scrollY - 140;
+              window.scrollTo({ top: y, behavior: 'smooth' });
+              invalidField.focus();
+            }
+          }, 420);
+        }
+      });
+    }
   })();
 </script>
 
@@ -563,18 +848,6 @@
       "id": "form_eyebrow",
       "label": "Small gold label above the form",
       "default": "Details"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_phone",
-      "label": "Include a phone number field",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "message_label",
-      "label": "Message field label",
-      "default": "Tell us what you have in mind"
     },
     {
       "type": "text",
