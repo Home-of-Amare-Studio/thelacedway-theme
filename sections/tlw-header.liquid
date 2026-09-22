@@ -527,37 +527,6 @@
     .tlw-drawer { display: none !important; }
   }
 
-    #tlw-header-{{ section.id }} .tlw-header__nav {
-      display: flex;
-      flex-wrap: wrap;
-      row-gap: 6px;
-      min-width: 0;
-    }
-
-    #tlw-header-{{ section.id }} .tlw-header__nav--left {
-      grid-column: 1;
-      justify-content: flex-start;
-    }
-
-    #tlw-header-{{ section.id }} .tlw-header__nav--right {
-      grid-column: 3;
-      justify-content: flex-end;
-    }
-
-    #tlw-header-{{ section.id }} .tlw-header__logo {
-      grid-column: 2;
-      position: static;
-      transform: translateX({{ section.settings.logo_nudge }}px);
-      margin-inline: 0;
-    }
-
-    #tlw-header-{{ section.id }} .tlw-header__cart {
-      grid-column: 4;
-    }
-
-    .tlw-drawer { display: none !important; }
-  }
-
   /* Phone menu: drops down under the header (its top edge is set by the script) */
   .tlw-drawer {
     position: fixed;
@@ -728,8 +697,8 @@
     });
 
     window.addEventListener('resize', function () {
-      if (window.innerWidth >= 1300) shut();
-      else if (menuIsOpen()) placeDrawer();
+      if (window.innerWidth >= 1600) shut();
+            else if (menuIsOpen()) placeDrawer();
     });
 
     /* Dropdown triggers are buttons now (see markup), so a click never
