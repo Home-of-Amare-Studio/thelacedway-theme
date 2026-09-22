@@ -1,40 +1,30 @@
 {% comment %}
-  THELACEDWÁY header
-  Home of Amare Studio
+  THELACEDWÁY header — Home of Amare Studio
 
-  Logo on the far left, then the nav, then the cart pinned to the far
-  right. One Shopify menu feeds the nav (the "Menu" setting, edited under
-  Content > Menus).
+  Layout: logo far left, nav next to it, cart pinned to the far right.
+  A single Shopify menu (Content > Menus) feeds the nav. Any menu item
+  with children becomes a hover/tap dropdown automatically.
 
-  The transparent, hide-until-scroll "over the hero" treatment is homepage
-  only, matching src/components/HomePage.tsx passing <SiteNav overlay /> —
-  every other page used plain <SiteNav />, a normal solid sticky bar that's
-  visible immediately. That's driven automatically by the template here
-  (template.name == 'index'), not a setting, since no other page should ever
-  want the hero treatment.
+  Mobile (below 1200px): logo, hamburger, cart. Tapping the hamburger
+  drops a full-screen-width menu down under the header; rows with
+  sub-items open in place with a tap, one at a time.
 
-  Any menu item with children becomes a dropdown automatically.
+  The transparent "over the hero" treatment (hide until you scroll, or
+  show white over the video) is homepage-only, driven automatically by
+  the template here — not a setting — since no other page has a hero
+  for it to sit over.
 
-  Phone menu: the hamburger turns into an X and the menu drops down under the
-  header. Items with sub-items show a chevron and open with a tap, one at a
-  time, so the list stays short.
-
-  Desktop layout: a single plain flex row, nothing removed from the
-  document flow. Logo, then nav, then cart, in that literal order, with
-  `margin-left: auto` on the cart alone pinning it to the far right and
-  everything else just sitting together on the left. Earlier versions
-  centred the logo with `position: absolute`, which pulls an element out
-  of the flex flow entirely so it stops reserving any space — that's what
-  let a long nav visually bleed into it. A plain, un-positioned flex row
-  can't reproduce that: every sibling always occupies real space and
-  siblings in normal flow are never painted on top of one another, so the
-  nav (which can wrap onto a second line, see .tlw-header__nav below) has
-  nowhere to overlap the logo or the cart, at any screen width. The
-  breakpoint below (currently 1200px) is just "is this a desktop".
+  Desktop layout notes: this is one plain flex row and nothing in it is
+  ever taken out of the document flow (no absolute positioning). Logo,
+  nav, cart appear in that literal order; `margin-left: auto` on the
+  cart alone pushes it to the far right while the logo and nav sit
+  together on the left. Ordinary flex siblings always occupy real space
+  and can never be painted on top of one another, so nothing here can
+  visually overlap, at any screen width.
 {% endcomment %}
 
 {%- liquid
-  assign left = section.settings.menu_left
+  assign menu = section.settings.menu
   assign is_home = false
   if template.name == 'index'
     assign is_home = true
@@ -49,12 +39,6 @@
 >
   <div class="tlw-header__inner">
 
-    {% comment %}
-      Logo — first in the DOM. On mobile that alone puts it on the left,
-      with the hamburger and cart following after it (see markup below) —
-      no CSS `order` needed to get that arrangement, it's just the literal
-      order these tags appear in. On desktop it's simply the far-left item.
-    {% endcomment %}
     <div class="tlw-header__logo">
       <a href="{{ routes.root_url }}">
         {%- if section.settings.logo_light != blank -%}
@@ -74,12 +58,6 @@
       </a>
     </div>
 
-    {% comment %}
-      Mobile: hamburger. Comes right after the logo in the markup — on
-      mobile, nav is hidden and cart comes after this, so the visible row
-      is simply logo, then hamburger, then cart, left to right, matching
-      the DOM, with nothing relying on CSS order to rearrange it.
-    {% endcomment %}
     <button
       type="button"
       class="tlw-header__burger"
@@ -90,9 +68,8 @@
       <span></span><span></span><span></span>
     </button>
 
-    {% comment %} Desktop: nav, one menu {% endcomment %}
     <nav class="tlw-header__nav" aria-label="Main">
-      {%- for link in left.links -%}
+      {%- for link in menu.links -%}
         <div class="tlw-nav__item{% if link.links.size > 0 %} has-children{% endif %}">
           {%- if link.links.size > 0 -%}
             <button type="button" class="tlw-nav__link" aria-expanded="false" aria-haspopup="true">
@@ -101,7 +78,7 @@
                 <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/>
               </svg>
             </button>
-      {%- else -%}
+          {%- else -%}
             <a class="tlw-nav__link" href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>{{ link.title }}</a>
           {%- endif -%}
 
@@ -116,7 +93,6 @@
       {%- endfor -%}
     </nav>
 
-    {% comment %} Cart — pinned to the far right on desktop via margin-left: auto {% endcomment %}
     <a class="tlw-header__cart" href="{{ routes.cart_url }}" aria-label="Bag">
       <svg viewBox="0 0 22 24" width="22" height="24" aria-hidden="true">
         <path d="M2 7h18v15a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7z" fill="none" stroke="currentColor" stroke-width="1.5"/>
@@ -129,21 +105,21 @@
 </header>
 
 {% comment %}
-  Phone menu. Drops down under the header. A row that has sub-items is a button
-  with a chevron; tapping it opens its list. Rows without sub-items are plain links.
+  Phone menu. Drops down under the header. A row that has sub-items is a
+  button with a chevron; tapping it opens its list. Rows without
+  sub-items are plain links.
 {% endcomment %}
 <div class="tlw-drawer" data-menu-drawer hidden>
   <div class="tlw-drawer__panel">
     <nav class="tlw-drawer__nav" aria-label="Menu">
-
-      {%- for list in left.links -%}
+      {%- for list in menu.links -%}
         {%- if list.links.size > 0 -%}
           <div class="tlw-drawer__group">
-            <button type="button" class="tlw-drawer__link tlw-drawer__link--parent" data-drawer-toggle aria-expanded="false" aria-controls="tlw-sub-{{ section.id }}-l{{ forloop.index }}">
+            <button type="button" class="tlw-drawer__link tlw-drawer__link--parent" data-drawer-toggle aria-expanded="false" aria-controls="tlw-sub-{{ section.id }}-{{ forloop.index }}">
               <span>{{ list.title }}</span>
               <svg class="tlw-drawer__chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
             </button>
-            <div class="tlw-drawer__sub" id="tlw-sub-{{ section.id }}-l{{ forloop.index }}">
+            <div class="tlw-drawer__sub" id="tlw-sub-{{ section.id }}-{{ forloop.index }}">
               {%- if section.settings.drawer_view_all and list.url != blank and list.url != '#' -%}
                 <a class="tlw-drawer__sublink" href="{{ list.url }}">All {{ list.title }}</a>
               {%- endif -%}
@@ -156,7 +132,6 @@
           <a class="tlw-drawer__link" href="{{ list.url }}">{{ list.title }}</a>
         {%- endif -%}
       {%- endfor -%}
-
     </nav>
   </div>
 </div>
@@ -298,6 +273,8 @@
     #tlw-header-{{ section.id }}.is-menu-open .tlw-header__logo--dark { display: block !important; }
   {% endif %}
 
+  /* ---- Row layout: mobile first, plain flex, nothing absolutely positioned ---- */
+
   #tlw-header-{{ section.id }} .tlw-header__inner {
     display: flex;
     align-items: center;
@@ -306,17 +283,13 @@
     min-height: {{ section.settings.height }}px;
   }
 
-  #tlw-header-{{ section.id }} .tlw-header__nav {
-    display: none;
-    flex: 1;
-    min-width: 0;
-    align-items: center;
-    gap: {{ section.settings.link_gap }}px;
-  }
-
+  /* Mobile order: logo, then hamburger, then cart — this is the literal
+     order these three tags appear in the markup above, so it needs no
+     CSS `order` property to arrange itself. margin-right: auto on the
+     logo alone pushes the hamburger+cart pair to the far right. */
   #tlw-header-{{ section.id }} .tlw-header__logo {
     flex: 0 0 auto;
-    margin-inline: 0;
+    margin-right: auto;
   }
 
   #tlw-header-{{ section.id }} .tlw-header__logo img {
@@ -331,6 +304,45 @@
     font-size: 22px;
     letter-spacing: 0.02em;
     color: var(--tlw-accent);
+  }
+
+  #tlw-header-{{ section.id }} .tlw-header__burger {
+    flex: 0 0 auto;
+    width: 26px;
+    height: 20px;
+    padding: 0;
+    background: none;
+    border: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  #tlw-header-{{ section.id }} .tlw-header__burger span {
+    display: block;
+    height: 1.5px;
+    background: var(--tlw-primary);
+    transition: transform 250ms ease, opacity 200ms ease;
+  }
+
+  /* The hamburger turns into an X while the phone menu is open */
+  #tlw-header-{{ section.id }} .tlw-header__burger[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(9.25px) rotate(45deg);
+  }
+
+  #tlw-header-{{ section.id }} .tlw-header__burger[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  #tlw-header-{{ section.id }} .tlw-header__burger[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-9.25px) rotate(-45deg);
+  }
+
+  /* Nav is desktop-only; hidden entirely on mobile in favour of the drawer. */
+  #tlw-header-{{ section.id }} .tlw-header__nav {
+    display: none;
+    align-items: center;
+    gap: {{ section.settings.link_gap }}px;
   }
 
   #tlw-header-{{ section.id }} .tlw-nav__item {
@@ -392,10 +404,8 @@
     z-index: 5;
   }
 
-  /* The nav now runs left-to-right after the logo, so dropdowns open
-     left-aligned by default. The one exception is the very last item,
-     which sits closest to the right edge of the screen — right-align
-     just that one so its dropdown can't run off-screen. */
+  /* The last item sits closest to the right edge of the screen —
+     right-align just that one dropdown so it can't run off-screen. */
   #tlw-header-{{ section.id }} .tlw-header__nav > .tlw-nav__item:last-child .tlw-nav__drop {
     left: auto;
     right: 0;
@@ -451,57 +461,17 @@
     border-radius: var(--tlw-radius);
   }
 
-  #tlw-header-{{ section.id }} .tlw-header__burger {
-    flex: 0 0 auto;
-    width: 26px;
-    height: 20px;
-    padding: 0;
-    background: none;
-    border: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-  #tlw-header-{{ section.id }} .tlw-header__burger span {
-    display: block;
-    height: 1.5px;
-    background: var(--tlw-primary);
-    transition: transform 250ms ease, opacity 200ms ease;
-  }
-
-  /* The hamburger turns into an X while the phone menu is open */
-  #tlw-header-{{ section.id }} .tlw-header__burger[aria-expanded="true"] span:nth-child(1) {
-    transform: translateY(9.25px) rotate(45deg);
-  }
-
-  #tlw-header-{{ section.id }} .tlw-header__burger[aria-expanded="true"] span:nth-child(2) {
-    opacity: 0;
-  }
-
-  #tlw-header-{{ section.id }} .tlw-header__burger[aria-expanded="true"] span:nth-child(3) {
-    transform: translateY(-9.25px) rotate(-45deg);
-  }
-
-  /* Mobile: logo left, burger and bag together on the right. This now
-     comes from plain DOM order (logo, then burger, then cart, exactly as
-     they appear in the markup) plus margin-right: auto on the logo alone,
-     which pushes the burger and cart as a pair over to the right edge.
-     No CSS `order` property is used here at all — one less thing that
-     could disagree with what's actually in the markup. */
-  #tlw-header-{{ section.id }} .tlw-header__logo { margin-inline: 0 auto; }
-
-  /* Desktop: one plain flex row, nothing removed from flow. Logo, then
-     nav, then cart, in that literal DOM order (so no `order` overrides
-     are needed here at all) — `margin-left: auto` on the cart alone is
-     what pins it to the far right, while the logo and nav sit together
-     on the left with the row's normal gap between them. 1200px covers
-     virtually every real laptop/desktop screen (1280, 1366, 1440, 1536,
-     1920...). */
+  /* ---- Desktop (1200px+): logo, nav, cart, one plain row ---- */
   @media (min-width: 1200px) {
-    #tlw-header-{{ section.id }} .tlw-header__burger { display: none; }
+    #tlw-header-{{ section.id }} .tlw-header__burger {
+      display: none;
+    }
 
-    #tlw-header-{{ section.id }} .tlw-header__logo { margin-inline: 0; }
+    #tlw-header-{{ section.id }} .tlw-header__logo {
+      margin-right: 0;
+      position: relative;
+      left: {{ section.settings.logo_nudge }}px;
+    }
 
     #tlw-header-{{ section.id }} .tlw-header__nav {
       display: flex;
@@ -510,12 +480,17 @@
       min-width: 0;
     }
 
-    #tlw-header-{{ section.id }} .tlw-header__cart { margin-left: auto; }
+    #tlw-header-{{ section.id }} .tlw-header__cart {
+      margin-left: auto;
+    }
 
-    .tlw-drawer { display: none !important; }
+    .tlw-drawer {
+      display: none !important;
+    }
   }
 
-  /* Phone menu: drops down under the header (its top edge is set by the script) */
+  /* ---- Phone menu ---- */
+
   .tlw-drawer {
     position: fixed;
     top: 0;
@@ -526,7 +501,9 @@
     background: rgba(0, 0, 0, 0.35);
   }
 
-  .tlw-drawer[hidden] { display: none; }
+  .tlw-drawer[hidden] {
+    display: none;
+  }
 
   .tlw-drawer__panel {
     max-height: 100%;
@@ -537,7 +514,10 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  .tlw-drawer__nav { display: flex; flex-direction: column; }
+  .tlw-drawer__nav {
+    display: flex;
+    flex-direction: column;
+  }
 
   .tlw-drawer__link {
     display: flex;
@@ -686,7 +666,7 @@
 
     window.addEventListener('resize', function () {
       if (window.innerWidth >= 1200) shut();
-            else if (menuIsOpen()) placeDrawer();
+      else if (menuIsOpen()) placeDrawer();
     });
 
     /* Dropdown triggers are buttons now (see markup), so a click never
@@ -810,7 +790,7 @@
   "settings": [
     {
       "type": "link_list",
-      "id": "menu_left",
+      "id": "menu",
       "label": "Menu",
       "info": "Edit under Content > Menus. Items with sub-items become dropdowns.",
       "default": "main-menu"
