@@ -570,8 +570,19 @@
       flex-wrap: wrap;
       justify-content: flex-end;
       row-gap: 6px;
-      gap: {{ split_gap }}px;
+      gap: clamp(8px, 1.3vw, {{ split_gap }}px);
       min-width: 0;
+    }
+
+    /* Text shrinks smoothly as the window narrows, instead of holding a
+       fixed size until it suddenly runs out of room and wraps. clamp()
+       reads as: never smaller than the first value, never bigger than the
+       last, scaling with viewport width in between. Letter-spacing is set
+       in "em" (relative to font-size), so it shrinks proportionally for
+       free as the font size drops — no separate rule needed for it. */
+    #tlw-header-{{ section.id }} .tlw-header__nav--left .tlw-nav__link,
+    #tlw-header-{{ section.id }} .tlw-header__nav--right .tlw-nav__link {
+      font-size: clamp(11px, 3px + 0.625vw, {{ section.settings.link_size }}px);
     }
 
     #tlw-header-{{ section.id }} .tlw-header__logo {
@@ -588,7 +599,7 @@
       flex-wrap: wrap;
       justify-content: flex-start;
       row-gap: 6px;
-      gap: {{ split_gap }}px;
+      gap: clamp(8px, 1.3vw, {{ split_gap }}px);
       min-width: 0;
     }
 
