@@ -19,13 +19,20 @@
   header. Items with sub-items show a chevron and open with a tap, one at a
   time, so the list stays short.
 
-  Desktop nav overflow safety: the left/right nav blocks are hard-capped
-  (max-width, below) to never extend past the space outside the centred
-  logo's own footprint, and wrap onto a second line if a menu doesn't fit in
-  one — so a long menu can never visually collide with the logo, at any
-  screen width. This means the breakpoint below (currently 1200px) is just
-  "is this a desktop", not a number chosen to dodge the overlap bug — it's
-  now structurally impossible for the nav to overlap the logo.
+  Desktop layout: CSS Grid, not flexbox-with-an-absolutely-positioned-logo.
+  The row is five real grid columns — [spacer][nav-left][logo][nav-right]
+  [cart] — with nav-left/nav-right on `minmax(0, 1fr)` tracks. A grid track
+  is a hard boundary a sibling can't be visually crossed into (unlike a
+  flex layout, where an absolutely-positioned logo is pulled out of the
+  flex formatting context entirely and stops reserving any space, letting
+  a long nav visually bleed into it) — so a long menu wraps onto a second
+  line inside its own column instead of spilling into the logo's column,
+  at any screen width. The leading "spacer" column is empty and invisible
+  but renders the same cart icon markup as the real cart, purely so its
+  width mirrors the cart column and the logo sits at the row's true visual
+  centre rather than centred only between the two nav blocks. This means
+  the breakpoint below (currently 1200px) is just "is this a desktop", not
+  a number chosen to dodge the overlap bug.
 {% endcomment %}
 
 {%- liquid
@@ -44,6 +51,20 @@
   {% if is_home %}data-overlay{% endif %}
 >
   <div class="tlw-header__inner">
+
+    {% comment %}
+      Desktop-only, invisible spacer. Same markup as the cart icon below so
+      it always renders at exactly the same width, which balances the
+      cart's width on the opposite end of the row and keeps the logo at
+      the row's true visual centre. Hidden on mobile; see the media query.
+    {% endcomment %}
+    <div class="tlw-header__spacer" aria-hidden="true">
+      <svg viewBox="0 0 22 24" width="22" height="24" aria-hidden="true">
+        <path d="M2 7h18v15a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M7 8V5.5a4 4 0 0 1 8 0V8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <span class="tlw-header__count">{{ cart.item_count }}</span>
+    </div>
 
     {% comment %} Mobile: hamburger {% endcomment %}
     <button
@@ -469,6 +490,14 @@
     display: inline-flex;
   }
 
+  /* Desktop-only mirror of the cart, see markup comment. Never shown on
+     mobile, where the row is burger / logo / cart with nothing to balance. */
+  #tlw-header-{{ section.id }} .tlw-header__spacer {
+    display: none;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
   #tlw-header-{{ section.id }} .tlw-header__count {
     position: absolute;
     top: -4px;
@@ -521,29 +550,45 @@
   #tlw-header-{{ section.id }} .tlw-header__burger { order: 2; }
   #tlw-header-{{ section.id }} .tlw-header__cart { order: 3; }
 
-  /* Desktop split-nav. 1200px covers virtually every real laptop/desktop
-     screen (1280, 1366, 1440, 1536, 1920...). Nothing here relies on a wide
-     breakpoint to dodge the overlap bug any more — the nav's own max-width
-     keeps it physically out of the logo's central footprint at any width,
-     wrapping onto a second line if a menu is too long to fit on one, rather
-     than spilling sideways into the logo. */
+  /* Desktop split-nav, as a real 5-column grid: spacer / nav-left / logo /
+     nav-right / cart. 1200px covers virtually every real laptop/desktop
+     screen (1280, 1366, 1440, 1536, 1920...). Nav-left and nav-right sit on
+     minmax(0, 1fr) tracks, which is a hard boundary neither can be visually
+     pushed past — a long menu wraps onto a second line inside its own
+     column instead of spilling into the logo's column, at any width. */
   @media (min-width: 1200px) {
     #tlw-header-{{ section.id }} .tlw-header__burger { display: none; }
-    #tlw-header-{{ section.id }} .tlw-header__inner { position: relative; }
+
+    #tlw-header-{{ section.id }} .tlw-header__inner {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr) auto;
+      align-items: center;
+    }
+
+    #tlw-header-{{ section.id }} .tlw-header__spacer {
+      display: inline-flex;
+      grid-column: 1;
+    }
+
     #tlw-header-{{ section.id }} .tlw-header__nav {
       display: flex;
       flex-wrap: wrap;
       row-gap: 6px;
-      max-width: calc(50% - {{ section.settings.logo_width | divided_by: 2 }}px - 24px);
     }
+
+    #tlw-header-{{ section.id }} .tlw-header__nav--left { grid-column: 2; }
+
     #tlw-header-{{ section.id }} .tlw-header__logo {
-      order: 0;
-      position: absolute;
-      left: 50%;
-      transform: translateX(calc(-50% + {{ section.settings.logo_nudge }}px));
+      grid-column: 3;
+      position: relative;
+      left: {{ section.settings.logo_nudge }}px;
       margin-inline: 0;
     }
-    #tlw-header-{{ section.id }} .tlw-header__cart { order: 0; }
+
+    #tlw-header-{{ section.id }} .tlw-header__nav--right { grid-column: 4; }
+
+    #tlw-header-{{ section.id }} .tlw-header__cart { grid-column: 5; }
+
     .tlw-drawer { display: none !important; }
   }
 
