@@ -2,11 +2,13 @@
   THELACEDWÁY services page
   Home of Amare Studio
 
-  Built from src/routes/services.tsx + src/components/BookingPolicies.tsx.
-  Full-bleed video hero (separate desktop/mobile clips, matching tlw-main-hero's
-  convention), opening hours + contact card, booking summary line, a 5-panel
-  booking policy accordion (native <details>, no JS needed), an appointment
-  CTA linking to Acuity, and a pinned floating "Book now" button.
+  Built from src/routes/services.tsx. Full-bleed video hero (separate
+  desktop/mobile clips, matching tlw-main-hero's convention), opening hours +
+  contact card, a simple "Book an Appointment" section linking to Acuity, and
+  a pinned floating "Book now" button. The detailed booking policies (deposit,
+  cancellation window, arrival, hair prep, etc.) were deliberately removed
+  from the page — customers see the full policies when they go through to
+  book, so this page stays short and just gets them to the booking link.
 
   Assign this section to the Services page template. Desktop video must be
   uploaded as mp4, not .mov, same rule as the homepage hero.
@@ -77,7 +79,7 @@
         <div class="tlw-services__rule"></div>
         <p class="tlw-body-lg" style="color: rgba(255,255,255,0.85); margin-top: 24px;">{{ section.settings.hero_intro }}</p>
         {%- if section.settings.hero_cta_label != blank -%}
-          <a href="#tlw-booking-policies-{{ section.id }}" class="tlw-services__hero-cta">{{ section.settings.hero_cta_label }}</a>
+          <a href="#tlw-book-appointment-{{ section.id }}" class="tlw-services__hero-cta">{{ section.settings.hero_cta_label }}</a>
         {%- endif -%}
       </div>
     </div>
@@ -106,46 +108,8 @@
       </div>
     </div>
 
-    {% comment %} Booking summary line {% endcomment %}
-    <div class="tlw-services__summary">
-      <p class="tlw-body-md" style="color: var(--tlw-on-surface-variant); margin: 0;">
-        <span style="font-weight: 500; color: var(--tlw-primary);">{{ section.settings.deposit_amount }}</span> deposit
-        <span style="color: var(--tlw-accent); opacity: 0.5; margin: 0 4px;">&middot;</span>
-        cancel <span style="font-weight: 500; color: var(--tlw-primary);">{{ section.settings.cancel_window }}</span> ahead
-        <span style="color: var(--tlw-accent); opacity: 0.5; margin: 0 4px;">&middot;</span>
-        <a href="#tlw-booking-policies-{{ section.id }}" class="tlw-services__link">Read full booking policies</a>
-      </p>
-    </div>
-
-    {% comment %} Booking policies accordion {% endcomment %}
-    <section class="tlw-services__policies" id="tlw-booking-policies-{{ section.id }}">
-      <p class="tlw-label-caps" style="color: var(--tlw-accent);">{{ section.settings.policies_eyebrow }}</p>
-      <h2 class="tlw-headline-md" style="color: var(--tlw-primary); margin-top: 12px;">{{ section.settings.policies_heading }}</h2>
-      <div class="tlw-body-md tlw-services__policies-intro" style="color: var(--tlw-on-surface-variant);">
-        {{ section.settings.policies_intro }}
-      </div>
-
-      <div class="tlw-services__panels">
-        {%- for block in section.blocks -%}
-          {%- if block.type == 'panel' -%}
-            <details class="tlw-services__panel" {{ block.shopify_attributes }}>
-              <summary class="tlw-services__panel-summary">
-                <span class="tlw-body-md" style="color: var(--tlw-primary);">{{ block.settings.label }}</span>
-                <svg class="tlw-services__panel-chevron" viewBox="0 0 12 8" width="14" height="10" aria-hidden="true">
-                  <path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
-              </summary>
-              <div class="tlw-services__panel-body tlw-body-md">
-                {{ block.settings.body }}
-              </div>
-            </details>
-          {%- endif -%}
-        {%- endfor -%}
-      </div>
-    </section>
-
-    {% comment %} Appointment CTA {% endcomment %}
-    <div class="tlw-services__appointments">
+    {% comment %} Book an Appointment {% endcomment %}
+    <div class="tlw-services__appointments" id="tlw-book-appointment-{{ section.id }}">
       <p class="tlw-label-caps" style="color: var(--tlw-accent);">{{ section.settings.appointments_eyebrow }}</p>
       <h2 class="tlw-display-lg" style="color: var(--tlw-primary); margin-top: 16px;">{{ section.settings.appointments_heading }}</h2>
       <p class="tlw-body-md" style="color: var(--tlw-on-surface-variant); max-width: 42ch; margin: 24px auto 0;">
@@ -344,88 +308,10 @@
     color: var(--tlw-primary);
   }
 
-  #tlw-services-{{ section.id }} .tlw-services__summary {
-    margin-top: 40px;
-    border-top: 1px solid var(--tlw-outline-variant);
-    border-bottom: 1px solid var(--tlw-outline-variant);
-    padding: 16px 0;
-  }
-
-  #tlw-services-{{ section.id }} .tlw-services__policies {
-    margin-top: 48px;
-    scroll-margin-top: calc(var(--tlw-header-h, 96px) + 16px);
-  }
-
-  @media (min-width: 768px) {
-    #tlw-services-{{ section.id }} .tlw-services__policies { margin-top: 64px; }
-  }
-
-  #tlw-services-{{ section.id }} .tlw-services__policies-intro {
-    margin-top: 24px;
-    max-width: 58ch;
-    line-height: 1.6;
-  }
-
-  #tlw-services-{{ section.id }} .tlw-services__panels {
-    margin-top: 48px;
-  }
-
-  #tlw-services-{{ section.id }} .tlw-services__panel {
-    border-top: 1px solid var(--tlw-outline-variant);
-  }
-
-  #tlw-services-{{ section.id }} .tlw-services__panel:last-child {
-    border-bottom: 1px solid var(--tlw-outline-variant);
-  }
-
-  #tlw-services-{{ section.id }} .tlw-services__panel-summary {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    min-height: 44px;
-    padding: 20px 0;
-    cursor: pointer;
-  }
-
-  #tlw-services-{{ section.id }} .tlw-services__panel-summary::-webkit-details-marker {
-    display: none;
-  }
-
-  #tlw-services-{{ section.id }} .tlw-services__panel-chevron {
-    color: var(--tlw-primary);
-    flex-shrink: 0;
-    transition: transform 400ms ease;
-  }
-
-  #tlw-services-{{ section.id }} .tlw-services__panel[open] .tlw-services__panel-chevron {
-    transform: rotate(180deg);
-  }
-
-  #tlw-services-{{ section.id }} .tlw-services__panel-body {
-    max-width: 62ch;
-    padding-bottom: 28px;
-    color: var(--tlw-on-surface-variant);
-    line-height: 1.65;
-  }
-
-  #tlw-services-{{ section.id }} .tlw-services__panel-body p {
-    margin: 0 0 14px;
-  }
-
-  #tlw-services-{{ section.id }} .tlw-services__panel-body p:last-child {
-    margin-bottom: 0;
-  }
-
-  #tlw-services-{{ section.id }} .tlw-services__panel-body strong {
-    font-weight: 500;
-    color: var(--tlw-primary);
-  }
-
   #tlw-services-{{ section.id }} .tlw-services__appointments {
     margin-top: 96px;
     text-align: center;
+    scroll-margin-top: calc(var(--tlw-header-h, 96px) + 16px);
   }
 
   @media (min-width: 768px) {
@@ -550,8 +436,8 @@
       "type": "text",
       "id": "hero_cta_label",
       "label": "Hero button label",
-      "info": "Scrolls to the booking policies section. Desktop only.",
-      "default": "Booking policies"
+      "info": "Scrolls to the Book an Appointment section. Desktop only.",
+      "default": "Book an appointment"
     },
     {
       "type": "header",
@@ -577,45 +463,7 @@
     },
     {
       "type": "header",
-      "content": "Booking summary line"
-    },
-    {
-      "type": "text",
-      "id": "deposit_amount",
-      "label": "Deposit amount",
-      "default": "\u00a330"
-    },
-    {
-      "type": "text",
-      "id": "cancel_window",
-      "label": "Cancellation window",
-      "default": "48 hours"
-    },
-    {
-      "type": "header",
-      "content": "Booking policies"
-    },
-    {
-      "type": "text",
-      "id": "policies_eyebrow",
-      "label": "Eyebrow",
-      "default": "Before you book"
-    },
-    {
-      "type": "text",
-      "id": "policies_heading",
-      "label": "Heading",
-      "default": "Booking policies"
-    },
-    {
-      "type": "richtext",
-      "id": "policies_intro",
-      "label": "Intro text",
-      "default": "<p>Slots are released on the 18th of each month at 8pm for the following month. If your date is unavailable we are either fully booked or away that day, so email us and we will see what we can do. We are in Enfield, North London, nearest station Brimsdown, and the exact address comes with your confirmation.</p>"
-    },
-    {
-      "type": "header",
-      "content": "Appointment CTA"
+      "content": "Book an Appointment"
     },
     {
       "type": "text",
@@ -655,64 +503,9 @@
       "default": "Book now"
     }
   ],
-  "blocks": [
-    {
-      "type": "panel",
-      "name": "Policy panel",
-      "settings": [
-        {
-          "type": "text",
-          "id": "label",
-          "label": "Panel label"
-        },
-        {
-          "type": "richtext",
-          "id": "body",
-          "label": "Panel body"
-        }
-      ]
-    }
-  ],
   "presets": [
     {
-      "name": "TLW Services",
-      "blocks": [
-        {
-          "type": "panel",
-          "settings": {
-            "label": "Deposit and payment",
-            "body": "<p>All services require a non-refundable <strong>\u00a330</strong> deposit to confirm your appointment. The remaining balance is due in cash on the day. There are no refunds once the service is complete. If something is wrong with your hair, contact us within <strong>48 hours</strong> and we will put it right.</p>"
-          }
-        },
-        {
-          "type": "panel",
-          "settings": {
-            "label": "Cancelling or rescheduling",
-            "body": "<p>You can reschedule or cancel up to <strong>48 hours</strong> before your appointment. Bookings made within 48 hours, or on a day we are normally closed, carry a <strong>\u00a335</strong> emergency booking charge. Working bank holidays also carry a <strong>\u00a335</strong> charge.</p>"
-          }
-        },
-        {
-          "type": "panel",
-          "settings": {
-            "label": "Arriving late",
-            "body": "<p>Arriving more than <strong>15 minutes</strong> late adds a <strong>\u00a315</strong> late fee. Arriving more than <strong>30 minutes</strong> late means the appointment is cancelled.</p>"
-          }
-        },
-        {
-          "type": "panel",
-          "settings": {
-            "label": "How to arrive",
-            "body": "<p>Please come with your hair in <strong>8 to 12</strong> neat cornrows so the unit lays flat and finishes seamlessly. If you need a braid down, select it as an add-on before booking rather than on the day.</p><p>If you bought your unit from us, book under \"Unit Purchased from Us\" and allow at least <strong>7 working days</strong> between your order date and your appointment so your unit can arrive and be prepared. You will get a confirmation email once your order and booking are both in.</p><p>If you are sending or dropping off hair, it needs to reach us at least <strong>7 days</strong> before your appointment. Less than <strong>5 days</strong> before adds a <strong>\u00a315</strong> late fee, and less than <strong>2 days</strong> before is treated as an emergency booking at <strong>\u00a335</strong> or the appointment may be cancelled. Drop off is at the same place as your appointment, so message us or check our Instagram story for times, and confirm the postage address with us first as it is different.</p>"
-          }
-        },
-        {
-          "type": "panel",
-          "settings": {
-            "label": "Your unit",
-            "body": "<p>We only accept <strong>13x6</strong> HD frontals for frontal wig installations. If your head size is <strong>20 inches</strong> or smaller, a <strong>13x4</strong> HD frontal is fine.</p><p>If you are buying a ready-made factory wig, make sure the vendor supplies a full frontal wig and not a \"lace front\", as lace fronts restrict you to a middle part. Thick knots or thick lace are <strong>not accepted</strong>.</p><p>Please check your unit comfortably covers your hairline, as we cannot install a unit that is too small. Units that do not fit will not be installed. If you are unsure, send us a video before your appointment and we will confirm.</p>"
-          }
-        }
-      ]
+      "name": "TLW Services"
     }
   ]
 }
