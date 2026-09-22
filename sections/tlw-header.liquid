@@ -512,15 +512,20 @@
   #tlw-header-{{ section.id }} .tlw-header__burger { order: 2; }
   #tlw-header-{{ section.id }} .tlw-header__cart { order: 3; }
 
-  @media (min-width: 1300px) {
+   @media (min-width: 1600px) {
     #tlw-header-{{ section.id }} .tlw-header__burger { display: none; }
-
-    #tlw-header-{{ section.id }} .tlw-header__inner {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto;
-      align-items: center;
-      column-gap: 16px;
+    #tlw-header-{{ section.id }} .tlw-header__nav { display: flex; }
+    #tlw-header-{{ section.id }} .tlw-header__inner { position: relative; }
+    #tlw-header-{{ section.id }} .tlw-header__logo {
+      order: 0;
+      position: absolute;
+      left: 50%;
+      transform: translateX(calc(-50% + {{ section.settings.logo_nudge }}px));
+      margin-inline: 0;
     }
+    #tlw-header-{{ section.id }} .tlw-header__cart { order: 0; }
+    .tlw-drawer { display: none !important; }
+  }
 
     #tlw-header-{{ section.id }} .tlw-header__nav {
       display: flex;
