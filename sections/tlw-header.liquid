@@ -2,11 +2,9 @@
   THELACEDWÁY header
   Home of Amare Studio
 
-  Logo on the far left, then the nav, then the cart pinned to the far right.
-  Two Shopify menus feed the nav — Left menu and Right menu, edited under
-  Content > Menus — but on screen they now just run together as one
-  continuous list right after the logo; the two settings are kept only so
-  Destinee's existing menu setup and this section's settings don't change.
+  Logo on the far left, then the nav, then the cart pinned to the far
+  right. One Shopify menu feeds the nav (the "Menu" setting, edited under
+  Content > Menus).
 
   The transparent, hide-until-scroll "over the hero" treatment is homepage
   only, matching src/components/HomePage.tsx passing <SiteNav overlay /> —
@@ -37,7 +35,6 @@
 
 {%- liquid
   assign left = section.settings.menu_left
-  assign right = section.settings.menu_right
   assign is_home = false
   if template.name == 'index'
     assign is_home = true
@@ -52,18 +49,12 @@
 >
   <div class="tlw-header__inner">
 
-    {% comment %} Mobile: hamburger {% endcomment %}
-    <button
-      type="button"
-      class="tlw-header__burger"
-      data-menu-toggle
-      aria-label="Open menu"
-      aria-expanded="false"
-    >
-      <span></span><span></span><span></span>
-    </button>
-
-    {% comment %} Logo — first in the row, so it's the far-left item on desktop {% endcomment %}
+    {% comment %}
+      Logo — first in the DOM. On mobile that alone puts it on the left,
+      with the hamburger and cart following after it (see markup below) —
+      no CSS `order` needed to get that arrangement, it's just the literal
+      order these tags appear in. On desktop it's simply the far-left item.
+    {% endcomment %}
     <div class="tlw-header__logo">
       <a href="{{ routes.root_url }}">
         {%- if section.settings.logo_light != blank -%}
@@ -84,34 +75,24 @@
     </div>
 
     {% comment %}
-      Desktop: nav. Left menu and Right menu render one after another here
-      so they read as one continuous list right after the logo — see the
-      top comment for why they're still two separate settings.
+      Mobile: hamburger. Comes right after the logo in the markup — on
+      mobile, nav is hidden and cart comes after this, so the visible row
+      is simply logo, then hamburger, then cart, left to right, matching
+      the DOM, with nothing relying on CSS order to rearrange it.
     {% endcomment %}
+    <button
+      type="button"
+      class="tlw-header__burger"
+      data-menu-toggle
+      aria-label="Open menu"
+      aria-expanded="false"
+    >
+      <span></span><span></span><span></span>
+    </button>
+
+    {% comment %} Desktop: nav, one menu {% endcomment %}
     <nav class="tlw-header__nav" aria-label="Main">
       {%- for link in left.links -%}
-        <div class="tlw-nav__item{% if link.links.size > 0 %} has-children{% endif %}">
-          {%- if link.links.size > 0 -%}
-            <button type="button" class="tlw-nav__link" aria-expanded="false" aria-haspopup="true">
-              {{ link.title }}
-              <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true">
-                <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/>
-              </svg>
-            </button>
-      {%- else -%}
-            <a class="tlw-nav__link" href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>{{ link.title }}</a>
-          {%- endif -%}
-
-          {%- if link.links.size > 0 -%}
-            <div class="tlw-nav__drop">
-              {%- for child in link.links -%}
-                <a class="tlw-nav__droplink" href="{{ child.url }}">{{ child.title }}</a>
-              {%- endfor -%}
-            </div>
-          {%- endif -%}
-        </div>
-      {%- endfor -%}
-      {%- for link in right.links -%}
         <div class="tlw-nav__item{% if link.links.size > 0 %} has-children{% endif %}">
           {%- if link.links.size > 0 -%}
             <button type="button" class="tlw-nav__link" aria-expanded="false" aria-haspopup="true">
@@ -163,27 +144,6 @@
               <svg class="tlw-drawer__chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
             </button>
             <div class="tlw-drawer__sub" id="tlw-sub-{{ section.id }}-l{{ forloop.index }}">
-              {%- if section.settings.drawer_view_all and list.url != blank and list.url != '#' -%}
-                <a class="tlw-drawer__sublink" href="{{ list.url }}">All {{ list.title }}</a>
-              {%- endif -%}
-              {%- for child in list.links -%}
-                <a class="tlw-drawer__sublink" href="{{ child.url }}">{{ child.title }}</a>
-              {%- endfor -%}
-            </div>
-          </div>
-        {%- else -%}
-          <a class="tlw-drawer__link" href="{{ list.url }}">{{ list.title }}</a>
-        {%- endif -%}
-      {%- endfor -%}
-
-      {%- for list in right.links -%}
-        {%- if list.links.size > 0 -%}
-          <div class="tlw-drawer__group">
-            <button type="button" class="tlw-drawer__link tlw-drawer__link--parent" data-drawer-toggle aria-expanded="false" aria-controls="tlw-sub-{{ section.id }}-r{{ forloop.index }}">
-              <span>{{ list.title }}</span>
-              <svg class="tlw-drawer__chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
-            </button>
-            <div class="tlw-drawer__sub" id="tlw-sub-{{ section.id }}-r{{ forloop.index }}">
               {%- if section.settings.drawer_view_all and list.url != blank and list.url != '#' -%}
                 <a class="tlw-drawer__sublink" href="{{ list.url }}">All {{ list.title }}</a>
               {%- endif -%}
@@ -523,10 +483,13 @@
     transform: translateY(-9.25px) rotate(-45deg);
   }
 
-  /* Mobile: logo left, burger and bag together on the right. */
-  #tlw-header-{{ section.id }} .tlw-header__logo { order: 1; margin-inline: 0 auto; }
-  #tlw-header-{{ section.id }} .tlw-header__burger { order: 2; }
-  #tlw-header-{{ section.id }} .tlw-header__cart { order: 3; }
+  /* Mobile: logo left, burger and bag together on the right. This now
+     comes from plain DOM order (logo, then burger, then cart, exactly as
+     they appear in the markup) plus margin-right: auto on the logo alone,
+     which pushes the burger and cart as a pair over to the right edge.
+     No CSS `order` property is used here at all — one less thing that
+     could disagree with what's actually in the markup. */
+  #tlw-header-{{ section.id }} .tlw-header__logo { margin-inline: 0 auto; }
 
   /* Desktop: one plain flex row, nothing removed from flow. Logo, then
      nav, then cart, in that literal DOM order (so no `order` overrides
@@ -848,14 +811,9 @@
     {
       "type": "link_list",
       "id": "menu_left",
-      "label": "Left menu",
+      "label": "Menu",
       "info": "Edit under Content > Menus. Items with sub-items become dropdowns.",
       "default": "main-menu"
-    },
-    {
-      "type": "link_list",
-      "id": "menu_right",
-      "label": "Right menu"
     },
     {
       "type": "header",
