@@ -20,19 +20,22 @@
   time, so the list stays short.
 
   Desktop layout: CSS Grid, not flexbox-with-an-absolutely-positioned-logo.
-  The row is five real grid columns — [spacer][nav-left][logo][nav-right]
-  [cart] — with nav-left/nav-right on `minmax(0, 1fr)` tracks. A grid track
-  is a hard boundary a sibling can't be visually crossed into (unlike a
-  flex layout, where an absolutely-positioned logo is pulled out of the
-  flex formatting context entirely and stops reserving any space, letting
-  a long nav visually bleed into it) — so a long menu wraps onto a second
-  line inside its own column instead of spilling into the logo's column,
-  at any screen width. The leading "spacer" column is empty and invisible
-  but renders the same cart icon markup as the real cart, purely so its
-  width mirrors the cart column and the logo sits at the row's true visual
-  centre rather than centred only between the two nav blocks. This means
-  the breakpoint below (currently 1200px) is just "is this a desktop", not
-  a number chosen to dodge the overlap bug.
+  The row is three real grid columns — [nav-left][logo][nav-right+cart] —
+  with the two outer columns both on `minmax(0, 1fr)` tracks. Because
+  they're the same fraction unit, the two tracks are always exactly equal
+  width, whatever is rendered inside them — which is what keeps the logo
+  column genuinely centred, with no separate spacer element needed. A grid
+  track is also a hard boundary a sibling can't be visually crossed into
+  (unlike a flex layout, where an absolutely-positioned logo is pulled out
+  of the flex formatting context entirely and stops reserving any space,
+  letting a long nav visually bleed into it) — so a long menu wraps onto a
+  second line inside its own column instead of spilling into the logo's
+  column, at any screen width. The cart sits inside the same right-hand
+  column as the right nav (a small flex row, right-aligned as a group) so
+  the two outer columns stay symmetric 1fr/1fr rather than needing to
+  balance an extra column. This means the breakpoint below (currently
+  1200px) is just "is this a desktop", not a number chosen to dodge the
+  overlap bug.
 {% endcomment %}
 
 {%- liquid
