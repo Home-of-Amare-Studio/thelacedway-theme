@@ -296,6 +296,38 @@
         {%- endunless -%}
 
         {% comment %}
+          ---------- QUANTITY ----------
+          A plain stepper, not a Shopify variant — every unit is the same
+          price, so this just multiplies the line item quantity on submit.
+        {% endcomment %}
+        {%- if section.settings.show_quantity -%}
+          <div class="tlw-field">
+            <label class="tlw-label-caps tlw-field__label" id="tlw-qty-label-{{ section.id }}">
+              Quantity
+            </label>
+            <div class="tlw-qty" data-quantity-wrap>
+              <button type="button" class="tlw-qty__btn" data-quantity-decrease aria-label="Decrease quantity">
+                <svg viewBox="0 0 12 2" width="12" height="2" aria-hidden="true"><path d="M0 1h12" stroke="currentColor" stroke-width="1.4"/></svg>
+              </button>
+              <input
+                type="number"
+                class="tlw-qty__input"
+                id="tlw-qty-{{ section.id }}"
+                aria-labelledby="tlw-qty-label-{{ section.id }}"
+                data-quantity-input
+                min="1"
+                step="1"
+                inputmode="numeric"
+                value="1"
+              >
+              <button type="button" class="tlw-qty__btn" data-quantity-increase aria-label="Increase quantity">
+                <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M6 0v12M0 6h12" stroke="currentColor" stroke-width="1.4"/></svg>
+              </button>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {% comment %}
           ---------- SERVICE OPTIONS ----------
           Each block is one dropdown. Up to 3 of its choices can each carry
           their own add-on product and price — most options only use the
@@ -1280,6 +1312,49 @@
     transform: rotate(180deg);
   }
 
+  #tlw-product-{{ section.id }} .tlw-qty {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    width: fit-content;
+    border-bottom: 1px solid var(--tlw-outline);
+    padding: 6px 0;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-qty__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--tlw-primary);
+    cursor: pointer;
+    transition: color 200ms ease;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-qty__btn:hover {
+    color: var(--tlw-accent);
+  }
+
+  #tlw-product-{{ section.id }} .tlw-qty__input {
+    width: 48px;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-family: var(--tlw-font-body);
+    font-size: 15px;
+    color: var(--tlw-primary);
+    -moz-appearance: textfield;
+  }
+
+  #tlw-product-{{ section.id }} .tlw-qty__input::-webkit-outer-spin-button,
+  #tlw-product-{{ section.id }} .tlw-qty__input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
   #tlw-product-{{ section.id }} .tlw-dropdown__panel {
     position: absolute;
     top: 100%;
@@ -2259,6 +2334,34 @@
       if (e.target.matches('[data-variant-option], [data-service-option]')) refresh();
     });
 
+    /* ---- quantity stepper (plain multiplier, not a variant) ---- */
+    var qtyInput = root.querySelector('[data-quantity-input]');
+    var qtyDecrease = root.querySelector('[data-quantity-decrease]');
+    var qtyIncrease = root.querySelector('[data-quantity-increase]');
+
+    function currentQuantity() {
+      if (!qtyInput) return 1;
+      var n = parseInt(qtyInput.value, 10);
+      if (!n || n < 1) n = 1;
+      return n;
+    }
+
+    if (qtyInput) {
+      qtyInput.addEventListener('change', function () {
+        qtyInput.value = currentQuantity();
+      });
+    }
+    if (qtyDecrease) {
+      qtyDecrease.addEventListener('click', function () {
+        qtyInput.value = Math.max(1, currentQuantity() - 1);
+      });
+    }
+    if (qtyIncrease) {
+      qtyIncrease.addEventListener('click', function () {
+        qtyInput.value = currentQuantity() + 1;
+      });
+    }
+
     /* ---- gallery: clicking a thumbnail swaps the main display ---- */
     var mainEl = root.querySelector('[data-main-media]');
     var thumbEls = root.querySelectorAll('[data-thumb]');
@@ -2315,6 +2418,7 @@
       var variant = currentVariant();
       if (!variant) return;
 
+      var quantity = currentQuantity();
       var productTitle = form.dataset.productTitle;
       var properties = {};
       var addons = [];
@@ -2333,13 +2437,15 @@
         if (match) {
           addons.push({
             id: match.variantId,
-            quantity: 1,
+            /* scales with quantity: e.g. 3 jet-black bundles charges the
+               add-on 3 times, once per unit being dyed */
+            quantity: quantity,
             properties: { 'Add-on for': productTitle, '_Bag group': bagGroup }
           });
         }
       });
 
-      var items = [{ id: variant.id, quantity: 1, properties: properties }].concat(addons);
+      var items = [{ id: variant.id, quantity: quantity, properties: properties }].concat(addons);
 
       buttonText.textContent = 'Adding...';
       button.disabled = true;
@@ -2778,6 +2884,13 @@
       "id": "unit_details_mode",
       "label": "Ready to Ship: show fixed Unit Details card",
       "info": "Use on Ready to Ship templates \u2014 the unit is already made, so there's nothing to customise. Turns off every dropdown and just lists the specs from the description.",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quantity",
+      "label": "Show a quantity selector",
+      "info": "Use on Bundles templates \u2014 lets a customer order more than one at the same price each. Leave off for made-to-order units like wigs and lace systems.",
       "default": false
     },
     {
