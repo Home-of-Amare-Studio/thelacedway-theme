@@ -290,6 +290,17 @@
   #tlw-header-{{ section.id }} .tlw-header__logo {
     flex: 0 0 auto;
     margin-right: auto;
+    /* !important below: this section has a leftover "Custom CSS" entry
+       saved in the theme customizer (outside this file, in the section's
+       own settings) that forces the logo to position: absolute + centered
+       at desktop widths. Shopify injects that snippet back in after this
+       file's own styles every time, so no ordinary rule here can beat it —
+       only !important can. This keeps the logo a normal, space-reserving
+       flex item at every width so it can never float on top of the nav
+       again, even if that old setting is never cleaned up. */
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
   }
 
   #tlw-header-{{ section.id }} .tlw-header__logo img {
@@ -469,8 +480,8 @@
 
     #tlw-header-{{ section.id }} .tlw-header__logo {
       margin-right: 0;
-      position: relative;
-      left: {{ section.settings.logo_nudge }}px;
+      position: relative !important;
+      left: {{ section.settings.logo_nudge }}px !important;
     }
 
     #tlw-header-{{ section.id }} .tlw-header__nav {
