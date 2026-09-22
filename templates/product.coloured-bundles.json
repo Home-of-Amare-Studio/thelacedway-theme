@@ -555,7 +555,7 @@
         "explore_body": "Every bundle is hand-picked and quality-checked before dispatch. See the full collection.",
         "explore_button": "Back to {collection}",
         "explore_fallback": "our collections",
-        "show_quantity": true
+        "show_quantity": false
       }
     }
   },
