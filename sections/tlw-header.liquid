@@ -18,6 +18,14 @@
   Phone menu: the hamburger turns into an X and the menu drops down under the
   header. Items with sub-items show a chevron and open with a tap, one at a
   time, so the list stays short.
+
+  Desktop nav overflow safety: the left/right nav blocks are hard-capped
+  (max-width, below) to never extend past the space outside the centred
+  logo's own footprint, and wrap onto a second line if a menu doesn't fit in
+  one — so a long menu can never visually collide with the logo, at any
+  screen width. This means the breakpoint below (currently 1200px) is just
+  "is this a desktop", not a number chosen to dodge the overlap bug — it's
+  now structurally impossible for the nav to overlap the logo.
 {% endcomment %}
 
 {%- liquid
@@ -334,6 +342,7 @@
   #tlw-header-{{ section.id }} .tlw-header__nav {
     display: none;
     flex: 1;
+    min-width: 0;
     align-items: center;
     gap: {{ section.settings.link_gap }}px;
   }
@@ -512,10 +521,21 @@
   #tlw-header-{{ section.id }} .tlw-header__burger { order: 2; }
   #tlw-header-{{ section.id }} .tlw-header__cart { order: 3; }
 
-   @media (min-width: 1600px) {
+  /* Desktop split-nav. 1200px covers virtually every real laptop/desktop
+     screen (1280, 1366, 1440, 1536, 1920...). Nothing here relies on a wide
+     breakpoint to dodge the overlap bug any more — the nav's own max-width
+     keeps it physically out of the logo's central footprint at any width,
+     wrapping onto a second line if a menu is too long to fit on one, rather
+     than spilling sideways into the logo. */
+  @media (min-width: 1200px) {
     #tlw-header-{{ section.id }} .tlw-header__burger { display: none; }
-    #tlw-header-{{ section.id }} .tlw-header__nav { display: flex; }
     #tlw-header-{{ section.id }} .tlw-header__inner { position: relative; }
+    #tlw-header-{{ section.id }} .tlw-header__nav {
+      display: flex;
+      flex-wrap: wrap;
+      row-gap: 6px;
+      max-width: calc(50% - {{ section.settings.logo_width | divided_by: 2 }}px - 24px);
+    }
     #tlw-header-{{ section.id }} .tlw-header__logo {
       order: 0;
       position: absolute;
@@ -697,7 +717,7 @@
     });
 
     window.addEventListener('resize', function () {
-      if (window.innerWidth >= 1600) shut();
+      if (window.innerWidth >= 1200) shut();
             else if (menuIsOpen()) placeDrawer();
     });
 
@@ -864,7 +884,7 @@
     },
     {
       "type": "paragraph",
-      "content": "The transparent \"over the hero\" bar only ever shows on the homepage \u2014 this happens automatically, not via a setting, since no other page has a hero for it to sit over."
+      "content": "The transparent \"over the hero\" bar only ever shows on the homepage — this happens automatically, not via a setting, since no other page has a hero for it to sit over."
     },
     {
       "type": "checkbox",
