@@ -1,0 +1,662 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "product-information",
+      "blocks": {
+        "disclosures_g9mWze": {
+          "type": "disclosures",
+          "name": "t:names.disclosures",
+          "settings": {
+            "heading": "Disclosures",
+            "heading_preset": "h5",
+            "open_by_default": false,
+            "icon": "caret",
+            "disclosure_heading_preset": "h6",
+            "text_color": "",
+            "dividers": true,
+            "divider_color": "{{ settings.color_palette.color2 }}",
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "media-gallery": {
+          "type": "_product-media-gallery",
+          "static": true,
+          "settings": {
+            "media_presentation": "grid",
+            "media_columns": "two",
+            "image_gap": 4,
+            "large_first_image": false,
+            "icons_style": "arrow",
+            "slideshow_controls_style": "counter",
+            "slideshow_mobile_controls_style": "dots",
+            "thumbnail_position": "right",
+            "thumbnail_width": 44,
+            "thumbnail_radius": 0,
+            "aspect_ratio": "adapt",
+            "constrain_to_viewport": true,
+            "media_fit": "contain",
+            "media_radius": 0,
+            "extend_media": false,
+            "zoom": true,
+            "video_loop": false,
+            "hide_variants": true,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "product-details": {
+          "type": "_product-details",
+          "static": true,
+          "settings": {
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fill",
+            "custom_width_mobile": 100,
+            "height": "fit",
+            "details_position": "flex-start",
+            "gap": 28,
+            "sticky_details_desktop": true,
+            "background_media": "none",
+            "background_color": "",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "",
+            "border_radius": 0,
+            "padding-block-start": 24,
+            "padding-block-end": 24,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "group_icgrde": {
+              "type": "group",
+              "name": "t:names.header",
+              "settings": {
+                "content_direction": "column",
+                "vertical_on_mobile": true,
+                "horizontal_alignment": "flex-start",
+                "vertical_alignment": "center",
+                "align_baseline": false,
+                "horizontal_alignment_flex_direction_column": "flex-start",
+                "vertical_alignment_flex_direction_column": "center",
+                "gap": 12,
+                "width": "fill",
+                "custom_width": 100,
+                "width_mobile": "fill",
+                "custom_width_mobile": 100,
+                "height": "fit",
+                "custom_height": 100,
+                "background_media": "none",
+                "background_color": "",
+                "video_position": "cover",
+                "background_image_position": "cover",
+                "toggle_overlay": false,
+                "overlay_color": "#00000026",
+                "overlay_style": "solid",
+                "gradient_direction": "to top",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_color": "",
+                "border_radius": 0,
+                "link": "",
+                "open_in_new_tab": false,
+                "placeholder": "",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {
+                "text_xrnftG": {
+                  "type": "text",
+                  "name": "t:names.product_title",
+                  "settings": {
+                    "text": "<h1>{{ closest.product.title }}</h1>",
+                    "width": "100%",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "h3",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "text_color": "",
+                    "background": false,
+                    "background_color": "#00000026",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                },
+                "price_tVjtKg": {
+                  "type": "price",
+                  "settings": {
+                    "show_sale_price_first": true,
+                    "show_installments": false,
+                    "show_tax_info": false,
+                    "type_preset": "paragraph",
+                    "width": "100%",
+                    "alignment": "left",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "text_color": "",
+                    "padding-block-start": 4,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_xrnftG",
+                "price_tVjtKg"
+              ]
+            },
+            "divider_VJhene": {
+              "type": "_divider",
+              "name": "t:names.divider",
+              "settings": {
+                "thickness": 1,
+                "corner_radius": "square",
+                "divider_color": "{{ settings.color_palette.color2 }}",
+                "width_percent": 100,
+                "padding-block-start": 0,
+                "padding-block-end": 0
+              },
+              "blocks": {}
+            },
+            "variant_picker_R3rGDr": {
+              "type": "variant-picker",
+              "settings": {
+                "variant_style": "buttons",
+                "show_swatches": false,
+                "option_label_text_color": "",
+                "variant_style_class": "default",
+                "custom_variant_background": "{{ settings.color_palette.background }}",
+                "custom_variant_text": "{{ settings.color_palette.foreground }}",
+                "custom_variant_border": "{{ settings.color_palette.foreground }}",
+                "selected_variant_style_class": "default",
+                "custom_selected_variant_background": "{{ settings.color_palette.foreground }}",
+                "custom_selected_variant_text": "{{ settings.color_palette.background }}",
+                "custom_selected_variant_border": "{{ settings.color_palette.foreground }}",
+                "alignment": "left",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "buy_buttons_eYQEYi": {
+              "type": "buy-buttons",
+              "settings": {
+                "stacking": true,
+                "text_color": "",
+                "show_pickup_availability": false,
+                "gift_card_form": true,
+                "recipient_button_style": "default",
+                "recipient_button_background": "{{ settings.color_palette.background }}",
+                "recipient_button_text": "{{ settings.color_palette.foreground }}",
+                "recipient_button_border": "{{ settings.color_palette.foreground }}",
+                "selected_recipient_button_style": "default",
+                "selected_recipient_button_background": "{{ settings.color_palette.foreground }}",
+                "selected_recipient_button_text": "{{ settings.color_palette.background }}",
+                "selected_recipient_button_border": "{{ settings.color_palette.foreground }}",
+                "input_style": "default",
+                "input_background_color": "{{ settings.color_palette.background }}",
+                "input_text_color": "{{ settings.color_palette.foreground }}",
+                "input_border_color": "{{ settings.color_palette.foreground }}",
+                "border_width": 1,
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {
+                "quantity": {
+                  "type": "quantity",
+                  "static": true,
+                  "settings": {
+                    "input_style": "default",
+                    "input_background_color": "{{ settings.color_palette.background }}",
+                    "input_text_color": "{{ settings.color_palette.foreground }}",
+                    "input_border_color": "{{ settings.color_palette.foreground }}",
+                    "border_width": 1,
+                    "border_radius": 0
+                  },
+                  "blocks": {}
+                },
+                "add-to-cart": {
+                  "type": "add-to-cart",
+                  "static": true,
+                  "settings": {
+                    "style_class": "button",
+                    "custom_button_background": "{{ settings.color_palette.foreground }}",
+                    "custom_button_text": "{{ settings.color_palette.background }}",
+                    "custom_button_border": "{{ settings.color_palette.background }}"
+                  },
+                  "blocks": {}
+                },
+                "accelerated-checkout": {
+                  "type": "accelerated-checkout",
+                  "static": true,
+                  "settings": {},
+                  "blocks": {}
+                }
+              },
+              "block_order": []
+            },
+            "text_aEtTtq": {
+              "type": "text",
+              "name": "t:names.product_description",
+              "settings": {
+                "text": "{{ closest.product.description }}",
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "text_color": "",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "group_icgrde",
+            "divider_VJhene",
+            "variant_picker_R3rGDr",
+            "buy_buttons_eYQEYi",
+            "text_aEtTtq"
+          ]
+        }
+      },
+      "block_order": [
+        "disclosures_g9mWze"
+      ],
+      "disabled": true,
+      "settings": {
+        "content_width": "content-center-aligned",
+        "desktop_media_position": "left",
+        "equal_columns": false,
+        "limit_details_width": false,
+        "gap": 48,
+        "enable_sticky_add_to_cart": true,
+        "background_color": "{{ settings.color_palette.background }}",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "product_recommendations_qggXJq": {
+      "type": "product-recommendations",
+      "blocks": {
+        "text_cbcgyb": {
+          "type": "text",
+          "name": "t:names.header",
+          "settings": {
+            "text": "<h3>You may also like </h3>",
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h4",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "text_color": "",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "static-product-card": {
+          "type": "_product-card",
+          "name": "t:names.product_card",
+          "static": true,
+          "settings": {
+            "product_card_gap": 8,
+            "background_color": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 8,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_card_gallery_DNizbJ": {
+              "type": "_product-card-gallery",
+              "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "adapt",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_color": "",
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_title_M7MJkb": {
+              "type": "product-title",
+              "name": "t:names.product_title",
+              "settings": {
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "text_color": "",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 4,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "price_gLWgA6": {
+              "type": "price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h6",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "text_color": "",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "product_card_gallery_DNizbJ",
+            "product_title_M7MJkb",
+            "price_gLWgA6"
+          ]
+        }
+      },
+      "block_order": [
+        "text_cbcgyb"
+      ],
+      "disabled": true,
+      "name": "t:names.product_recommendations",
+      "settings": {
+        "product": "{{ closest.product }}",
+        "recommendation_type": "related",
+        "layout_type": "grid",
+        "carousel_on_mobile": false,
+        "max_products": 4,
+        "columns": 4,
+        "mobile_columns": "2",
+        "columns_gap": 12,
+        "rows_gap": 24,
+        "icons_style": "arrow",
+        "icons_shape": "none",
+        "section_width": "page-width",
+        "gap": 28,
+        "background_color": "{{ settings.color_palette.background }}",
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    },
+    "tlw_main_product_i4zQzg": {
+      "type": "tlw-main-product",
+      "blocks": {
+        "service_option_Pyyfgn": {
+          "type": "service_option",
+          "name": "Service option - Jet Black",
+          "settings": {
+            "label": "Jet Black",
+            "values": "No, Yes",
+            "trigger_value": "",
+            "addon_product": "",
+            "trigger_value_2": "Yes",
+            "addon_product_2": "jet-black",
+            "trigger_value_3": "",
+            "addon_product_3": "",
+            "trigger_value_4": "",
+            "addon_product_4": "",
+            "help_text": "",
+            "tooltip": "",
+            "reveal_on_customisation": false
+          }
+        },
+        "service_option_BQnRLg": {
+          "type": "service_option",
+          "name": "Service option - Customisation",
+          "settings": {
+            "label": "Customisation",
+            "values": "No, Yes",
+            "trigger_value": "",
+            "addon_product": "",
+            "trigger_value_2": "Yes",
+            "addon_product_2": "customisation",
+            "trigger_value_3": "",
+            "addon_product_3": "",
+            "trigger_value_4": "",
+            "addon_product_4": "",
+            "help_text": "",
+            "tooltip": "",
+            "reveal_on_customisation": false
+          }
+        },
+        "service_option_CcaqMm": {
+          "type": "service_option",
+          "name": "Service option - Parting Preference",
+          "settings": {
+            "label": "Parting Preference",
+            "values": "Left side part, Middle part, Right side part",
+            "trigger_value": "",
+            "addon_product": "",
+            "trigger_value_2": "",
+            "addon_product_2": "",
+            "trigger_value_3": "",
+            "addon_product_3": "",
+            "trigger_value_4": "",
+            "addon_product_4": "",
+            "help_text": "Please note: If you select a side part for a 5x5, 6x6 or 7x7 closure, the closure itself will be constructed and positioned towards your preferred side rather than in the centre.",
+            "tooltip": "",
+            "reveal_on_customisation": false
+          }
+        },
+        "service_option_TmYGdG": {
+          "type": "service_option",
+          "name": "Service option - Hairline",
+          "settings": {
+            "label": "Hairline",
+            "values": "Natural Hairline, Lagos Hairline",
+            "trigger_value": "",
+            "addon_product": "",
+            "trigger_value_2": "",
+            "addon_product_2": "",
+            "trigger_value_3": "",
+            "addon_product_3": "",
+            "trigger_value_4": "",
+            "addon_product_4": "",
+            "help_text": "",
+            "tooltip": "",
+            "reveal_on_customisation": false
+          }
+        },
+        "accordion_MVUhKj": {
+          "type": "accordion",
+          "settings": {
+            "title": "Product Details",
+            "content": "<p>{product_details}</p>"
+          }
+        },
+        "accordion_EqXGLD": {
+          "type": "accordion",
+          "settings": {
+            "title": "Hair Care",
+            "content": "<p>Our {hair_type} Hair can be washed and conditioned just like your natural hair. For the best results, we recommend using sulphate-free or organic hair care products to maintain the softness and longevity of the hair.</p><p>For best results, we recommend air drying your hair after washing. This helps retain moisture, reduces unnecessary heat exposure, and prolongs the life and quality of your hair.</p>"
+          }
+        },
+        "accordion_pXxgCh": {
+          "type": "accordion",
+          "settings": {
+            "title": "Longevity",
+            "content": "<p>With the correct maintenance and aftercare, our hair can last {lifespan}, making it a worthwhile investment.</p>"
+          }
+        },
+        "accordion_H6FcMR": {
+          "type": "accordion",
+          "settings": {
+            "title": "Closure Placement Notice",
+            "content": "<p>Please note that if you select Side Part for a 5x5, 6x6, or 7x7 closure unit the closure itself will be constructed and positioned on the side rather than in the centre. Please ensure you are happy with this before placing your order.</p><p>If you would like your closure to remain positioned in the centre but simply styled with a side part, please select Middle Part and at checkout leave a note requesting a side part. This will allow the closure to be installed centrally while still achieving your desired look.</p><p>Please note that 9x6 closure units are always constructed with the closure positioned in the centre due to the larger closure size.</p>"
+          }
+        },
+        "accordion_WQfGwf": {
+          "type": "accordion",
+          "settings": {
+            "title": "Shipping and Returns",
+            "content": "<p>Once your order has been placed, you have 24 hours to contact us if you wish to make any amendments. After this period, your order will be processed and no further changes can be made.</p><p>Each unit is custom made to order. Please allow 7-15 working days for your unit to be made before dispatch.</p><p>Once your order has been shipped, delivery typically takes:</p><ul><li>Royal Mail Tracked 24 (Tracked and Signed)</li><li>Royal Mail Special Delivery (Covers parcel if lost): Next working day before 1pm.</li></ul><p>For full details, please refer to our <a href=\"/pages/shipping-returns\">Shipping &amp; Returns Policy</a>.</p>"
+          }
+        },
+        "accordion_PhEhKH": {
+          "type": "accordion",
+          "settings": {
+            "title": "How to Measure Your Head",
+            "content": "<p>To ensure the best fit, we recommend measuring your head before selecting your wig size.</p><p>Using a soft measuring tape, start at the centre of your hairline and wrap the tape around your head, passing just above your ears and around the nape of your neck before bringing it back to the starting point.</p><p>This measurement is your head circumference and will help you choose the correct cap size for the most secure and comfortable fit.</p><p>Please note: We strongly recommend measuring your head accurately before placing your order. As all units are custom-made, we cannot accept responsibility for incorrect measurements provided by the customer and cap sizes cannot be changed once production has begun.</p>"
+          }
+        },
+        "accordion_cnzmCK": {
+          "type": "accordion",
+          "settings": {
+            "title": "International Orders",
+            "content": "<p>For orders shipped outside of the United Kingdom, import duties, taxes and customs fees may apply once your parcel reaches its destination country. These charges are determined by your local customs authorities and are the responsibility of the customer.</p>"
+          }
+        },
+        "accordion_Y9wNKB": {
+          "type": "accordion",
+          "settings": {
+            "title": "Disclaimer (Please Read)",
+            "content": "<p><strong>Colour Disclaimer</strong></p><p>Every unit is unique. Slight variations in colour may occur. Please note that colours may appear differently depending on your device screen and lighting.</p><p><strong>Hair Length Disclaimer</strong></p><p>When selecting your desired hair length, please keep in mind that the final appearance will vary depending on how the hair is styled.</p><p>Curls may reduce the visible length by approximately 2-4 inches.</p><p>For example: If you would like your curled hair to appear approximately 22 inches long, we recommend selecting a straight hair length of 24-26 inches.</p><p>Please note that all hair lengths are measured when the hair is straight and fully stretched.</p><p><strong>Texture Disclaimer</strong></p><p>Please note that any unit displayed with a curled, loose wave or similar styled appearance has been heat styled. These looks are achieved by curling our straight hair and are intended to showcase the hair's versatility. This style is temporary and will gradually loosen over time, particularly after brushing or washing.</p><p>Once washed, the hair will return to its natural texture. The hair can be restyled using heat whenever desired.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "service_option_Pyyfgn",
+        "service_option_BQnRLg",
+        "service_option_CcaqMm",
+        "service_option_TmYGdG",
+        "accordion_MVUhKj",
+        "accordion_EqXGLD",
+        "accordion_pXxgCh",
+        "accordion_H6FcMR",
+        "accordion_WQfGwf",
+        "accordion_PhEhKH",
+        "accordion_cnzmCK",
+        "accordion_Y9wNKB"
+      ],
+      "name": "TLW Product",
+      "settings": {
+        "detail_line": "",
+        "button_label": "Add to bag",
+        "show_collection_label": true,
+        "show_rating": true,
+        "unit_details_mode": false,
+        "clients_eyebrow": "Before You Take Our Word For It.",
+        "clients_heading": "Fitted On Real Clients.",
+        "clients_size": "large",
+        "show_reviews": true,
+        "reviews_eyebrow": "Reviews",
+        "reviews_heading": "What clients say about our wigs",
+        "reviews_name_style": "neat",
+        "reviews_summary": true,
+        "reviews_widget": true,
+        "reviews_empty_title": "Leave a review",
+        "reviews_empty_text": "Be the first to leave a review.",
+        "reviews_empty_stars": true,
+        "reviews_hide_badge": true,
+        "reviews_clean": true,
+        "reviews_view_more": true,
+        "reviews_lines": 5,
+        "reviews_more_label": "View more",
+        "reviews_less_label": "View less",
+        "show_explore": true,
+        "explore_heading": "Explore the rest of {collection}",
+        "explore_body": "Every piece is hand-tied and finished to your measurements. See the full collection.",
+        "explore_button": "Back to {collection}",
+        "explore_fallback": "our collections"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "product_recommendations_qggXJq",
+    "tlw_main_product_i4zQzg"
+  ]
+}
