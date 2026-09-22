@@ -2,9 +2,11 @@
   THELACEDWÁY header
   Home of Amare Studio
 
-  Split navigation with the logo in the middle. Two Shopify menus feed it, one
-  for the left side and one for the right, so Destinee edits them under
-  Content > Menus like any other navigation.
+  Logo on the far left, then the nav, then the cart pinned to the far right.
+  Two Shopify menus feed the nav — Left menu and Right menu, edited under
+  Content > Menus — but on screen they now just run together as one
+  continuous list right after the logo; the two settings are kept only so
+  Destinee's existing menu setup and this section's settings don't change.
 
   The transparent, hide-until-scroll "over the hero" treatment is homepage
   only, matching src/components/HomePage.tsx passing <SiteNav overlay /> —
@@ -19,23 +21,18 @@
   header. Items with sub-items show a chevron and open with a tap, one at a
   time, so the list stays short.
 
-  Desktop layout: CSS Grid, not flexbox-with-an-absolutely-positioned-logo.
-  The row is three real grid columns — [nav-left][logo][nav-right+cart] —
-  with the two outer columns both on `minmax(0, 1fr)` tracks. Because
-  they're the same fraction unit, the two tracks are always exactly equal
-  width, whatever is rendered inside them — which is what keeps the logo
-  column genuinely centred, with no separate spacer element needed. A grid
-  track is also a hard boundary a sibling can't be visually crossed into
-  (unlike a flex layout, where an absolutely-positioned logo is pulled out
-  of the flex formatting context entirely and stops reserving any space,
-  letting a long nav visually bleed into it) — so a long menu wraps onto a
-  second line inside its own column instead of spilling into the logo's
-  column, at any screen width. The cart sits inside the same right-hand
-  column as the right nav (a small flex row, right-aligned as a group) so
-  the two outer columns stay symmetric 1fr/1fr rather than needing to
-  balance an extra column. This means the breakpoint below (currently
-  1200px) is just "is this a desktop", not a number chosen to dodge the
-  overlap bug.
+  Desktop layout: a single plain flex row, nothing removed from the
+  document flow. Logo, then nav, then cart, in that literal order, with
+  `margin-left: auto` on the cart alone pinning it to the far right and
+  everything else just sitting together on the left. Earlier versions
+  centred the logo with `position: absolute`, which pulls an element out
+  of the flex flow entirely so it stops reserving any space — that's what
+  let a long nav visually bleed into it. A plain, un-positioned flex row
+  can't reproduce that: every sibling always occupies real space and
+  siblings in normal flow are never painted on top of one another, so the
+  nav (which can wrap onto a second line, see .tlw-header__nav below) has
+  nowhere to overlap the logo or the cart, at any screen width. The
+  breakpoint below (currently 1200px) is just "is this a desktop".
 {% endcomment %}
 
 {%- liquid
@@ -66,9 +63,55 @@
       <span></span><span></span><span></span>
     </button>
 
-    {% comment %} Desktop: left menu {% endcomment %}
-    <nav class="tlw-header__nav tlw-header__nav--left" aria-label="Main">
+    {% comment %} Logo — first in the row, so it's the far-left item on desktop {% endcomment %}
+    <div class="tlw-header__logo">
+      <a href="{{ routes.root_url }}">
+        {%- if section.settings.logo_light != blank -%}
+          {{ section.settings.logo_light
+            | image_url: width: 600
+            | image_tag: loading: 'eager', alt: shop.name, class: 'tlw-header__logo--light'
+          }}
+        {%- endif -%}
+        {%- if section.settings.logo != blank -%}
+          {{ section.settings.logo
+            | image_url: width: 600
+            | image_tag: loading: 'eager', alt: shop.name, class: 'tlw-header__logo--dark'
+          }}
+        {%- else -%}
+          <span class="tlw-header__wordmark">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+
+    {% comment %}
+      Desktop: nav. Left menu and Right menu render one after another here
+      so they read as one continuous list right after the logo — see the
+      top comment for why they're still two separate settings.
+    {% endcomment %}
+    <nav class="tlw-header__nav" aria-label="Main">
       {%- for link in left.links -%}
+        <div class="tlw-nav__item{% if link.links.size > 0 %} has-children{% endif %}">
+          {%- if link.links.size > 0 -%}
+            <button type="button" class="tlw-nav__link" aria-expanded="false" aria-haspopup="true">
+              {{ link.title }}
+              <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true">
+                <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+              </svg>
+            </button>
+      {%- else -%}
+            <a class="tlw-nav__link" href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>{{ link.title }}</a>
+          {%- endif -%}
+
+          {%- if link.links.size > 0 -%}
+            <div class="tlw-nav__drop">
+              {%- for child in link.links -%}
+                <a class="tlw-nav__droplink" href="{{ child.url }}">{{ child.title }}</a>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+      {%- for link in right.links -%}
         <div class="tlw-nav__item{% if link.links.size > 0 %} has-children{% endif %}">
           {%- if link.links.size > 0 -%}
             <button type="button" class="tlw-nav__link" aria-expanded="false" aria-haspopup="true">
@@ -92,68 +135,14 @@
       {%- endfor -%}
     </nav>
 
-    {% comment %} Logo {% endcomment %}
-    <div class="tlw-header__logo">
-      <a href="{{ routes.root_url }}">
-        {%- if section.settings.logo_light != blank -%}
-          {{ section.settings.logo_light
-            | image_url: width: 600
-            | image_tag: loading: 'eager', alt: shop.name, class: 'tlw-header__logo--light'
-          }}
-        {%- endif -%}
-        {%- if section.settings.logo != blank -%}
-          {{ section.settings.logo
-            | image_url: width: 600
-            | image_tag: loading: 'eager', alt: shop.name, class: 'tlw-header__logo--dark'
-          }}
-        {%- else -%}
-          <span class="tlw-header__wordmark">{{ shop.name }}</span>
-        {%- endif -%}
-      </a>
-    </div>
-
-    {% comment %}
-      Desktop: right menu + cart, grouped in one wrapper. Keeping them
-      together as a single grid item is what makes the two outer columns
-      genuinely equal (1fr/1fr) for centering the logo — see the top
-      comment. On mobile this wrapper has no layout role; the media query
-      is what turns it into a flex row.
-    {% endcomment %}
-    <div class="tlw-header__right">
-      <nav class="tlw-header__nav tlw-header__nav--right" aria-label="Secondary">
-        {%- for link in right.links -%}
-          <div class="tlw-nav__item{% if link.links.size > 0 %} has-children{% endif %}">
-            {%- if link.links.size > 0 -%}
-              <button type="button" class="tlw-nav__link" aria-expanded="false" aria-haspopup="true">
-                {{ link.title }}
-                <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true">
-                  <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/>
-                </svg>
-              </button>
-      {%- else -%}
-              <a class="tlw-nav__link" href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>{{ link.title }}</a>
-            {%- endif -%}
-
-            {%- if link.links.size > 0 -%}
-              <div class="tlw-nav__drop">
-                {%- for child in link.links -%}
-                  <a class="tlw-nav__droplink" href="{{ child.url }}">{{ child.title }}</a>
-                {%- endfor -%}
-              </div>
-            {%- endif -%}
-          </div>
-        {%- endfor -%}
-      </nav>
-
-      {% comment %} Cart {% endcomment %}
-      <a class="tlw-header__cart" href="{{ routes.cart_url }}" aria-label="Bag">
-        <svg viewBox="0 0 22 24" width="22" height="24" aria-hidden="true">
-          <path d="M2 7h18v15a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7z" fill="none" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M7 8V5.5a4 4 0 0 1 8 0V8" fill="none" stroke="currentColor" stroke-width="1.5"/>
-        </svg>
-        <span class="tlw-header__count" data-cart-count>{{ cart.item_count }}</span>
-      </a>
-    </div>
+    {% comment %} Cart — pinned to the far right on desktop via margin-left: auto {% endcomment %}
+    <a class="tlw-header__cart" href="{{ routes.cart_url }}" aria-label="Bag">
+      <svg viewBox="0 0 22 24" width="22" height="24" aria-hidden="true">
+        <path d="M2 7h18v15a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M7 8V5.5a4 4 0 0 1 8 0V8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <span class="tlw-header__count" data-cart-count>{{ cart.item_count }}</span>
+    </a>
 
   </div>
 </header>
@@ -365,13 +354,9 @@
     gap: {{ section.settings.link_gap }}px;
   }
 
-  #tlw-header-{{ section.id }} .tlw-header__nav--right {
-    justify-content: flex-end;
-  }
-
   #tlw-header-{{ section.id }} .tlw-header__logo {
     flex: 0 0 auto;
-    margin-inline: auto;
+    margin-inline: 0;
   }
 
   #tlw-header-{{ section.id }} .tlw-header__logo img {
@@ -447,7 +432,11 @@
     z-index: 5;
   }
 
-  #tlw-header-{{ section.id }} .tlw-header__nav--right .tlw-nav__drop {
+  /* The nav now runs left-to-right after the logo, so dropdowns open
+     left-aligned by default. The one exception is the very last item,
+     which sits closest to the right edge of the screen — right-align
+     just that one so its dropdown can't run off-screen. */
+  #tlw-header-{{ section.id }} .tlw-header__nav > .tlw-nav__item:last-child .tlw-nav__drop {
     left: auto;
     right: 0;
   }
@@ -534,54 +523,31 @@
     transform: translateY(-9.25px) rotate(-45deg);
   }
 
-  /* Mobile: logo left, burger and bag together on the right. The cart now
-     lives inside .tlw-header__right (see markup), so that wrapper is the
-     flex item that needs the order, not the cart link directly — `order`
-     only affects direct flex/grid children, not descendants. */
+  /* Mobile: logo left, burger and bag together on the right. */
   #tlw-header-{{ section.id }} .tlw-header__logo { order: 1; margin-inline: 0 auto; }
   #tlw-header-{{ section.id }} .tlw-header__burger { order: 2; }
-  #tlw-header-{{ section.id }} .tlw-header__right { order: 3; }
+  #tlw-header-{{ section.id }} .tlw-header__cart { order: 3; }
 
-  /* Desktop split-nav, as a real 3-column grid: nav-left / logo /
-     (nav-right + cart). 1200px covers virtually every real laptop/desktop
-     screen (1280, 1366, 1440, 1536, 1920...). The two outer columns are
-     both minmax(0, 1fr) — always exactly equal width to each other,
-     whatever they contain, which is what centres the logo — and a grid
-     track is a hard boundary neither can be visually pushed past: a long
-     menu wraps onto a second line inside its own column instead of
-     spilling into the logo's column, at any width. */
+  /* Desktop: one plain flex row, nothing removed from flow. Logo, then
+     nav, then cart, in that literal DOM order (so no `order` overrides
+     are needed here at all) — `margin-left: auto` on the cart alone is
+     what pins it to the far right, while the logo and nav sit together
+     on the left with the row's normal gap between them. 1200px covers
+     virtually every real laptop/desktop screen (1280, 1366, 1440, 1536,
+     1920...). */
   @media (min-width: 1200px) {
     #tlw-header-{{ section.id }} .tlw-header__burger { display: none; }
 
-    #tlw-header-{{ section.id }} .tlw-header__inner {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-      align-items: center;
-    }
+    #tlw-header-{{ section.id }} .tlw-header__logo { margin-inline: 0; }
 
     #tlw-header-{{ section.id }} .tlw-header__nav {
       display: flex;
       flex-wrap: wrap;
       row-gap: 6px;
-    }
-
-    #tlw-header-{{ section.id }} .tlw-header__nav--left { grid-column: 1; }
-
-    #tlw-header-{{ section.id }} .tlw-header__logo {
-      grid-column: 2;
-      position: relative;
-      left: {{ section.settings.logo_nudge }}px;
-      margin-inline: 0;
-    }
-
-    #tlw-header-{{ section.id }} .tlw-header__right {
-      grid-column: 3;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 16px;
       min-width: 0;
     }
+
+    #tlw-header-{{ section.id }} .tlw-header__cart { margin-left: auto; }
 
     .tlw-drawer { display: none !important; }
   }
