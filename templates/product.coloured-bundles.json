@@ -474,120 +474,6 @@
     "tlw_main_product_i4zQzg": {
       "type": "tlw-main-product",
       "blocks": {
-        "service_option_Pyyfgn": {
-          "type": "service_option",
-          "name": "Service option - Jet Black",
-          "settings": {
-            "label": "Jet Black",
-            "values": "No, Yes",
-            "trigger_value": "",
-            "addon_product": "",
-            "trigger_value_2": "Yes",
-            "addon_product_2": "jet-black",
-            "trigger_value_3": "",
-            "addon_product_3": "",
-            "trigger_value_4": "",
-            "addon_product_4": "",
-            "help_text": "",
-            "tooltip": "",
-            "reveal_on_customisation": false
-          }
-        },
-        "service_option_BQnRLg": {
-          "type": "service_option",
-          "name": "Service option - Customisation",
-          "settings": {
-            "label": "Customisation",
-            "values": "No, Yes",
-            "trigger_value": "",
-            "addon_product": "",
-            "trigger_value_2": "Yes",
-            "addon_product_2": "customisation",
-            "trigger_value_3": "",
-            "addon_product_3": "",
-            "trigger_value_4": "",
-            "addon_product_4": "",
-            "help_text": "",
-            "tooltip": "",
-            "reveal_on_customisation": false
-          }
-        },
-        "service_option_CcaqMm": {
-          "type": "service_option",
-          "name": "Service option - Parting Preference",
-          "settings": {
-            "label": "Parting Preference",
-            "values": "Left side part, Middle part, Right side part",
-            "trigger_value": "",
-            "addon_product": "",
-            "trigger_value_2": "",
-            "addon_product_2": "",
-            "trigger_value_3": "",
-            "addon_product_3": "",
-            "trigger_value_4": "",
-            "addon_product_4": "",
-            "help_text": "Please note: If you select a side part for a 5x5, 6x6 or 7x7 closure, the closure itself will be constructed and positioned towards your preferred side rather than in the centre.",
-            "tooltip": "",
-            "reveal_on_customisation": false
-          }
-        },
-        "service_option_TmYGdG": {
-          "type": "service_option",
-          "name": "Service option - Hairline",
-          "settings": {
-            "label": "Hairline",
-            "values": "Natural Hairline, Lagos Hairline",
-            "trigger_value": "",
-            "addon_product": "",
-            "trigger_value_2": "",
-            "addon_product_2": "",
-            "trigger_value_3": "",
-            "addon_product_3": "",
-            "trigger_value_4": "",
-            "addon_product_4": "",
-            "help_text": "",
-            "tooltip": "",
-            "reveal_on_customisation": false
-          }
-        },
-        "service_option_DgWjqW": {
-          "type": "service_option",
-          "name": "Service option - Styled",
-          "settings": {
-            "label": "Styled",
-            "values": "Straight, Curled, Curled (Pin Intact)",
-            "trigger_value": "",
-            "addon_product": "",
-            "trigger_value_2": "",
-            "addon_product_2": "",
-            "trigger_value_3": "Curled (Pin Intact)",
-            "addon_product_3": "pin-intact",
-            "trigger_value_4": "",
-            "addon_product_4": "",
-            "help_text": "",
-            "tooltip": "",
-            "reveal_on_customisation": false
-          }
-        },
-        "service_option_iFrh6Q": {
-          "type": "service_option",
-          "name": "Service option - Layers",
-          "settings": {
-            "label": "Layers",
-            "values": "No, Face framing, Heavy Layers (Curls Only), Blunt Cut",
-            "trigger_value": "",
-            "addon_product": "",
-            "trigger_value_2": "Face framing",
-            "addon_product_2": "face-framing-layers",
-            "trigger_value_3": "Heavy Layers (Curls Only)",
-            "addon_product_3": "heavy-layers",
-            "trigger_value_4": "",
-            "addon_product_4": "",
-            "help_text": "",
-            "tooltip": "",
-            "reveal_on_customisation": false
-          }
-        },
         "accordion_MVUhKj": {
           "type": "accordion",
           "settings": {
@@ -609,25 +495,11 @@
             "content": "<p>With the correct maintenance and aftercare, our hair can last {lifespan}, making it a worthwhile investment.</p>"
           }
         },
-        "accordion_H6FcMR": {
-          "type": "accordion",
-          "settings": {
-            "title": "Closure Placement Notice",
-            "content": "<p>Please note that if you select Side Part for a 5x5, 6x6, or 7x7 closure unit the closure itself will be constructed and positioned on the side rather than in the centre. Please ensure you are happy with this before placing your order.</p><p>If you would like your closure to remain positioned in the centre but simply styled with a side part, please select Middle Part and at checkout leave a note requesting a side part. This will allow the closure to be installed centrally while still achieving your desired look.</p><p>Please note that 9x6 closure units are always constructed with the closure positioned in the centre due to the larger closure size.</p>"
-          }
-        },
         "accordion_WQfGwf": {
           "type": "accordion",
           "settings": {
             "title": "Shipping and Returns",
             "content": "<p>Once your order has been placed, you have 24 hours to contact us if you wish to make any amendments. After this period, your order will be processed and no further changes can be made.</p><p>Each unit is custom made to order. Please allow 7-15 working days for your unit to be made before dispatch.</p><p>Once your order has been shipped, delivery typically takes:</p><ul><li>Royal Mail Tracked 24 (Tracked and Signed)</li><li>Royal Mail Special Delivery (Covers parcel if lost): Next working day before 1pm.</li></ul><p>For full details, please refer to our <a href=\"/pages/shipping-returns\">Shipping &amp; Returns Policy</a>.</p>"
-          }
-        },
-        "accordion_PhEhKH": {
-          "type": "accordion",
-          "settings": {
-            "title": "How to Measure Your Head",
-            "content": "<p>To ensure the best fit, we recommend measuring your head before selecting your wig size.</p><p>Using a soft measuring tape, start at the centre of your hairline and wrap the tape around your head, passing just above your ears and around the nape of your neck before bringing it back to the starting point.</p><p>This measurement is your head circumference and will help you choose the correct cap size for the most secure and comfortable fit.</p><p>Please note: We strongly recommend measuring your head accurately before placing your order. As all units are custom-made, we cannot accept responsibility for incorrect measurements provided by the customer and cap sizes cannot be changed once production has begun.</p>"
           }
         },
         "accordion_cnzmCK": {
@@ -646,22 +518,14 @@
         }
       },
       "block_order": [
-        "service_option_Pyyfgn",
-        "service_option_BQnRLg",
-        "service_option_CcaqMm",
-        "service_option_TmYGdG",
-        "service_option_DgWjqW",
-        "service_option_iFrh6Q",
         "accordion_MVUhKj",
         "accordion_EqXGLD",
         "accordion_pXxgCh",
-        "accordion_H6FcMR",
         "accordion_WQfGwf",
-        "accordion_PhEhKH",
         "accordion_cnzmCK",
         "accordion_Y9wNKB"
       ],
-      "name": "TLW Product",
+      "name": "TLW Product — Coloured Bundles",
       "settings": {
         "detail_line": "",
         "button_label": "Add to bag",
@@ -673,7 +537,7 @@
         "clients_size": "large",
         "show_reviews": true,
         "reviews_eyebrow": "Reviews",
-        "reviews_heading": "What clients say about our wigs",
+        "reviews_heading": "What clients say",
         "reviews_name_style": "neat",
         "reviews_summary": true,
         "reviews_widget": true,
@@ -688,9 +552,10 @@
         "reviews_less_label": "View less",
         "show_explore": true,
         "explore_heading": "Explore the rest of {collection}",
-        "explore_body": "Every piece is hand-tied and finished to your measurements. See the full collection.",
+        "explore_body": "Every bundle is hand-picked and quality-checked before dispatch. See the full collection.",
         "explore_button": "Back to {collection}",
-        "explore_fallback": "our collections"
+        "explore_fallback": "our collections",
+        "show_quantity": true
       }
     }
   },
