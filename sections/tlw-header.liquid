@@ -14,17 +14,29 @@
   the template here — not a setting — since no other page has a hero
   for it to sit over.
 
-  Desktop layout notes: this is one plain flex row and nothing in it is
-  ever taken out of the document flow (no absolute positioning). Logo,
-  nav, cart appear in that literal order; `margin-left: auto` on the
-  cart alone pushes it to the far right while the logo and nav sit
-  together on the left. Ordinary flex siblings always occupy real space
-  and can never be painted on top of one another, so nothing here can
-  visually overlap, at any screen width.
+  Desktop layout notes: the logo sits centered using CSS Grid, not
+  position: absolute — this is the important difference from the old,
+  overlap-prone version. The single menu is split automatically down the
+  middle (first half of links left of the logo, second half right of
+  it), with an invisible spacer on the far left sized to exactly match
+  the cart icon on the far right. Because the two link columns are equal
+  grid fractions (1fr each) and the two outer bookends match in width,
+  the logo always lands dead-center — mathematically, not by nudging
+  pixels — however many links there are or however long they run. Every
+  piece still occupies real grid space, so nothing can ever be painted
+  on top of anything else, at any width.
+
+  Mobile/tablet (below 1200px, which covers phones and virtually every
+  iPad): logo, hamburger, cart in one plain row, same as before —
+  untouched by any of this, since it's a completely separate set of CSS
+  rules that only apply above the 1200px breakpoint.
 {% endcomment %}
 
 {%- liquid
   assign menu = section.settings.menu
+  assign menu_links = menu.links
+  assign total_links = menu_links.size
+  assign half_links = total_links | divided_by: 2
   assign is_home = false
   if template.name == 'index'
     assign is_home = true
