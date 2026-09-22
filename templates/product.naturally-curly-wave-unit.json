@@ -474,6 +474,25 @@
     "tlw_main_product_i4zQzg": {
       "type": "tlw-main-product",
       "blocks": {
+        "service_option_LKQikL": {
+          "type": "service_option",
+          "name": "Service option - Cap Size",
+          "settings": {
+            "label": "Cap Size",
+            "values": "Small, Medium, Large",
+            "trigger_value": "",
+            "addon_product": "",
+            "trigger_value_2": "",
+            "addon_product_2": "",
+            "trigger_value_3": "",
+            "addon_product_3": "",
+            "trigger_value_4": "",
+            "addon_product_4": "",
+            "help_text": "",
+            "tooltip": "",
+            "reveal_on_customisation": false
+          }
+        },
         "service_option_Pyyfgn": {
           "type": "service_option",
           "name": "Service option - Jet Black",
@@ -608,6 +627,7 @@
         }
       },
       "block_order": [
+        "service_option_LKQikL",
         "service_option_Pyyfgn",
         "service_option_BQnRLg",
         "service_option_CcaqMm",
