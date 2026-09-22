@@ -550,44 +550,6 @@
             "reveal_on_customisation": false
           }
         },
-        "service_option_DgWjqW": {
-          "type": "service_option",
-          "name": "Service option - Styled",
-          "settings": {
-            "label": "Styled",
-            "values": "Straight, Curled, Curled (Pin Intact)",
-            "trigger_value": "",
-            "addon_product": "",
-            "trigger_value_2": "",
-            "addon_product_2": "",
-            "trigger_value_3": "Curled (Pin Intact)",
-            "addon_product_3": "pin-intact",
-            "trigger_value_4": "",
-            "addon_product_4": "",
-            "help_text": "",
-            "tooltip": "",
-            "reveal_on_customisation": false
-          }
-        },
-        "service_option_iFrh6Q": {
-          "type": "service_option",
-          "name": "Service option - Layers",
-          "settings": {
-            "label": "Layers",
-            "values": "No, Face framing, Heavy Layers (Curls Only), Blunt Cut",
-            "trigger_value": "",
-            "addon_product": "",
-            "trigger_value_2": "Face framing",
-            "addon_product_2": "face-framing-layers",
-            "trigger_value_3": "Heavy Layers (Curls Only)",
-            "addon_product_3": "heavy-layers",
-            "trigger_value_4": "",
-            "addon_product_4": "",
-            "help_text": "",
-            "tooltip": "",
-            "reveal_on_customisation": false
-          }
-        },
         "accordion_MVUhKj": {
           "type": "accordion",
           "settings": {
@@ -650,8 +612,6 @@
         "service_option_BQnRLg",
         "service_option_CcaqMm",
         "service_option_TmYGdG",
-        "service_option_DgWjqW",
-        "service_option_iFrh6Q",
         "accordion_MVUhKj",
         "accordion_EqXGLD",
         "accordion_pXxgCh",
