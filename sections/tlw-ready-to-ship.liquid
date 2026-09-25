@@ -92,13 +92,13 @@
                 <p class="tlw-rts__caption">{{ section.settings.caption }}</p>
               {%- endif -%}
 
-              <span class="tlw-rts__cta">
-                {%- if product.available -%}
-                  {{ section.settings.cta_view }}
-                {%- else -%}
-                  {{ section.settings.cta_enquire }}
-                {%- endif -%}
-              </span>
+              {%- if product.available -%}
+                {% comment %} Sold-out Ready to Ship pieces are one-off, already-made units —
+                   once it's gone there's nothing to enquire about, so sold-out cards simply
+                   show no hover CTA at all here; the "Sold out" label above already says
+                   everything that needs saying. {% endcomment %}
+                <span class="tlw-rts__cta">{{ section.settings.cta_view }}</span>
+              {%- endif -%}
             </a>
           {%- endfor -%}
 
@@ -669,14 +669,9 @@
     {
       "type": "text",
       "id": "cta_view",
-      "label": "Hover text, available",
+      "label": "Hover text",
+      "info": "Shown on hover for in-stock pieces only. Sold-out cards show no hover text — just the \"Sold out\" label.",
       "default": "View"
-    },
-    {
-      "type": "text",
-      "id": "cta_enquire",
-      "label": "Hover text, sold out",
-      "default": "Enquire"
     },
     {
       "type": "checkbox",
