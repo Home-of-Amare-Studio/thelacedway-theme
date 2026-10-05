@@ -274,7 +274,11 @@
 
             </div>
 
-            <button type="submit" class="tlw-custom__submit">{{ section.settings.submit_label }}</button>
+            {%- if section.settings.submit_note != blank -%}
+              <p class="tlw-custom__submit-note">{{ section.settings.submit_note }}</p>
+            {%- endif -%}
+
+            <button type="submit" class="tlw-custom__submit" data-submit data-sending-label="{{ section.settings.sending_label | escape }}">{{ section.settings.submit_label }}</button>
 
           {%- endif -%}
 
@@ -609,6 +613,19 @@
     transition: background-color 250ms ease, color 250ms ease;
   }
 
+  #tlw-custom-{{ section.id }} .tlw-custom__submit-note {
+    margin: 8px 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--tlw-on-surface-variant, var(--tlw-primary));
+    text-align: center;
+  }
+
+  #tlw-custom-{{ section.id }} .tlw-custom__submit[disabled] {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
   #tlw-custom-{{ section.id }} .tlw-custom__submit:hover {
     background: var(--tlw-accent);
     color: var(--tlw-on-primary);
@@ -739,24 +756,52 @@
     });
 
     if (form) {
-      form.addEventListener('submit', function (e) {
-        var badStep = null;
-        steps.forEach(function (step) {
-          if (!badStep && step.querySelector(':invalid')) badStep = step;
-        });
-        if (badStep && !badStep.classList.contains('is-open')) {
+      var submitBtn = form.querySelector('[data-submit]');
+      var sending = false;
+
+      /* The browser checks required fields BEFORE it fires a "submit" event, so
+         the check has to happen on the button click instead. Otherwise a missing
+         answer inside a folded-away step makes the browser stop silently — the
+         visitor sees nothing happen. Here we open the step with the gap, scroll
+         to it, then let the browser point at the empty box. */
+      if (submitBtn) {
+        submitBtn.addEventListener('click', function (e) {
+          if (sending) { e.preventDefault(); return; }
+          var firstBad = form.querySelector(':invalid');
+          if (!firstBad) return;
           e.preventDefault();
-          openStep(badStep);
+          var badStep = firstBad.closest('[data-step]');
+          if (badStep && !badStep.classList.contains('is-open')) openStep(badStep);
           window.setTimeout(function () {
-            var invalidField = badStep.querySelector(':invalid');
-            if (invalidField) {
+            if (badStep) {
               var y = badStep.getBoundingClientRect().top + window.scrollY - 140;
               window.scrollTo({ top: y, behavior: 'smooth' });
-              invalidField.focus();
             }
-          }, 420);
+            window.setTimeout(function () { form.reportValidity(); }, 350);
+          }, badStep && badStep.classList.contains('is-open') ? 60 : 460);
+        });
+      }
+
+      /* Everything is filled in and the form is really going. Lock the button
+         so extra clicks can't send the enquiry twice, and say it's working. */
+      form.addEventListener('submit', function (e) {
+        if (sending) { e.preventDefault(); return; }
+        sending = true;
+        if (submitBtn) {
+          var label = submitBtn.getAttribute('data-sending-label');
+          if (label) submitBtn.textContent = label;
+          window.setTimeout(function () { submitBtn.disabled = true; }, 0);
         }
       });
+
+      /* Coming back with the browser's Back button: unlock the form again. */
+      window.addEventListener('pageshow', function (ev) {
+        if (!ev.persisted || !submitBtn) return;
+        sending = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = submitBtn.getAttribute('data-ready-label') || submitBtn.textContent;
+      });
+      if (submitBtn) submitBtn.setAttribute('data-ready-label', submitBtn.textContent);
     }
   })();
 </script>
@@ -854,6 +899,19 @@
       "id": "submit_label",
       "label": "Submit button text",
       "default": "Send enquiry"
+    },
+    {
+      "type": "text",
+      "id": "sending_label",
+      "label": "Button text while sending",
+      "default": "Sending…"
+    },
+    {
+      "type": "textarea",
+      "id": "submit_note",
+      "label": "Note above the submit button",
+      "info": "Leave blank for no note.",
+      "default": "Please wait for the confirmation message before closing this page to ensure your enquiry has been submitted."
     },
     {
       "type": "text",
