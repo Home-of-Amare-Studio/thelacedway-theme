@@ -39,7 +39,12 @@
         <p class="tlw-footer__heading">{{ shop_menu.title | default: 'Shop' }}</p>
         <ul class="tlw-footer__list">
           {%- for link in shop_menu.links -%}
-            <li><a href="{{ link.url }}" class="tlw-footer__link">{{ link.title }}</a></li>
+            {%- assign link_href = link.url -%}
+            {%- assign t = link.title | downcase -%}
+            {%- if t contains 'custom wig' -%}
+              {%- assign link_href = section.settings.custom_wig_url | default: '/pages/custom-wigs' -%}
+            {%- endif -%}
+            <li><a href="{{ link_href }}" class="tlw-footer__link">{{ link.title }}</a></li>
           {%- endfor -%}
         </ul>
       </nav>
@@ -50,7 +55,12 @@
         <p class="tlw-footer__heading">{{ info_menu.title | default: 'Information' }}</p>
         <ul class="tlw-footer__list">
           {%- for link in info_menu.links -%}
-            <li><a href="{{ link.url }}" class="tlw-footer__link">{{ link.title }}</a></li>
+            {%- assign link_href = link.url -%}
+            {%- assign t = link.title | downcase -%}
+            {%- if t contains 'custom wig' -%}
+              {%- assign link_href = section.settings.custom_wig_url | default: '/pages/custom-wigs' -%}
+            {%- endif -%}
+            <li><a href="{{ link_href }}" class="tlw-footer__link">{{ link.title }}</a></li>
           {%- endfor -%}
         </ul>
       </nav>
@@ -291,6 +301,12 @@
       "id": "menu_shop",
       "label": "Shop menu",
       "info": "Edit under Content > Menus"
+    },
+    {
+      "type": "url",
+      "id": "custom_wig_url",
+      "label": "Custom wig form page",
+      "info": "Any footer link whose name contains \"Custom Wig\" goes to this page, whatever the menu says. Leave blank to use /pages/custom-wigs."
     },
     {
       "type": "link_list",
