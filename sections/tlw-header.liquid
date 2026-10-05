@@ -371,26 +371,41 @@
 
   #tlw-header-{{ section.id }} .tlw-header__burger {
     flex: 0 0 auto;
-    width: 26px;
-    height: 20px;
-    padding: 0;
+    /* 44px is Apple's minimum comfortable touch size; the lines are
+       centred inside it. Explicit sizes and !important here because
+       iPad Safari applies its own default button styling that can
+       otherwise collapse or whiten the three lines. */
+    width: 44px;
+    height: 44px;
+    padding: 12px 9px;
+    box-sizing: border-box;
     background: none;
     border: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     justify-content: space-between;
   }
 
   #tlw-header-{{ section.id }} .tlw-header__burger span {
     display: block;
-    height: 1.5px;
-    background: var(--tlw-primary);
+    width: 100%;
+    height: 2px;
+    background: var(--tlw-primary, #241b15) !important;
     transition: transform 250ms ease, opacity 200ms ease;
+  }
+
+  /* Over the homepage hero (before scrolling) the lines are white on purpose */
+  #tlw-header-{{ section.id }}.tlw-header--overlay:not(.is-solid) .tlw-header__burger span {
+    background: #fff !important;
   }
 
   /* The hamburger turns into an X while the phone menu is open */
   #tlw-header-{{ section.id }} .tlw-header__burger[aria-expanded="true"] span:nth-child(1) {
-    transform: translateY(9.25px) rotate(45deg);
+    transform: translateY(8px) rotate(45deg);
   }
 
   #tlw-header-{{ section.id }} .tlw-header__burger[aria-expanded="true"] span:nth-child(2) {
@@ -398,7 +413,7 @@
   }
 
   #tlw-header-{{ section.id }} .tlw-header__burger[aria-expanded="true"] span:nth-child(3) {
-    transform: translateY(-9.25px) rotate(-45deg);
+    transform: translateY(-8px) rotate(-45deg);
   }
 
   /* Nav (both halves) and the cart-spacer are desktop-only; hidden
@@ -542,7 +557,7 @@
      nothing here can ever sit on top of anything else. */
   @media (min-width: 1280px) {
     #tlw-header-{{ section.id }} .tlw-header__burger {
-      display: none;
+      display: none !important;
     }
 
     {%- comment -%}
@@ -558,14 +573,14 @@
     {%- assign split_gap = section.settings.link_gap | at_most: 20 -%}
 
     #tlw-header-{{ section.id }} .tlw-header__inner {
-      display: grid;
+      display: grid !important;
       grid-template-columns: auto 1fr auto 1fr auto;
       column-gap: 20px;
       align-items: center;
     }
 
     #tlw-header-{{ section.id }} .tlw-header__cart-spacer {
-      display: flex;
+      display: flex !important;
       grid-column: 1;
       visibility: hidden;
       pointer-events: none;
@@ -573,7 +588,7 @@
 
     #tlw-header-{{ section.id }} .tlw-header__nav--left {
       grid-column: 2;
-      display: flex;
+      display: flex !important;
       align-items: center;
       flex-wrap: wrap;
       justify-content: flex-end;
@@ -603,7 +618,7 @@
 
     #tlw-header-{{ section.id }} .tlw-header__nav--right {
       grid-column: 4;
-      display: flex;
+      display: flex !important;
       align-items: center;
       flex-wrap: wrap;
       justify-content: flex-start;
