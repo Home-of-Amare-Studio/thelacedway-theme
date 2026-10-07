@@ -534,8 +534,17 @@
       {%- endunless -%}
     {%- endcapture -%}
 
+    {%- comment -%}
+      Raw or Virgin. Looks at the "Hair Type" line in the product description
+      first (any capitalisation: Raw, raw, RAW), then falls back to a product
+      tag called "raw" so a Raw unit can be marked without touching its
+      description. Anything else reads as Virgin.
+    {%- endcomment -%}
     {%- assign hair_word = 'Virgin' -%}
-    {%- if hair_type_value contains 'Raw' -%}
+    {%- assign hair_type_lower = hair_type_value | downcase -%}
+    {%- assign tags_lower = product.tags | join: ',' | downcase | remove: ' ' -%}
+    {%- assign tags_wrapped = ',' | append: tags_lower | append: ',' -%}
+    {%- if hair_type_lower contains 'raw' or tags_wrapped contains ',raw,' -%}
       {%- assign hair_word = 'Raw' -%}
     {%- endif -%}
     {%- assign lifespan_word = '1 to 3 years' -%}
