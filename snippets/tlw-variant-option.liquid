@@ -1,0 +1,77 @@
+{% comment %}
+  THELACEDWÁY — one variant-option dropdown (Length, Lace Size, Quantity, etc).
+  Pulled out of tlw-main-product.liquid so it can be rendered twice in a
+  fixed display order (see the REAL VARIANTS comment in that file) while
+  still using the option's real Shopify position for ids/data-option-index,
+  so the variant-matching JS keeps working regardless of display order.
+
+  Expects: section, option
+{% endcomment %}
+
+{%- assign opt_index = option.position | minus: 1 -%}
+
+<div class="tlw-field">
+  <label class="tlw-label-caps tlw-field__label" id="tlw-opt-label-{{ section.id }}-{{ option.position }}">
+    {{ option.name }}
+  </label>
+
+  <div
+    class="tlw-dropdown"
+    data-dropdown
+    data-dropdown-id="variant-{{ option.position }}"
+  >
+    <select
+      class="tlw-select tlw-visually-hidden"
+      id="tlw-opt-{{ section.id }}-{{ option.position }}"
+      data-option-index="{{ opt_index }}"
+      data-variant-option
+      data-dropdown-store
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      {%- for value in option.values -%}
+        <option
+          value="{{ value | escape }}"
+          {% if option.selected_value == value %}selected{% endif %}
+        >
+          {{ value }}
+        </option>
+      {%- endfor -%}
+    </select>
+
+    <button
+      type="button"
+      class="tlw-dropdown__trigger"
+      data-dropdown-trigger
+      aria-haspopup="listbox"
+      aria-expanded="false"
+      aria-labelledby="tlw-opt-label-{{ section.id }}-{{ option.position }} tlw-opt-{{ section.id }}-{{ option.position }}-value"
+    >
+      <span data-dropdown-value id="tlw-opt-{{ section.id }}-{{ option.position }}-value" class="tlw-dropdown__placeholder">
+        Select {{ option.name | downcase }}...
+      </span>
+      <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" class="tlw-dropdown__chevron">
+        <path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <ul class="tlw-dropdown__panel" data-dropdown-panel role="listbox" aria-label="{{ option.name }}" hidden>
+      {%- for value in option.values -%}
+        <li role="option" data-dropdown-option data-value="{{ value | escape }}">
+          <button type="button" class="tlw-dropdown__option">
+            <span>{{ value }}</span>
+            <span class="tlw-dropdown__option-note" data-sold-out-label hidden>(Sold out)</span>
+          </button>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+
+  {%- assign option_downcase = option.name | downcase -%}
+  {%- if option_downcase contains 'cap size' -%}
+    {%- assign measure_guide_id = 'variant-' | append: option.position -%}
+    <p class="tlw-field__help">
+      {%- render 'tlw-measure-guide', id: measure_guide_id -%}
+    </p>
+  {%- endif -%}
+</div>
