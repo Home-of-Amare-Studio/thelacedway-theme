@@ -493,25 +493,6 @@
             "reveal_on_customisation": false
           }
         },
-        "service_option_BQnRLg": {
-          "type": "service_option",
-          "name": "Service option - Customisation",
-          "settings": {
-            "label": "Customisation",
-            "values": "No, Yes",
-            "trigger_value": "",
-            "addon_product": "",
-            "trigger_value_2": "Yes",
-            "addon_product_2": "customisation",
-            "trigger_value_3": "",
-            "addon_product_3": "",
-            "trigger_value_4": "",
-            "addon_product_4": "",
-            "help_text": "",
-            "tooltip": "",
-            "reveal_on_customisation": false
-          }
-        },
         "service_option_CcaqMm": {
           "type": "service_option",
           "name": "Service option - Parting Preference",
@@ -595,6 +576,25 @@
             "content": "<p>{product_details}</p>"
           }
         },
+        "service_option_BQnRLg": {
+          "type": "service_option",
+          "name": "Service option - Customisation",
+          "settings": {
+            "label": "Customisation",
+            "values": "No, Yes",
+            "trigger_value": "",
+            "addon_product": "",
+            "trigger_value_2": "Yes",
+            "addon_product_2": "customisation",
+            "trigger_value_3": "",
+            "addon_product_3": "",
+            "trigger_value_4": "",
+            "addon_product_4": "",
+            "help_text": "",
+            "tooltip": "",
+            "reveal_on_customisation": false
+          }
+        },
         "accordion_EqXGLD": {
           "type": "accordion",
           "settings": {
@@ -647,12 +647,12 @@
       },
       "block_order": [
         "service_option_Pyyfgn",
-        "service_option_BQnRLg",
         "service_option_CcaqMm",
         "service_option_TmYGdG",
         "service_option_DgWjqW",
         "service_option_iFrh6Q",
         "accordion_MVUhKj",
+        "service_option_BQnRLg",
         "accordion_EqXGLD",
         "accordion_pXxgCh",
         "accordion_H6FcMR",
@@ -668,6 +668,7 @@
         "show_collection_label": true,
         "show_rating": true,
         "unit_details_mode": false,
+        "show_quantity": false,
         "clients_eyebrow": "Before You Take Our Word For It.",
         "clients_heading": "Fitted On Real Clients.",
         "clients_size": "large",
